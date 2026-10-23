@@ -1,0 +1,40 @@
+<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bangdaBody" x1="50" y1="30" x2="350" y2="170" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1A6678"/>
+      <stop offset="0.3" stop-color="#2D9DB8"/>
+      <stop offset="0.65" stop-color="#D7F1FA"/>
+      <stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <linearGradient id="bangdaFin" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#7AC9DE" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#1A6678" stop-opacity="0.6"/>
+    </linearGradient>
+    <filter id="bangdaGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#0A9AD9" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <!-- Tail fin (forked) -->
+  <path d="M75 100 L25 50 C40 85 40 115 25 150 L75 100 Z" fill="url(#bangdaFin)" filter="url(#bangdaGlow)"/>
+  <!-- Dorsal fin and finlets -->
+  <path d="M160 55 C200 35 240 45 255 60 C230 65 190 65 160 55 Z" fill="url(#bangdaFin)"/>
+  <path d="M125 72 L110 65 L115 78 Z" fill="url(#bangdaFin)"/>
+  <path d="M100 78 L90 73 L94 83 Z" fill="url(#bangdaFin)"/>
+  <!-- Torpedo Body -->
+  <path d="M70 100 C110 58 240 50 335 92 C355 100 355 105 335 110 C240 145 110 138 70 100 Z" fill="url(#bangdaBody)" filter="url(#bangdaGlow)"/>
+  <!-- Mackerel stripes on upper back -->
+  <path d="M260 62 Q265 75 255 85" stroke="#0F4C5C" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+  <path d="M235 58 Q240 73 230 86" stroke="#0F4C5C" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+  <path d="M210 56 Q215 72 205 87" stroke="#0F4C5C" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+  <path d="M185 58 Q190 73 180 88" stroke="#0F4C5C" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+  <path d="M160 63 Q165 76 155 89" stroke="#0F4C5C" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+  <path d="M135 70 Q140 80 132 90" stroke="#0F4C5C" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+  <!-- Pectoral fin -->
+  <path d="M260 105 C295 100 315 118 300 128 C280 130 265 120 260 105 Z" fill="url(#bangdaFin)"/>
+  <!-- Gill slit -->
+  <path d="M295 85 C308 97 305 115 292 125" stroke="#0A323D" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+  <!-- Eye with gold sheen -->
+  <circle cx="325" cy="98" r="6.5" fill="#1A2E35"/>
+  <circle cx="324" cy="96" r="3" fill="#FFE57F"/>
+  <circle cx="323" cy="95" r="1.5" fill="#FFFFFF"/>
+</svg>

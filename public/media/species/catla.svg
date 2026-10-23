@@ -1,0 +1,36 @@
+<svg viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="catlaBody" x1="50" y1="30" x2="350" y2="210" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3A4856"/>
+      <stop offset="0.3" stop-color="#6F889E"/>
+      <stop offset="0.7" stop-color="#D9E6EF"/>
+      <stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <linearGradient id="catlaFin" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#5B768E" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#2D3B47" stop-opacity="0.6"/>
+    </linearGradient>
+    <filter id="catlaGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#0A9AD9" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <!-- Tail fin -->
+  <path d="M70 120 L18 60 C38 95 38 145 18 180 L70 120 Z" fill="url(#catlaFin)" filter="url(#catlaGlow)"/>
+  <!-- Dorsal fin -->
+  <path d="M150 48 C195 24 235 32 250 56 C220 62 185 62 150 48 Z" fill="url(#catlaFin)"/>
+  <!-- Ventral & Anal fin -->
+  <path d="M115 170 C140 195 160 185 165 165 Z" fill="url(#catlaFin)"/>
+  <path d="M185 168 C205 188 225 180 230 160 Z" fill="url(#catlaFin)"/>
+  <!-- Broad Catla Body with large upturned head -->
+  <path d="M65 120 C95 45 205 35 305 85 C335 100 345 110 330 130 C295 165 210 195 110 185 C75 165 65 135 65 120 Z" fill="url(#catlaBody)" filter="url(#catlaGlow)"/>
+  <!-- Pectoral fin -->
+  <path d="M230 135 C270 135 290 155 275 168 C255 168 238 152 230 135 Z" fill="url(#catlaFin)"/>
+  <!-- Prominent upturned lower lip -->
+  <path d="M328 128 C338 125 342 118 335 110" stroke="#3A4856" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Operculum/Gill Line -->
+  <path d="M275 95 C290 115 288 138 270 152" stroke="#2D3B47" stroke-width="2.5" stroke-linecap="round" opacity="0.4"/>
+  <!-- Large Eye -->
+  <circle cx="305" cy="105" r="7.5" fill="#1A242E"/>
+  <circle cx="303" cy="103" r="3.5" fill="#6F889E"/>
+  <circle cx="302" cy="102" r="1.5" fill="#FFFFFF"/>
+</svg>

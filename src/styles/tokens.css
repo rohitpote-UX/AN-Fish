@@ -1,0 +1,154 @@
+/**
+ * AN Fish World — Design System Tokens (Alethia Replicated Architecture)
+ * Sourced strictly from /docs/design-spec.md (no guessing)
+ * Colour Rule: 70% White/Off-white · 20% Blue · 10% Black
+ */
+
+:root {
+  /* ==========================================================================
+     1. COLOUR PALETTE (Strict 70% White / 20% Blue / 10% Black)
+     ========================================================================== */
+  /* ==========================================================================
+     1. AWWWARDS OCEAN-INSPIRED COLOUR PALETTE
+     ========================================================================== */
+  /* Ocean Midnight & Deep Marine */
+  --ocean-midnight: #071A24;    /* Deep cinematic ocean midnight */
+  --deep-marine: #103747;       /* Rich marine twilight */
+  --ocean-navy: #063A63;        /* Deep coastal navy */
+  --ocean-midnight-card: #0D2634;
+
+  /* Fresh Catch Blue & Luminous Accents */
+  --fresh-blue: #0B9DD8;        /* Fresh Catch Blue (Primary Accent) */
+  --an-blue: #0A9AD9;           /* AN Brand Blue */
+  --an-lagoon: #6EC6F0;         /* Luminous Lagoon Cyan */
+  --natural-mint: #A6DCCB;      /* Organic coastal mint (used sparingly) */
+  --an-blue-light: #EBF8FF;     /* Soft ice accent background */
+  --an-blue-08: rgba(11, 157, 216, 0.08);
+  --an-blue-15: rgba(11, 157, 216, 0.15);
+  --an-blue-25: rgba(11, 157, 216, 0.25);
+  --an-blue-glow: 0 4px 24px rgba(11, 157, 216, 0.40);
+
+  /* Pearl White & Pure White Surfaces */
+  --pearl-white: #F5F4EF;       /* Warm editorial pearl white */
+  --bg-bone: #F5F4EF;
+  --bg-canvas: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F8FAFC;
+  --bg-card-muted: #F1F5F9;
+
+  /* Editorial Typography & Borders */
+  --text-primary: #071A24;      /* Deep midnight text */
+  --text-secondary: rgba(7, 26, 36, 0.75);
+  --text-muted: rgba(7, 26, 36, 0.45);
+  --dark-pine: #071A24;
+  --charcoal: #071A24;
+
+  /* Compatibility Aliases */
+  --ink: #071A24;
+  --abyss: #071A24;
+  --deep: #103747;
+  --brand: #0B9DD8;
+  --lagoon: #6EC6F0;
+  --foam: #F5F4EF;
+  --white: #FFFFFF;
+
+  /* ==========================================================================
+     2. FLUID TYPOGRAPHIC SCALE MATRIX (Exact computed values at 1440 / 768 / 390)
+     ========================================================================== */
+  --font-geist: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+  --font-marathi-body: var(--font-noto-devanagari), var(--font-geist-sans), sans-serif;
+  --font-marathi-display: var(--font-baloo), var(--font-geist-sans), sans-serif;
+
+  /* Fluid Type Sizes (clamp from 390px mobile to 1440px desktop) */
+  /* Display / Hero H1: 32px -> 72px -> 120px */
+  --fs-hero: clamp(2rem, 7.5vw, 7.5rem);
+  /* Section H2: 42px -> 64px -> 80px */
+  --fs-h2: clamp(2.625rem, 5vw, 5rem);
+  /* Section H3 / Story: 36px -> 56px -> 56px */
+  --fs-h3: clamp(2.25rem, 3.8vw, 3.5rem);
+  /* Card H4 / Feature: 28px -> 40px -> 40px */
+  --fs-h4: clamp(1.75rem, 2.7vw, 2.5rem);
+  /* Subhead / Lead Body: 16px -> 24px -> 24px */
+  --fs-subhead: clamp(1rem, 1.6vw, 1.5rem);
+  /* Body Standard: 14px -> 16px -> 16px */
+  --fs-body: clamp(0.875rem, 0.2vw + 0.825rem, 1rem);
+  /* Eyebrow / Category: 12px -> 14px -> 14px */
+  --fs-eyebrow: clamp(0.75rem, 0.2vw + 0.7rem, 0.875rem);
+  /* Navigation Link: 14px -> 15px */
+  --fs-nav: clamp(0.875rem, 0.15vw + 0.85rem, 0.9375rem);
+  /* Primary Button CTA: 14px */
+  --fs-btn: 0.875rem;
+  /* Stat Big Number: 20px -> 24px -> 32px */
+  --fs-stat: clamp(1.25rem, 2vw, 2rem);
+  /* Caption / Footnote: 11px -> 12px -> 12px */
+  --fs-caption: clamp(0.6875rem, 0.1vw + 0.65rem, 0.75rem);
+
+  /* Line Heights */
+  --lh-tight: 0.95;     /* 95% for H1, H2, H3, H4 */
+  --lh-subhead: 1.0;    /* 100% for Subhead */
+  --lh-body: 1.4;       /* 140% for Body */
+  --lh-marathi: 1.5;    /* >= 1.4 guaranteed for Devanagari */
+  --lh-mono: 0.9;       /* 90% for Eyebrow, Nav, Button */
+  --lh-stat: 1.2;       /* 120% for Stat Numbers and Footnotes */
+
+  /* Letter Spacing */
+  --ls-hero: -0.05em;
+  --ls-heading: -0.05em;
+  --ls-feature: -0.03em;
+  --ls-subhead: -0.04em;
+  --ls-body: -0.01em;
+  --ls-mono: 0em;
+  --ls-stat: -0.02em;
+
+  /* ==========================================================================
+     3. SPACING SCALE (4px Base Grid)
+     ========================================================================== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-30: 120px;
+  --space-40: 160px;
+
+  /* ==========================================================================
+     4. SECTION PADDINGS & CONTAINER WIDTH (Fluid across 1440 / 768 / 390)
+     ========================================================================== */
+  /* Vertical Section Padding: 56px (mobile) -> 80px-100px (tablet) -> 120px-160px (desktop) */
+  --section-py: clamp(3.5rem, 8vw, 10rem);
+  /* Horizontal Page Margin: 16px (mobile) -> 32px (tablet) -> 48px-64px (desktop) */
+  --page-margin-x: clamp(1rem, 3.5vw, 4rem);
+
+  /* Container Constraints */
+  --container-max: 1440px;
+  --container-desktop: 1380px;
+
+  /* ==========================================================================
+     5. BORDER RADII (Alethia Scale: 99px/5px pills, 24px/16px cards, 12px modals)
+     ========================================================================== */
+  --radius-pill: 9999px;
+  --radius-tag: 5px;
+  --radius-card: clamp(1rem, 2vw, 1.5rem);   /* 16px mobile -> 24px desktop */
+  --radius-card-desktop: 24px;
+  --radius-card-mobile: 16px;
+  --radius-modal: 12px;
+
+  /* ==========================================================================
+     6. LINE WIDTHS & STRUCTURAL DIVIDERS (1px)
+     ========================================================================== */
+  --line-width: 1px;
+  --border-light: rgba(15, 31, 16, 0.08);
+  --border-medium: rgba(15, 31, 16, 0.14);
+  --border-hover: #0A9AD9;
+  --border-dark: rgba(255, 255, 255, 0.10);
+  --border-divider-gray: #E0E0E0;
+}
+

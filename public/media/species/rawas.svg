@@ -1,0 +1,23 @@
+<svg viewBox="0 0 440 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="rawasGrad" x1="50" y1="90" x2="400" y2="90" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3A82A6"/>
+      <stop offset="0.4" stop-color="#E2F0F7"/>
+      <stop offset="0.7" stop-color="#FFEBE8"/>
+      <stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+  </defs>
+  <!-- Tail -->
+  <path d="M60 90 L18 45 C32 75 32 105 18 135 L60 90 Z" fill="#3A82A6"/>
+  <!-- Body -->
+  <path d="M50 90 C110 52 290 48 405 88 C300 132 110 128 50 90 Z" fill="url(#rawasGrad)"/>
+  <!-- Dorsal & Adipose Fin -->
+  <path d="M190 55 C215 35 240 38 250 55 Z" fill="#3A82A6"/>
+  <path d="M110 65 C125 58 135 60 140 68 Z" fill="#3A82A6" opacity="0.8"/>
+  <!-- Threadfin tendrils under chin -->
+  <path d="M360 105 C330 140 280 150 250 160" stroke="#FFEBE8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M365 105 C340 135 300 145 270 152" stroke="#FFEBE8" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Eye -->
+  <circle cx="385" cy="82" r="6" fill="#05080C"/>
+  <circle cx="383" cy="80" r="2.2" fill="#FFFFFF"/>
+</svg>

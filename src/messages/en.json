@@ -1,0 +1,267 @@
+{
+  "common": {
+    "brandName": "AN Fish World",
+    "tagline": "Karad's Beloved Fresh Catch — Pure Coastal Seafood to Your Doorstep",
+    "city": "Karad, Maharashtra",
+    "orderNow": "Reserve Fresh Catch",
+    "exploreCatch": "Explore Daily Catch",
+    "viewCatalog": "Full Menu",
+    "diveDeeper": "Dive into the Abyss",
+    "scrollPrompt": "Scroll to Dive",
+    "depthUnit": "meters deep",
+    "temperature": "Water Temp",
+    "pressure": "Atm. Pressure",
+    "currentZone": "Current Depth Zone",
+    "zeroChemical": "100% Chemical & Formalin Free",
+    "coldChain": "0°C Liquid Ice Slurry",
+    "callStore": "Call Outlet",
+    "whatsappOrder": "Order via WhatsApp",
+    "morningArrival": "Morning Harvest",
+    "eveningArrival": "Evening Harvest",
+    "close": "Close",
+    "backToTop": "Surface Up",
+    "kg": "kg",
+    "grams": "g",
+    "audioToggle": "Ocean Ambience Sound On/Off",
+    "reducedMotionToggle": "Reduce Motion"
+  },
+  "nav": {
+    "liveCatch": "Live Catch Available",
+    "theDive": "The Dive",
+    "ourCatch": "Fresh Catch",
+    "freshnessPledge": "Freshness Pledge",
+    "familyStory": "The Laadki Story",
+    "karadStore": "Karad Outpost",
+    "cart": "My Basket",
+    "switchLang": "मराठी"
+  },
+  "hero": {
+    "badge": "Karad's #1 Trusted Fresh Seafood Outpost",
+    "titleLine1": "Karad's",
+    "titleHighlight": "Beloved Catch",
+    "titleLine2": "From Oceanic Depths to Your Table.",
+    "subheading": "Hand-picked at 4:00 AM harbour auctions across Ratnagiri & Malvan, chilled in 0°C liquid ice slurry, and delivered impeccably fresh to homes across Karad.",
+    "ctaExplore": "Begin The Dive",
+    "ctaOrder": "Quick WhatsApp Order",
+    "stat1Value": "4:00 AM",
+    "stat1Label": "Harbour Boat Selection",
+    "stat2Value": "0.0%",
+    "stat2Label": "Formalin & Chemical Free",
+    "stat3Value": "100%",
+    "stat3Label": "Clean Room Precision Cuts",
+    "scrollHint": "Scroll down to dive into the deep"
+  },
+  "depthZones": {
+    "surface": {
+      "name": "Surface Waters (Krishna-Koyna Confluence)",
+      "depth": "0 - 10 Meters",
+      "desc": "Starting from Karad's sacred waters towards the coastal oceanic currents."
+    },
+    "shallows": {
+      "name": "Sunlit Coastal Shallows",
+      "depth": "10 - 30 Meters",
+      "desc": "Agile schools of Silver Pomfret and Ratnagiri Mackerel basking in clear blue light."
+    },
+    "twilight": {
+      "name": "The Twilight Zone",
+      "depth": "30 - 60 Meters",
+      "desc": "Domain of regal King Seer (Surmai) and luscious Indian Salmon (Rawas)."
+    },
+    "abyss": {
+      "name": "The Midnight Abyss",
+      "depth": "60 - 90 Meters",
+      "desc": "Home to deep-water Royal Tiger Prawns and pristine low-temperature sanctuaries."
+    },
+    "vault": {
+      "name": "AN Fish Cold Vault (Karad)",
+      "depth": "100+ Meters",
+      "desc": "Our cutting-edge 0°C cold preservation and hygienic retail preparation hub."
+    }
+  },
+  "catalog": {
+    "sectionTitle": "Today's Fresh Harvest",
+    "sectionSubtitle": "Hand-selected like shopping for our own family — crystal-clear eyes, ruby gills, and natural oceanic shine.",
+    "tabs": {
+      "all": "All Fish",
+      "sea": "Sea Fish",
+      "river": "Freshwater (Krishna River)",
+      "shellfish": "Shellfish & Prawns"
+    },
+    "cutsLabel": "Custom Artisanal Cuts:",
+    "cutTypes": {
+      "curry": "Curry Cut",
+      "fry": "Rawa / Tawa Fry Cut",
+      "wholeCleaned": "Whole Gutted & Descaled",
+      "fillet": "Boneless Fillet",
+      "boneless": "Boneless Cubes"
+    },
+    "addToCart": "Add to Basket",
+    "bookOnWhatsapp": "Order on WhatsApp",
+    "dailyMarketNote": "* Prices are determined each morning based on ocean auction rates. Contact us directly for today's live wholesale quote."
+  },
+  "fish": {
+    "badges": {
+      "mostLoved": "Karad's Most Beloved",
+      "coastalGold": "Pride of Konkan",
+      "chefPick": "Chef's Choice",
+      "sweetJuicy": "Succulent & Sweet",
+      "dailyEssential": "Daily Nutrition Champion",
+      "freshwaterKing": "King of Freshwater",
+      "rareDelicacy": "Royal Feast"
+    },
+    "paplet": {
+      "name": "Silver Pomfret (सिल्व्हर पापलेट)",
+      "notes": "Velvety, buttery texture with delicate sweetness. Crisps to perfection when shallow fried.",
+      "culinary": "Pomfret Rawa Fry, Malvani Coconut Curry"
+    },
+    "surmai": {
+      "name": "King Seer Fish (सुरमई / तोर)",
+      "notes": "Dense, meaty steaks with a single central bone. Ideal for kids and seafood connoisseurs alike.",
+      "culinary": "Spicy Tawa Fry, Surmai Fish Curry, Koli Style Rassa"
+    },
+    "rawas": {
+      "name": "Indian Salmon (रावस)",
+      "notes": "Packed with Omega-3 fatty acids, ultra-tender flakes, and rich nutritional value.",
+      "culinary": "Pan-seared Salmon, Lemon Herb Fillet, Light Coconut Stew"
+    },
+    "kolambiTiger": {
+      "name": "Royal Tiger Prawns (जंबो कोळंबी)",
+      "notes": "Jumbo size, crunchy snap, and natural sweet seawater finish.",
+      "culinary": "Kolambi Bhaat (Prawn Pulao), Prawn Masala Fry"
+    },
+    "bangda": {
+      "name": "Ratnagiri Mackerel (ताजा बांगडा)",
+      "notes": "Robust oceanic flavor loaded with healthy marine oils and minerals.",
+      "culinary": "Bangda Tawa Fry, Teppal Spiced Coastal Curry"
+    },
+    "rohu": {
+      "name": "Krishna Basin Rohu (गोड्या पाण्याचा रोहू)",
+      "notes": "Freshwater sweetness with firm flesh sourced along local river reservoirs.",
+      "culinary": "Maharashtrian Kala Masala Curry, Spiced Fry"
+    },
+    "catla": {
+      "name": "Koyna Valley Catla (कटला)",
+      "notes": "Large, succulent cuts that absorb curry flavors intensely.",
+      "culinary": "Gavran Style Fiery Fish Curry"
+    },
+    "jitada": {
+      "name": "Asian Seabass (जिताडा)",
+      "notes": "Snow-white flakes with a mild, clean, royal profile.",
+      "culinary": "Steamed with Ginger & Garlic, Coastal Mild Curry"
+    },
+    "crab": {
+      "name": "Live Mud Crabs (चिंबोरी / खेकडे)",
+      "notes": "Packed with rich meat and flavorful roe for an unforgettable feast.",
+      "culinary": "Fiery Crab Masala, Coconut Roasted Crab Curry"
+    }
+  },
+  "freshness": {
+    "tag": "The Cold-Chain Protocol",
+    "title": "From 4:00 AM Coastal Docks to Your Doorstep",
+    "subtitle": "Real seafood flavor is born from uncompromising freshness. We rely on thermal physics, never chemicals.",
+    "step1Title": "1. Direct Boat Harbor Selection",
+    "step1Desc": "No middlemen. Our certified scouts inspect lots directly as boats dock at Ratnagiri and Malvan at dawn.",
+    "step2Title": "2. 0°C Liquid Ice Slurry",
+    "step2Desc": "Fish are immersed in sub-zero liquid slurry within minutes, locking in cellular structure and pristine ocean scent.",
+    "step3Title": "3. Zero Formalin Guarantee",
+    "step3Desc": "We conduct daily digital testing. Zero formalin, zero ammonia, and zero chemical preservatives — guaranteed.",
+    "step4Title": "4. Clean-Room Custom Cutting",
+    "step4Desc": "Prepared in our Karad facility on sanitized stainless-steel benches, washed in purified RO water, and packed in food-grade insulated trays."
+  },
+  "familyStory": {
+    "tag": "The Laadki Philosophy",
+    "title": "Selected Like Shopping for Family",
+    "quote": "Buying fish in Karad is no longer a gamble at an overcrowded market; it is an intimate bond of family trust.",
+    "storyP1": "AN Fish World was born with a single heartfelt mission: ensuring every household in Karad has access to the exact same uncompromising freshness enjoyed right by the Arabian sea coast.",
+    "storyP2": "We treat every customer not as a transaction, but as family. Just as a mother or grandmother inspects every gill and scale with affectionate scrutiny, our master fishmongers curate only what we would proudly feed our own children. That is why our catch is affectionately called 'Laadki' (beloved) by Karad's homes.",
+    "signature": "— The AN Fish World Family, Karad"
+  },
+  "karadStore": {
+    "tag": "Karad Outpost",
+    "title": "Visit Our Flagship Store",
+    "subtitle": "Experience Karad's premier odor-free, climate-controlled fresh seafood retail destination in the heart of town.",
+    "addressTitle": "Address:",
+    "addressValue": "[FILL: STORE_ADDRESS_KARAD, Maharashtra 415110]",
+    "hoursTitle": "Operating Hours:",
+    "hoursValue": "[FILL: MORNING 7:00 AM - 1:00 PM | EVENING 4:30 PM - 9:00 PM]",
+    "phoneTitle": "Phone / WhatsApp:",
+    "phoneValue": "[FILL: +91 98XXX XXXXX]",
+    "deliveryTitle": "Delivery Coverage:",
+    "deliveryValue": "[FILL: KARAD CITY & WITHIN 15 KM RADIUS]",
+    "viewOnMaps": "Open in Google Maps",
+    "directions": "Get Directions"
+  },
+  "orderModal": {
+    "title": "Reserve Fresh Catch",
+    "subtitle": "Your order is prepared fresh at our Karad outpost and delivered in temperature-insulated ice packs.",
+    "selectFish": "Choose Fish",
+    "selectWeight": "Select Weight",
+    "selectCut": "Select Cut Type",
+    "fullName": "Your Full Name",
+    "phone": "Mobile Number (10 Digits)",
+    "address": "Delivery Address in Karad",
+    "slot": "Preferred Delivery Slot",
+    "slotMorning": "Morning Slot (8:30 AM - 11:30 AM)",
+    "slotEvening": "Evening Slot (5:00 PM - 7:30 PM)",
+    "notes": "Special Requests (e.g. curry pieces, head separated)",
+    "submitWhatsapp": "Send Order on WhatsApp",
+    "submitting": "Composing order...",
+    "successTitle": "Order Ready to Send!",
+    "successDesc": "WhatsApp will open with your pre-formatted order summary. Our team will instantly confirm.",
+    "cartEmpty": "Your basket is empty. Select today's fresh catch to begin!"
+  },
+  "faq": {
+    "tag": "FAQ & Assistance",
+    "title": "Frequently Asked Questions",
+    "q1": "How do you guarantee authentic freshness?",
+    "a1": "Our catch arrives daily from coastal auctions at Ratnagiri and Malvan. Gills are vivid ruby, eyes are convex and translucent, and flesh springs back instantly when pressed. There is only the crisp, clean scent of the sea.",
+    "q2": "What is the delivery time within Karad?",
+    "a2": "Once your order is confirmed, custom butchering takes under 15 minutes and delivery reaches your doorstep within [FILL: 45 MINS IN KARAD] in insulated ice-chilled packaging.",
+    "q3": "How is the fish cleaned and dressed?",
+    "a3": "Every fish is completely descaled, degutted, and washed in purified RO water on sanitized surgical stainless-steel tables. You receive zero waste and 100% kitchen-ready meat.",
+    "q4": "How do daily market rates work?",
+    "a4": "Because we only source wild and fresh daily catches, prices align with the daily dock auction rates announced every morning at 7:00 AM. Reach us on WhatsApp or phone for today's live rate card."
+  },
+  "footer": {
+    "fssai": "FSSAI Lic. No.: [FILL: FSSAI_LICENSE_NO]",
+    "copyright": "© 2026 AN Fish World. All rights reserved.",
+    "madeWithLove": "Crafted with love and trust for Karad's seafood lovers.",
+    "legalDisclaimer": "Market rates vary with daily harbour arrivals. All images are representative."
+  },
+  "aboutPage": {
+    "title": "The Laadki Heritage — AN Fish World",
+    "subtitle": "Bringing the pristine freshness of the Konkan coastline to homes across Karad.",
+    "storyTitle": "Born from Pure Family Dedication",
+    "storyText": "At the holy confluence of the Krishna and Koyna rivers in Karad, our mission is to ensure Western Maharashtra enjoys the finest, unadulterated seafood exactly like coastal natives.",
+    "milestonesTitle": "Our Quality Pillars"
+  },
+  "catchPage": {
+    "title": "Today's Catch & Full Range",
+    "subtitle": "Wild-caught seafood hand-selected at dawn from Ratnagiri & Malvan harbour auctions, along with local freshwater catches.",
+    "filterAll": "All Seafood & Freshwater",
+    "liveRates": "Market rates are determined each morning at dock auctions."
+  },
+  "branchesPage": {
+    "title": "Our Karad Outposts & Flagship Stores",
+    "subtitle": "Experience odor-free, climate-controlled fresh seafood retail across Karad and surrounding areas.",
+    "visitHeading": "Visit Our Nearest Outpost"
+  },
+  "wholesalePage": {
+    "title": "Wholesale & B2B Supply for Hotels",
+    "subtitle": "Daily unbroken cold-chain supply for premium restaurants and caterers across Karad, Satara, and Kolhapur.",
+    "b2bHeading": "Your Dependable Seafood Partner",
+    "b2bDesc": "Our 0°C liquid ice slurry guarantees zero moisture loss and maximum freshness retention. Inquire today for custom B2B contracts.",
+    "inquireCta": "Inquire via WhatsApp for Wholesale Rates"
+  },
+  "contactPage": {
+    "title": "Contact Our Karad Team",
+    "subtitle": "We are available 7 days a week for inquiries, event catering orders, and home delivery support.",
+    "formTitle": "Direct Message Form",
+    "formDesc": "Send us your inquiry and our team will get back to you promptly."
+  },
+  "notFound": {
+    "title": "404 — Drifting in the Deep Sea!",
+    "desc": "The page you are looking for has sunk into oceanic depths. Let us swim back to the surface.",
+    "backHome": "Return to Surface / Home"
+  }
+}

@@ -1,0 +1,15 @@
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M85 50C70 30 45 25 15 35C28 45 32 55 15 65C45 75 70 70 85 50Z" fill="url(#brandGradient)"/>
+  <path d="M18 36C8 22 2 18 1 20C4 35 4 65 1 80C2 82 8 78 18 64Z" fill="#6EC6F0"/>
+  <path d="M55 27C62 16 72 14 74 15C68 24 64 30 55 33Z" fill="#6EC6F0" opacity="0.9"/>
+  <path d="M48 50C56 52 62 60 60 64C54 65 48 58 45 53Z" fill="#E9F7FF" opacity="0.85"/>
+  <circle cx="72" cy="46" r="3.5" fill="#05080C"/>
+  <circle cx="73" cy="45" r="1.2" fill="#FFFFFF"/>
+  <defs>
+    <linearGradient id="brandGradient" x1="15" y1="50" x2="85" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stopColor="#063A63"/>
+      <stop offset="0.5" stopColor="#0A9AD9"/>
+      <stop offset="1" stopColor="#6EC6F0"/>
+    </linearGradient>
+  </defs>
+</svg>

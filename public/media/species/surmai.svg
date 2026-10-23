@@ -1,0 +1,28 @@
+<svg viewBox="0 0 460 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="surmaiGrad" x1="40" y1="90" x2="420" y2="90" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4B9DC9"/>
+      <stop offset="0.3" stop-color="#A5DBF5"/>
+      <stop offset="0.7" stop-color="#E9F7FF"/>
+      <stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <linearGradient id="surmaiBack" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#063A63"/>
+      <stop offset="0.4" stop-color="#0A9AD9"/>
+      <stop offset="1" stop-color="transparent"/>
+    </linearGradient>
+  </defs>
+  <!-- Forked tail -->
+  <path d="M70 90 L15 35 C35 70 35 110 15 145 L70 90 Z" fill="#0A9AD9"/>
+  <!-- Sleek Torpedo Body -->
+  <path d="M60 90 C120 50 320 45 435 90 C320 135 120 130 60 90 Z" fill="url(#surmaiGrad)"/>
+  <!-- Dark dorsal back -->
+  <path d="M90 70 C160 52 300 52 390 75 C300 70 160 70 90 70 Z" fill="url(#surmaiBack)"/>
+  <!-- Vertical tiger bars on Surmai -->
+  <path d="M140 68 L142 110 M170 65 L173 115 M200 62 L202 118 M230 62 L233 118 M260 65 L263 115 M290 68 L293 110 M320 72 L323 105" stroke="#063A63" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/>
+  <!-- Dorsal fin spikes -->
+  <path d="M180 56 L195 35 L210 56 L225 38 L240 56" stroke="#0A9AD9" stroke-width="3" stroke-linejoin="round"/>
+  <!-- Eye -->
+  <circle cx="405" cy="85" r="6" fill="#05080C"/>
+  <circle cx="403" cy="83" r="2.2" fill="#FFFFFF"/>
+</svg>

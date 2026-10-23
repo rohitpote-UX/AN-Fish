@@ -1,0 +1,36 @@
+<svg viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="rohuBody" x1="60" y1="30" x2="340" y2="190" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4A5B4C"/>
+      <stop offset="0.3" stop-color="#8DA792"/>
+      <stop offset="0.65" stop-color="#E2D4B7"/>
+      <stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <linearGradient id="rohuFin" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#E28452" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#A84824" stop-opacity="0.7"/>
+    </linearGradient>
+    <filter id="rohuGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#E28452" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <!-- Tail fin -->
+  <path d="M70 110 L20 55 C38 88 38 132 20 165 L70 110 Z" fill="url(#rohuFin)" filter="url(#rohuGlow)"/>
+  <!-- Dorsal fin -->
+  <path d="M165 42 C205 25 245 32 260 52 C230 58 195 56 165 42 Z" fill="url(#rohuFin)"/>
+  <!-- Pelvic & Anal fins with reddish tint -->
+  <path d="M120 155 C145 178 165 170 170 150 Z" fill="url(#rohuFin)"/>
+  <path d="M195 150 C215 170 230 165 235 145 Z" fill="url(#rohuFin)"/>
+  <!-- Deep Arched Rohu Body -->
+  <path d="M65 110 C95 50 220 38 320 95 C340 106 340 114 320 125 C230 175 105 168 65 110 Z" fill="url(#rohuBody)" filter="url(#rohuGlow)"/>
+  <!-- Pectoral fin -->
+  <path d="M250 118 C285 118 305 138 290 148 C270 148 255 136 250 118 Z" fill="url(#rohuFin)"/>
+  <!-- Gill line -->
+  <path d="M285 92 C298 108 296 126 284 138" stroke="#3D4B3F" stroke-width="2.5" stroke-linecap="round" opacity="0.45"/>
+  <!-- Barbels near mouth -->
+  <path d="M335 115 Q342 118 340 124" stroke="#8DA792" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Eye -->
+  <circle cx="312" cy="104" r="7" fill="#1C241D"/>
+  <circle cx="310" cy="102" r="3" fill="#E28452"/>
+  <circle cx="309" cy="101" r="1.5" fill="#FFFFFF"/>
+</svg>

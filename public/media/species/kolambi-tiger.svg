@@ -1,0 +1,26 @@
+<svg viewBox="0 0 380 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="prawnGrad" x1="50" y1="200" x2="320" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF7A59"/>
+      <stop offset="0.5" stop-color="#FFB39E"/>
+      <stop offset="0.8" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#FF5A36"/>
+    </linearGradient>
+  </defs>
+  <!-- Long Antennae -->
+  <path d="M310 90 C340 70 360 40 370 10" stroke="#FF7A59" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M315 95 C350 90 375 75 380 50" stroke="#FF7A59" stroke-width="2" stroke-linecap="round"/>
+  <!-- Curved Tail Fan -->
+  <path d="M50 180 L20 200 C35 190 40 170 30 150 L50 180 Z" fill="#FF5A36"/>
+  <!-- Curved Segmented Prawn Body -->
+  <path d="M50 180 C90 230 190 210 260 140 C300 100 320 80 330 95 C310 120 280 150 220 180 C160 210 90 190 50 180 Z" fill="url(#prawnGrad)"/>
+  <!-- Tiger Stripes -->
+  <path d="M100 195 C110 185 115 175 110 165" stroke="#7A2210" stroke-width="3" stroke-linecap="round"/>
+  <path d="M140 198 C150 185 160 170 150 155" stroke="#7A2210" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M185 185 C200 170 205 150 195 135" stroke="#7A2210" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M230 155 C245 135 250 120 240 105" stroke="#7A2210" stroke-width="3" stroke-linecap="round"/>
+  <!-- Swimming legs -->
+  <path d="M120 205 L110 230 M150 200 L145 228 M180 188 L180 220 M210 170 L215 205" stroke="#FF7A59" stroke-width="2" stroke-linecap="round"/>
+  <!-- Eye -->
+  <circle cx="318" cy="88" r="4.5" fill="#05080C"/>
+</svg>
