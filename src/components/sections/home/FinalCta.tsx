@@ -1,12 +1,14 @@
 "use client";
 
 import React from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useBasketStore } from "@/store/basket";
 import { MessageCircle, Phone, ArrowUp } from "lucide-react";
 
 export function FinalCta() {
   const tCommon = useTranslations("common");
+  const locale = useLocale();
+  const isMarathi = locale === "mr";
   const openDrawer = useBasketStore((state) => state.openDrawer);
 
   const scrollToTop = () => {
@@ -20,11 +22,13 @@ export function FinalCta() {
       className="relative py-28 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto z-10 text-center"
     >
       <div className="rounded-3xl bg-gradient-to-b from-[#063A63]/50 via-[#02111F]/80 to-[#05080C] border border-[#6EC6F0]/30 p-10 sm:p-16 backdrop-blur-xl shadow-2xl">
-        <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-4">
-          आजच्या ताज्या आवकेचा आस्वाद घ्या
+        <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-4 font-marathi-display">
+          {isMarathi ? "आजच्या ताज्या आवकेचा आस्वाद घ्या" : "Savor Today's Dawn Catch at Home"}
         </h2>
-        <p className="text-base sm:text-lg text-white/80 max-w-xl mx-auto mb-10">
-          पहाटे ४:०० AM ची ताजी मासोळी थेट आपल्या दारात. घरबसल्या व्हॉट्सॲपवर ऑर्डर करा.
+        <p className="text-base sm:text-lg text-white/80 max-w-xl mx-auto mb-10 leading-relaxed font-marathi-body">
+          {isMarathi
+            ? "पहाटे ४:०० AM ची ताजी मासोळी थेट आपल्या दारात. घरबसल्या व्हॉट्सॲपवर ऑर्डर करा."
+            : "Fresh coastal harvest delivered directly to your doorstep across Karad. Order seamlessly on WhatsApp."}
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4">

@@ -197,10 +197,22 @@ export function Capabilities() {
             return (
               <div
                 key={cap.num}
-                className={`capability-card p-8 rounded-3xl transition-all duration-300 flex flex-col justify-between space-y-5 border ${
+                onClick={() => setActiveIndex(index)}
+                onMouseEnter={() => setActiveIndex(index)}
+                role="button"
+                tabIndex={0}
+                data-cursor="view"
+                aria-pressed={isActive}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setActiveIndex(index);
+                  }
+                }}
+                className={`capability-card p-8 rounded-3xl transition-all duration-300 flex flex-col justify-between space-y-5 border cursor-pointer select-none ${
                   isActive
-                    ? "bg-white border-[#0A9AD9]/40 shadow-xl opacity-100 -translate-y-1"
-                    : "bg-[#F5F4F2] border-[#0F1F10]/08 opacity-45 hover:opacity-75"
+                    ? "bg-white border-[#0A9AD9]/40 shadow-xl opacity-100 -translate-y-1 ring-1 ring-[#0A9AD9]/20"
+                    : "bg-[#F5F4F2] border-[#0F1F10]/08 opacity-45 hover:opacity-85 hover:border-[#0A9AD9]/25 hover:bg-white/80"
                 }`}
               >
                 <div className="flex items-center justify-between">

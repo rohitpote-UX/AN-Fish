@@ -13,6 +13,9 @@ import {
 import "@/app/globals.css";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { Header } from "@/components/layout/Header";
+import { FishCursor } from "@/components/layout/FishCursor";
+import { DepthMeter } from "@/components/layout/DepthMeter";
+import { StickyActions } from "@/components/layout/StickyActions";
 import { BasketDrawer } from "@/components/basket/BasketDrawer";
 import { FooterCtaBand } from "@/components/layout/FooterCtaBand";
 import { Footer } from "@/components/layout/Footer";
@@ -84,6 +87,12 @@ export default async function LocaleLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${baloo2.variable} ${notoSansDevanagari.variable} ${playfair.variable} antialiased`}
     >
       <body className="min-h-screen bg-[#FFFFFF] text-[#0F1F10] relative selection:bg-[#0A9AD9] selection:text-white">
+        {/* Custom Studio Fish Cursor (Fine pointer only, auto-disables on touch) */}
+        <FishCursor />
+
+        {/* Ocean Depth Vertical Telemetry Meter (Desktop only) */}
+        <DepthMeter />
+
         {/* Accessibility: Skip to main content landmark */}
         <a
           href="#main-content"
@@ -101,6 +110,9 @@ export default async function LocaleLayout({
             <main id="main-content" className="relative z-10 focus:outline-none">
               {children}
             </main>
+
+            {/* Floating Quick Order Action Pills (WhatsApp + Mobile Call) */}
+            <StickyActions />
 
             {/* Basket Drawer (Framer Motion right-drawer / bottom-sheet) */}
             <BasketDrawer />

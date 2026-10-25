@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Link } from "@/i18n/routing";
 import { useLocale } from "next-intl";
 import { gsap } from "@/lib/gsap";
-import { ArrowUp, MapPin, Phone, Clock, ArrowRight } from "lucide-react";
+import { ArrowUp, MapPin, Phone, Clock, ArrowRight, ArrowUpRight, Code2, Sparkles } from "lucide-react";
 import { useScrollStore } from "@/store/scroll";
 
 interface FooterLink {
@@ -173,6 +173,185 @@ function FacebookIcon({ className = "w-4 h-4" }: { className?: string }) {
     >
       <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
     </svg>
+  );
+}
+
+function FishVideoWordmark({ reducedMotion }: { reducedMotion: boolean }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    if (!canvas || !video) return;
+
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
+
+    let animId: number;
+    let isRunning = true;
+
+    // Autoplay video with immediate mute
+    video.muted = true;
+    const tryPlay = () => {
+      if (video.paused) {
+        video.play().catch(() => {});
+      }
+    };
+    tryPlay();
+    video.addEventListener("loadeddata", tryPlay);
+    video.addEventListener("canplay", tryPlay);
+    video.addEventListener("playing", () => {});
+
+    const updateSize = () => {
+      const container = containerRef.current;
+      if (!container || !canvas) return;
+      const rect = container.getBoundingClientRect();
+      const w = Math.max(320, rect.width || window.innerWidth);
+      // Monumental font size: fills ~92% of the container width on a single line
+      const fontSize = Math.min(w * 0.116, 175);
+      const h = Math.round(fontSize * 1.35);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      const targetW = Math.round(w * dpr);
+      const targetH = Math.round(h * dpr);
+
+      if (canvas.width !== targetW || canvas.height !== targetH) {
+        canvas.width = targetW;
+        canvas.height = targetH;
+        canvas.style.width = `${w}px`;
+        canvas.style.height = `${h}px`;
+      }
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+
+    const render = () => {
+      if (!isRunning) return;
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = canvas.width / dpr;
+      const h = canvas.height / dpr;
+
+      ctx.save();
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, w, h);
+
+      // Monumental font size matching container width
+      const fontSize = Math.min(w * 0.116, 175);
+      // Valid concrete font string WITHOUT var() so Canvas 2D parser never defaults to 10px
+      const fontStr = `900 ${fontSize}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
+
+      // Check if video is producing frames
+      const isVideoActive =
+        video.readyState >= 2 &&
+        video.videoWidth > 0 &&
+        !video.paused &&
+        !video.ended;
+
+      if (isVideoActive) {
+        // 1. Draw swimming fish video with cover aspect ratio
+        ctx.save();
+        const vAspect = video.videoWidth / video.videoHeight;
+        const cAspect = w / h;
+        let drawW = w;
+        let drawH = h;
+        let drawX = 0;
+        let drawY = 0;
+
+        if (cAspect > vAspect) {
+          drawH = w / vAspect;
+          drawY = (h - drawH) / 2;
+        } else {
+          drawW = h * vAspect;
+          drawX = (w - drawW) / 2;
+        }
+
+        ctx.drawImage(video, drawX, drawY, drawW, drawH);
+
+        // 2. Mask strictly inside the text "AN FISH WORLD"
+        ctx.globalCompositeOperation = "destination-in";
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = fontStr;
+        ctx.fillText("AN FISH WORLD", w / 2, h / 2);
+        ctx.restore();
+
+        // 3. Crisp luminous lagoon cyan water stroke
+        ctx.save();
+        ctx.globalCompositeOperation = "source-over";
+        ctx.strokeStyle = "rgba(110, 198, 240, 0.45)";
+        ctx.lineWidth = Math.max(1.5, fontSize * 0.015);
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = fontStr;
+        ctx.strokeText("AN FISH WORLD", w / 2, h / 2);
+        ctx.restore();
+      } else {
+        // Fallback: Vibrant sunlit aquatic gradient so text is never an empty wireframe
+        ctx.save();
+        const grad = ctx.createLinearGradient(0, 0, w, h);
+        grad.addColorStop(0, "#FFFFFF");
+        grad.addColorStop(0.35, "#6EC6F0");
+        grad.addColorStop(0.7, "#0A9AD9");
+        grad.addColorStop(1, "#034966");
+        ctx.fillStyle = grad;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = fontStr;
+        ctx.fillText("AN FISH WORLD", w / 2, h / 2);
+        ctx.restore();
+      }
+
+      ctx.restore(); // restores ctx.scale(dpr, dpr)
+      animId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      isRunning = false;
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", updateSize);
+      video.removeEventListener("loadeddata", tryPlay);
+      video.removeEventListener("canplay", tryPlay);
+    };
+  }, [reducedMotion]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative w-full max-w-7xl mx-auto flex flex-col items-center justify-center select-none"
+    >
+      {/* Full-bleed active video element keeping hardware decoder at 60fps */}
+      <video
+        ref={videoRef}
+        src="/media/fish-clean-water-2.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        crossOrigin="anonymous"
+        className="pointer-events-none"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          opacity: 0.001,
+          zIndex: -1,
+        }}
+      />
+      <canvas
+        ref={canvasRef}
+        className="w-full h-auto block drop-shadow-[0_12px_40px_rgba(10,154,217,0.3)]"
+      />
+    </div>
   );
 }
 
@@ -351,18 +530,15 @@ export function Footer() {
           ))}
         </div>
 
-        {/* SECTION 3: Giant Interactive Wordmark */}
+        {/* SECTION 3: Giant Wordmark with Fish Swimming Video strictly masked inside text */}
         <div
           ref={wordmarkRef}
           onPointerMove={handlePointerMove}
           onPointerLeave={handlePointerLeave}
           className="relative text-center select-none overflow-hidden py-4 cursor-crosshair group"
         >
-          <div
-            style={{ filter: reducedMotion ? "none" : "url(#wordmark-water-ripple)" }}
-            className="text-[12vw] font-black tracking-[-0.05em] leading-none text-white/85 group-hover:text-white transition-colors duration-300 font-latin-display"
-          >
-            AN FISH WORLD
+          <div style={{ filter: reducedMotion ? "none" : "url(#wordmark-water-ripple)" }}>
+            <FishVideoWordmark reducedMotion={reducedMotion} />
           </div>
           <div className="text-[11px] font-mono-accent uppercase tracking-widest text-[#0A9AD9] mt-3 font-semibold">
             KARAD • MAHARASHTRA • EST. 2024 • FRESH SEAFOOD
@@ -379,27 +555,170 @@ export function Footer() {
           </span>
         </div>
 
-        {/* SECTION 5: Bottom Row */}
-        <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono-accent text-white/50">
-          <div>
-            © {new Date().getFullYear()} AN Fish World. All rights reserved.
+        {/* SECTION 5: Awwwards Architectural Colophon & Studio Credits */}
+        <div className="border-t border-white/10 pt-10 sm:pt-14 space-y-8">
+          {/* Awwwards Grand Showcase Container */}
+          <div className="relative rounded-3xl p-6 sm:p-10 bg-gradient-to-b from-white/[0.08] via-white/[0.04] to-[#0A160C] border border-white/15 backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden group/colophon">
+            {/* Ambient Breathing Neon Glows */}
+            <div
+              className="absolute -top-24 -left-24 w-80 h-80 bg-[#0A9AD9]/20 rounded-full blur-[90px] pointer-events-none animate-pulse"
+              style={{ animationDuration: "6s" }}
+              aria-hidden="true"
+            />
+            <div
+              className="absolute -bottom-24 -right-24 w-80 h-80 bg-amber-400/15 rounded-full blur-[90px] pointer-events-none animate-pulse"
+              style={{ animationDuration: "7s", animationDelay: "1.5s" }}
+              aria-hidden="true"
+            />
+
+            {/* Sweeping Shimmer Light Beam */}
+            <div
+              className="shimmer-sweep pointer-events-none absolute -inset-full bg-gradient-to-r from-transparent via-white/15 to-transparent -rotate-45"
+              aria-hidden="true"
+            />
+
+            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+              {/* Studio Colophon Identity & Vision */}
+              <div className="text-center lg:text-left space-y-2 max-w-md">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono-accent text-[#6EC6F0] font-bold uppercase tracking-widest shadow-xs">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                  </span>
+                  <span>{isMarathi ? "डिजिटल अनुभव व निर्मिती" : "DIGITAL CRAFT & ENGINEERING"}</span>
+                </div>
+                <h4 className="text-base sm:text-lg font-bold text-white font-latin-display tracking-tight">
+                  {isMarathi ? "संकल्पना, डिझाईन आणि अत्याधुनिक तंत्रज्ञान" : "Engineered with Passion for AN Fish World"}
+                </h4>
+                <p className="text-xs text-white/60 font-mono-accent leading-relaxed">
+                  {isMarathi
+                    ? "कराड, महाराष्ट्र • Next.js, WebGL आणि आधुनिक डिझाईन सह निर्मित"
+                    : "Karad, Maharashtra • Built with Next.js, Tailwind, GSAP & WebGL"}
+                </p>
+              </div>
+
+              {/* Studio Showcase Interactive Cards */}
+              <div className="flex flex-col sm:flex-row items-center gap-3.5 w-full lg:w-auto">
+                {/* 1. AB Tech Services */}
+                <a
+                  href="https://abtechservices.store/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="AB Tech Services — Developed by (Opens in new tab)"
+                  className="studio-card group/ab relative w-full sm:w-auto flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/15 hover:border-[#0A9AD9] text-white transition-all duration-300 shadow-sm hover:shadow-[0_0_35px_rgba(10,154,217,0.45)] hover:-translate-y-1.5 cursor-pointer select-none overflow-hidden"
+                >
+                  {/* Subtle inner highlight */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#0A9AD9]/0 via-[#0A9AD9]/10 to-transparent opacity-0 group-hover/ab:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                  <div className="relative w-10 h-10 rounded-xl bg-[#0A9AD9]/15 border border-[#0A9AD9]/40 flex items-center justify-center text-[#6EC6F0] group-hover/ab:scale-110 group-hover/ab:bg-[#0A9AD9] group-hover/ab:text-white group-hover/ab:shadow-[0_0_15px_rgba(10,154,217,0.6)] transition-all duration-300 shrink-0">
+                    <Code2 className="w-5 h-5" />
+                  </div>
+                  <div className="text-left relative z-10">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[9px] font-mono-accent uppercase tracking-wider text-[#6EC6F0] font-bold">
+                        {isMarathi ? "वेबसाईट निर्मिती" : "DEVELOPED BY"}
+                      </span>
+                    </div>
+                    <div className="text-sm sm:text-base font-bold tracking-tight text-white group-hover/ab:text-[#6EC6F0] transition-colors flex items-center gap-1.5 mt-0.5">
+                      <span>AB Tech Services</span>
+                      <ArrowUpRight className="w-4 h-4 text-[#6EC6F0] transition-transform duration-300 group-hover/ab:translate-x-1 group-hover/ab:-translate-y-1" />
+                    </div>
+                    <span className="text-[10px] font-mono-accent text-white/40 block mt-0.5 group-hover/ab:text-white/60 transition-colors">
+                      abtechservices.store
+                    </span>
+                  </div>
+                </a>
+
+                {/* Collaboration Indicator Node */}
+                <div className="hidden sm:flex flex-col items-center justify-center px-1">
+                  <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/40 text-xs font-mono-accent font-bold shadow-xs">
+                    ×
+                  </div>
+                </div>
+                <div className="sm:hidden flex items-center gap-2 py-0.5">
+                  <span className="h-px w-6 bg-white/15" />
+                  <span className="text-[10px] font-mono-accent uppercase tracking-widest text-white/40 font-semibold">
+                    {isMarathi ? "सहकार्याने" : "IN COLLABORATION WITH"}
+                  </span>
+                  <span className="h-px w-6 bg-white/15" />
+                </div>
+
+                {/* 2. Goldspade */}
+                <a
+                  href="https://www.goldspade.in/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Goldspade — In collaboration with (Opens in new tab)"
+                  className="studio-card group/gs relative w-full sm:w-auto flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/[0.04] hover:bg-white/[0.09] border border-white/15 hover:border-amber-400 text-white transition-all duration-300 shadow-sm hover:shadow-[0_0_35px_rgba(251,191,36,0.45)] hover:-translate-y-1.5 cursor-pointer select-none overflow-hidden"
+                >
+                  {/* Subtle inner highlight */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-400/0 via-amber-400/10 to-transparent opacity-0 group-hover/gs:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                  <div className="relative w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-300 group-hover/gs:scale-110 group-hover/gs:bg-amber-400 group-hover/gs:text-black group-hover/gs:shadow-[0_0_15px_rgba(251,191,36,0.6)] transition-all duration-300 shrink-0">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <div className="text-left relative z-10">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[9px] font-mono-accent uppercase tracking-wider text-amber-300/90 font-bold">
+                        {isMarathi ? "सहकार्याने" : "COLLABORATION"}
+                      </span>
+                    </div>
+                    <div className="text-sm sm:text-base font-bold tracking-tight text-white group-hover/gs:text-amber-300 transition-colors flex items-center gap-1.5 mt-0.5">
+                      <span>Goldspade</span>
+                      <ArrowUpRight className="w-4 h-4 text-amber-300 transition-transform duration-300 group-hover/gs:translate-x-1 group-hover/gs:-translate-y-1" />
+                    </div>
+                    <span className="text-[10px] font-mono-accent text-white/40 block mt-0.5 group-hover/gs:text-white/60 transition-colors">
+                      goldspade.in
+                    </span>
+                  </div>
+                </a>
+              </div>
+            </div>
           </div>
 
-          <div className="text-white/60">
-            Made by <span className="text-white font-semibold">Goldspade</span>
-          </div>
+          {/* Bottom Meta & Back to Top Bar (With clearance for Sticky WhatsApp Action) */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono-accent text-white/50 pt-3 pb-8 md:pr-48">
+            <div className="text-center sm:text-left">
+              © {new Date().getFullYear()} AN Fish World. All rights reserved.
+            </div>
 
-          <button
-            type="button"
-            onClick={scrollToTop}
-            aria-label="Back to Top"
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/30 text-white transition-all cursor-pointer active:scale-95"
-          >
-            <span>Back to top ↑</span>
-            <ArrowUp className="w-3.5 h-3.5 text-[#0A9AD9]" />
-          </button>
+            <div className="hidden md:flex items-center gap-2 text-[11px] text-white/40">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0A9AD9]" />
+              <span>17.2892° N, 74.1818° E • 0°C UNBROKEN COLD CHAIN</span>
+            </div>
+
+            <button
+              type="button"
+              onClick={scrollToTop}
+              aria-label="Back to Top"
+              className="group/top flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#0A9AD9]/50 text-white transition-all cursor-pointer active:scale-95 shadow-sm hover:shadow-[0_0_20px_rgba(10,154,217,0.25)] shrink-0"
+            >
+              <span className="font-semibold text-xs tracking-wider">Back to top</span>
+              <ArrowUp className="w-3.5 h-3.5 text-[#0A9AD9] transition-transform duration-300 group-hover/top:-translate-y-1" />
+            </button>
+          </div>
         </div>
+
+        <style jsx>{`
+          @keyframes shimmerAnimation {
+            0% {
+              transform: translateX(-150%) skewX(-20deg);
+            }
+            35%, 100% {
+              transform: translateX(250%) skewX(-20deg);
+            }
+          }
+          .shimmer-sweep {
+            animation: shimmerAnimation 7s ease-in-out infinite;
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .shimmer-sweep {
+              animation: none !important;
+            }
+          }
+        `}</style>
       </div>
     </footer>
   );
 }
+

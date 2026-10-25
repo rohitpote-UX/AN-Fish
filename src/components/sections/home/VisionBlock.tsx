@@ -124,13 +124,12 @@ export function VisionBlock() {
             <Heart className="w-5 h-5 fill-current" />
           </div>
 
-          {/* Lead Statement [V] */}
           <blockquote
             className={`text-2xl sm:text-4xl lg:text-5xl font-black text-[#0F1F10] tracking-tight leading-tight ${
               isMarathi ? "font-marathi-display" : "font-latin-display"
             }`}
           >
-            &ldquo;आमच्या लाडक्या ग्राहकांची लाडकी फिश कंपनी.&rdquo;
+            &ldquo;{isMarathi ? "आमच्या लाडक्या ग्राहकांची लाडकी फिश कंपनी." : "Our Beloved Customers' Beloved Fish Company."}&rdquo;
           </blockquote>
 
           {/* Paragraph [C]: 2-3 lines about trust and community, no unverified claims */}
@@ -146,22 +145,24 @@ export function VisionBlock() {
 
           {/* Owner & Founder Badge */}
           <div className="pt-2 flex items-center justify-center">
-            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-[#F5F4F2] border border-[#0F1F10]/10 shadow-xs">
-              <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-[#0A9AD9] shadow-xs shrink-0">
+            <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-full bg-[#F5F4EF] border border-[#0F1F10]/10 shadow-xs">
+              <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-[#0A9AD9] shadow-xs shrink-0">
                 <Image
                   src="/media/founder-owner-square.webp"
-                  alt="Owner and Founder of AN Fish"
-                  width={40}
-                  height={40}
+                  alt="Ameer Nadaf — Owner of AN Fish, Founder & CEO"
+                  width={44}
+                  height={44}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="text-left leading-tight">
                 <span className="text-xs font-bold text-[#0F1F10] block">
-                  {isMarathi ? "संस्थापक व मालक" : "Owner & Founder"}
+                  {isMarathi ? "अमीर नदाफ" : "Ameer Nadaf"}
                 </span>
-                <span className="text-[10px] font-mono-accent text-[#0A9AD9] font-bold block">
-                  AN Fish World Karad
+                <span className="text-[10px] font-mono-accent text-[#0A9AD9] font-bold block mt-0.5">
+                  {isMarathi
+                    ? "ए एन फिशचे मालक • संस्थापक / CEO"
+                    : "Owner of AN Fish • Founder / CEO"}
                 </span>
               </div>
             </div>

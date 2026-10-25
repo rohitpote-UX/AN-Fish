@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { Link } from "@/i18n/routing";
 import { useLocale } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, ShoppingBag, Waves, Scissors, Check, Info, ArrowUpRight } from "lucide-react";
@@ -322,15 +323,25 @@ export function ProductDiscovery() {
               {/* Card Body: Info */}
               <div className="p-6 flex-grow flex flex-col justify-between space-y-4">
                 <div>
-                  <div className="flex items-baseline justify-between gap-2">
+                  <Link
+                    href={`/catch/${
+                      fish.id === "king-surmai"
+                        ? "king-seer-surmai"
+                        : fish.id === "indian-rawas"
+                        ? "indian-salmon-rawas"
+                        : fish.id
+                    }`}
+                    className="group/link flex items-center justify-between gap-2"
+                  >
                     <h3
-                      className={`text-xl font-bold text-[#071A24] group-hover:text-[#0B9DD8] transition-colors leading-tight ${
+                      className={`text-xl font-bold text-[#071A24] group-hover/link:text-[#0B9DD8] transition-colors leading-tight ${
                         isMarathi ? "font-marathi-display" : "font-latin-display"
                       }`}
                     >
                       {isMarathi ? fish.nameMr : fish.nameEn}
                     </h3>
-                  </div>
+                    <ArrowUpRight className="w-4 h-4 text-[#0B9DD8] opacity-0 group-hover/link:opacity-100 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-all shrink-0" />
+                  </Link>
                   <span className="text-xs text-[#0B9DD8] font-mono-accent font-semibold block mt-0.5">
                     {isMarathi ? fish.nameEn : fish.nameMr}
                   </span>

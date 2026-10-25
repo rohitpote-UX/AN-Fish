@@ -163,6 +163,15 @@ export function TrustStatements() {
       </div>
 
       <style jsx global>{`
+        .trust-statement-row {
+          cursor: default;
+        }
+        .trust-statement-row:hover {
+          opacity: 0.85;
+          border-color: rgba(10, 154, 217, 0.25);
+          background-color: #ffffff;
+          transform: translateY(-1px);
+        }
         .trust-statement-row.active-trust-row {
           opacity: 1 !important;
           background-color: #ffffff !important;

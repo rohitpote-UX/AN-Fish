@@ -10,6 +10,26 @@ export function StoreOutpostSection() {
   const locale = useLocale();
   const isMarathi = locale === "mr";
 
+  const [isCurrentlyOpen, setIsCurrentlyOpen] = React.useState(true);
+
+  React.useEffect(() => {
+    const checkStatus = () => {
+      // Current time in IST (Asia/Kolkata)
+      const now = new Date();
+      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+      const ist = new Date(utc + 3600000 * 5.5);
+      const hours = ist.getHours();
+      const minutes = ist.getMinutes();
+      const timeVal = hours + minutes / 60;
+      const morningOpen = timeVal >= 7.0 && timeVal < 13.0;
+      const eveningOpen = timeVal >= 16.5 && timeVal < 21.0;
+      setIsCurrentlyOpen(morningOpen || eveningOpen);
+    };
+    checkStatus();
+    const timer = setInterval(checkStatus, 60000);
+    return () => clearInterval(timer);
+  }, []);
+
   const cleanPhone = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || PLACEHOLDERS.WHATSAPP_NUMBER).replace(
     /[^0-9]/g,
     ""
@@ -53,17 +73,50 @@ export function StoreOutpostSection() {
           {/* Left Column: Authentic Store Information */}
           <div className="lg:col-span-6 rounded-3xl bg-[#F8FAFC] border border-[#071A24]/10 p-8 sm:p-10 flex flex-col justify-between shadow-xs space-y-8">
             <div className="space-y-6">
-              <div>
-                <span className="text-xs font-mono-accent text-[#0B9DD8] uppercase tracking-wider font-bold block">
-                  FLAGSHIP RETAIL HUB
-                </span>
-                <h3
-                  className={`text-2xl sm:text-3xl font-bold text-[#071A24] mt-1 ${
-                    isMarathi ? "font-marathi-display" : "font-latin-display"
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <span className="text-xs font-mono-accent text-[#0B9DD8] uppercase tracking-wider font-bold block">
+                    FLAGSHIP RETAIL HUB
+                  </span>
+                  <h3
+                    className={`text-2xl sm:text-3xl font-bold text-[#071A24] mt-1 ${
+                      isMarathi ? "font-marathi-display" : "font-latin-display"
+                    }`}
+                  >
+                    {isMarathi ? "ए एन फिश वर्ल्ड — मलकापूर, कराड" : "AN Fish World — Malkapur, Karad"}
+                  </h3>
+                </div>
+
+                {/* Real-time IST Live Status Badge */}
+                <div
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-mono-accent font-bold self-start sm:self-center border shadow-2xs ${
+                    isCurrentlyOpen
+                      ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                      : "bg-amber-50 border-amber-200 text-amber-700"
                   }`}
                 >
-                  {isMarathi ? "ए एन फिश वर्ल्ड — मलकापूर, कराड" : "AN Fish World — Malkapur, Karad"}
-                </h3>
+                  <span className="relative flex h-2 w-2">
+                    <span
+                      className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                        isCurrentlyOpen ? "bg-emerald-400" : "bg-amber-400"
+                      }`}
+                    />
+                    <span
+                      className={`relative inline-flex rounded-full h-2 w-2 ${
+                        isCurrentlyOpen ? "bg-emerald-500" : "bg-amber-500"
+                      }`}
+                    />
+                  </span>
+                  <span>
+                    {isCurrentlyOpen
+                      ? isMarathi
+                        ? "दालन सुरू आहे"
+                        : "OPEN NOW"
+                      : isMarathi
+                      ? "सध्या बंद"
+                      : "CLOSED"}
+                  </span>
+                </div>
               </div>
 
               {/* Address */}

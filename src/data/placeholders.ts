@@ -6,6 +6,9 @@
  */
 
 export const PLACEHOLDERS = {
+  FOUNDER_NAME: "Ameer Nadaf",
+  FOUNDER_ROLE_EN: "Owner of AN Fish • Founder / CEO",
+  FOUNDER_ROLE_MR: "ए एन फिशचे मालक • संस्थापक / CEO",
   FOUNDING_YEAR: "[FILL: FOUNDING_YEAR]",
   FSSAI_LICENSE: "[FILL: FSSAI_LICENSE_NO]",
   FSSAI_LICENSE_NO: "[FILL: FSSAI_LICENSE_NO]",

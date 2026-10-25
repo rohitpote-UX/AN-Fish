@@ -21,15 +21,15 @@ interface TeamMember {
 const TEAM_MEMBERS: TeamMember[] = [
   {
     id: "founder",
-    nameEn: "Owner & Founder (Aslam 'Haji Bhai')",
-    nameMr: "संस्थापक व मालक (अस्लम 'हाजी भाई')",
-    roleEn: "Owner and Founder of AN Fish",
-    roleMr: "ए एन फिशचे संस्थापक व मालक",
+    nameEn: "Ameer Nadaf",
+    nameMr: "अमीर नदाफ",
+    roleEn: "Owner of AN Fish • Founder / CEO",
+    roleMr: "ए एन फिशचे मालक • संस्थापक / CEO",
     image: "/media/founder-owner.jpg",
-    bioEn: "Visionary Owner and Founder of AN Fish World. Pioneered direct Ratnagiri harbour dawn procurement and established Karad's first dedicated 0°C liquid slurry retail hub.",
-    bioMr: "ए एन फिश वर्ल्डचे आदरणीय संस्थापक व मालक. पहाटेच्या थेट सागरी लिलाव खरेदीचे प्रणेते आणि कराडमध्ये अखंड ०°C शीतसाखळी दालनाची उभारणी.",
-    badgeEn: "Owner & Founder",
-    badgeMr: "संस्थापक व मालक",
+    bioEn: "Visionary Owner of AN Fish, Founder & CEO. Pioneered direct Ratnagiri harbour dawn procurement and established Karad's first dedicated 0°C liquid slurry retail hub and strict chemical-free standards.",
+    bioMr: "ए एन फिशचे आदरणीय मालक, संस्थापक व मुख्य कार्यकारी अधिकारी (CEO). पहाटेच्या थेट सागरी लिलाव खरेदीचे प्रणेते आणि कराडमध्ये अखंड ०°C शीतसाखळी दालनाची यशस्वी उभारणी.",
+    badgeEn: "Owner • Founder & CEO",
+    badgeMr: "मालक • संस्थापक व CEO",
   },
   {
     id: "operations",

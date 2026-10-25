@@ -85,7 +85,7 @@ export function TrustStatement() {
             <div className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-[#0A9AD9] shadow-md shrink-0 bg-white">
               <Image
                 src="/media/founder-owner-square.webp"
-                alt="Owner and Founder of AN Fish"
+                alt="Ameer Nadaf — Owner of AN Fish, Founder & CEO"
                 width={56}
                 height={56}
                 className="w-full h-full object-cover"
@@ -93,10 +93,10 @@ export function TrustStatement() {
             </div>
             <div>
               <h4 className="text-base font-bold text-[#0F1F10]">
-                {isMarathi ? "संस्थापक व मालक, ए एन फिश" : "Owner & Founder, AN Fish"}
+                {isMarathi ? "अमीर नदाफ" : "Ameer Nadaf"}
               </h4>
               <p className="text-xs text-[#0A9AD9] font-mono-accent font-semibold">
-                AN Fish World Karad Flagship & Regional Operations
+                {isMarathi ? "ए एन फिशचे मालक • संस्थापक / CEO" : "Owner of AN Fish • Founder / CEO"}
               </p>
             </div>
           </div>
@@ -110,7 +110,7 @@ export function TrustStatement() {
           >
             <Image
               src="/media/founder-owner.jpg"
-              alt="Owner and Founder of AN Fish"
+              alt="Ameer Nadaf — Owner of AN Fish, Founder & CEO"
               fill
               sizes="(max-width: 1024px) 100vw, 500px"
               className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -120,7 +120,7 @@ export function TrustStatement() {
 
             <div className="absolute top-6 left-6">
               <span className="px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md text-[#0F1F10] text-xs font-mono-accent font-bold uppercase tracking-wider shadow-md border border-white/40">
-                {isMarathi ? "संस्थापक व मालक • FOUNDER & OWNER" : "OWNER & FOUNDER • संस्थापक व मालक"}
+                {isMarathi ? "मालक • संस्थापक / CEO" : "OWNER • FOUNDER / CEO"}
               </span>
             </div>
 
@@ -129,10 +129,10 @@ export function TrustStatement() {
                 AN FISH WORLD • KARAD
               </span>
               <p className="text-lg sm:text-xl font-bold font-latin-display">
-                {isMarathi ? "ए एन फिशचे संस्थापक व मालक" : "Owner and Founder of AN Fish"}
+                {isMarathi ? "अमीर नदाफ" : "Ameer Nadaf"}
               </p>
               <p className="text-xs text-white/70 font-mono-accent">
-                {isMarathi ? "कराडच्या लाडक्या खवय्यांसाठी अखंड सेवेचे व्रत" : "Dedicated to Fresh Catch & Family Trust Since Day One"}
+                {isMarathi ? "ए एन फिशचे मालक, संस्थापक व मुख्य कार्यकारी अधिकारी (CEO)" : "Owner of AN Fish • Founder / CEO"}
               </p>
             </div>
           </div>

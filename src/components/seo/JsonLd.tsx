@@ -14,8 +14,8 @@ export function JsonLd() {
     image: "https://anfishworld.com/media/founder-owner.jpg",
     founder: {
       "@type": "Person",
-      name: "Owner and Founder of AN Fish",
-      jobTitle: "Owner & Founder",
+      name: "Ameer Nadaf",
+      jobTitle: "Owner of AN Fish • Founder / CEO",
       image: "https://anfishworld.com/media/founder-owner.jpg",
     },
     telephone: PLACEHOLDERS.CONTACT_PHONE,

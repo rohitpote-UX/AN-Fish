@@ -7,6 +7,7 @@ import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, MessageCircle, ArrowRight, Menu, X } from "lucide-react";
 import { PLACEHOLDERS } from "@/data/placeholders";
+import { useScrollStore } from "@/store/scroll";
 
 interface NavDropdownItem {
   href: string;
@@ -176,8 +177,9 @@ export function Header() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  // Lock body scroll when mobile drawer is open
+  // Lock body scroll and notify store when mobile drawer is open
   useEffect(() => {
+    useScrollStore.getState().setMenuOpen(mobileMenuOpen);
     if (mobileMenuOpen) {
       document.body.style.overflow = "hidden";
     } else {
@@ -185,6 +187,7 @@ export function Header() {
     }
     return () => {
       document.body.style.overflow = "";
+      useScrollStore.getState().setMenuOpen(false);
     };
   }, [mobileMenuOpen]);
 
@@ -250,6 +253,15 @@ export function Header() {
               </span>
             </div>
           </Link>
+
+          {/* Live Harbour Telemetry Badge (Awwwards Boutique Status Indicator) */}
+          <div className="hidden xl:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F5F4EF] border border-[#071A24]/08 text-[10px] font-mono-accent text-[#071A24]/75 select-none">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
+            <span className="font-semibold">{isMarathi ? "०°C शीतसाखळी • थेट बंदर आवक" : "0°C COLD CHAIN • DAWN HARBOUR CATCH"}</span>
+          </div>
 
           {/* 2. Center: Refined Editorial Navigation Links */}
           <nav
