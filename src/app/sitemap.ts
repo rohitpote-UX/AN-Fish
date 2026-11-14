@@ -4,7 +4,7 @@ import { SPECIES_LIST } from "@/data/species";
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://anfishworld.com";
   const routes = ["", "/about", "/catch", "/branches", "/wholesale", "/contact"];
-  const locales = ["mr", "en"];
+  const locales = ["mr", "en", "hi"];
 
   const entries: MetadataRoute.Sitemap = [];
 

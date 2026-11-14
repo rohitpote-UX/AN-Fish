@@ -24,7 +24,7 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
 
-  if (!routing.locales.includes(locale as "mr" | "en")) {
+  if (!routing.locales.includes(locale as any)) {
     notFound();
   }
 

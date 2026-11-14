@@ -29,12 +29,13 @@ export function generatePageMetadata({
       languages: {
         mr: `${baseUrl}/mr${path}`,
         en: `${baseUrl}/en${path}`,
+        hi: `${baseUrl}/hi${path}`,
       },
     },
     openGraph: {
       title,
       description,
-      locale: isMarathi ? "mr_IN" : "en_IN",
+      locale: isMarathi ? "mr_IN" : locale === "hi" ? "hi_IN" : "en_IN",
       type: "website",
       url: `${baseUrl}/${locale}${path}`,
     },

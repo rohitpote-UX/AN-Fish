@@ -41,7 +41,7 @@ export default async function SpeciesPage({
   params: Promise<{ locale: string; slug: string }>;
 }) {
   const { locale, slug } = await params;
-  if (!routing.locales.includes(locale as "mr" | "en")) notFound();
+  if (!routing.locales.includes(locale as any)) notFound();
   setRequestLocale(locale);
 
   const sp = SPECIES_LIST.find((item) => item.slug === slug);

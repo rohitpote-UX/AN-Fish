@@ -32,13 +32,18 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
 
   const title = isMarathi
     ? "ए एन फिश वर्ल्ड | कराडची लाडकी मासोळी — Fresh Fish Retail"
+    : isHindi
+    ? "ए एन फिश वर्ल्ड | कराड की चहेती मछली — Fresh Fish Retail"
     : "AN Fish World | Karad's Beloved Fresh Catch — Fresh Fish Retail";
 
   const description = isMarathi
     ? "रत्नागिरी आणि मालवणच्या पहाटे ४:०० AM लिलावातून थेट निवडलेली, ०°C लिक्विड आईसमध्ये सुरक्षित आणलेली, १००% फॉर्मेलिनमुक्त ताजी मासोळी आता कराडमध्ये."
+    : isHindi
+    ? "रत्नागिरी और मालवण बंदरगाहों पर सुबह ४:०० AM नीलामी से चुनी गई, ०°C लिक्विड आइस में सुरक्षित लाई गई, १००% फॉर्मेलिन मुक्त ताजी मछली अब कराड में।"
     : "Selected at 4:00 AM coastal harbour auctions across Ratnagiri & Malvan, chilled in 0°C liquid ice slurry, and delivered fresh to homes across Karad.";
 
   return {
@@ -50,12 +55,13 @@ export async function generateMetadata({
       languages: {
         mr: "/mr",
         en: "/en",
+        hi: "/hi",
       },
     },
     openGraph: {
       title,
       description,
-      locale: isMarathi ? "mr_IN" : "en_IN",
+      locale: isMarathi ? "mr_IN" : isHindi ? "hi_IN" : "en_IN",
       type: "website",
     },
     robots: {
@@ -74,7 +80,7 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
 
-  if (!routing.locales.includes(locale as "mr" | "en")) {
+  if (!routing.locales.includes(locale as any)) {
     notFound();
   }
 

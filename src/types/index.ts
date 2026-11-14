@@ -1,4 +1,4 @@
-export type Locale = "mr" | "en";
+export type Locale = "mr" | "en" | "hi";
 
 export type DepthZone = "surface" | "shallows" | "twilight" | "abyss" | "vault";
 
