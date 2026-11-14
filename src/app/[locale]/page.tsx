@@ -2,16 +2,16 @@ import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import { Hero } from "@/components/sections/home/Hero";
-import { Capabilities } from "@/components/sections/home/Capabilities";
-import { ProductDiscovery } from "@/components/sections/home/ProductDiscovery";
-import { FreshnessPanels } from "@/components/sections/home/FreshnessPanels";
-import { VisionBlock } from "@/components/sections/home/VisionBlock";
-import { Ticker } from "@/components/sections/home/Ticker";
-import { LogoCluster } from "@/components/sections/home/LogoCluster";
-import { TrustStatements } from "@/components/sections/home/TrustStatements";
-import { StoreOutpostSection } from "@/components/sections/home/StoreOutpostSection";
-import { Stories } from "@/components/sections/home/Stories";
-import { JournalSection } from "@/components/sections/home/JournalSection";
+import { MaharashtraMapSection } from "@/components/sections/home/MaharashtraMapSection";
+import { SignatureSection } from "@/components/sections/home/SignatureSection";
+import { AboutSection } from "@/components/sections/home/AboutSection";
+import { MenuSection } from "@/components/sections/home/MenuSection";
+import { ServicesSection } from "@/components/sections/home/ServicesSection";
+import { GallerySection } from "@/components/sections/home/GallerySection";
+import { ReviewsSection } from "@/components/sections/home/ReviewsSection";
+import { OrderSection } from "@/components/sections/home/OrderSection";
+import { FaqSection } from "@/components/sections/home/FaqSection";
+import { ContactSection } from "@/components/sections/home/ContactSection";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -32,38 +32,38 @@ export default async function HomePage({
 
   return (
     <>
-      {/* 01. SIGNATURE CINEMATIC HERO */}
+      {/* 01. HERO SECTION (#home) - Centered Logo, Name, Heading, Tagline, 2 Action Buttons & Textured Background */}
       <Hero />
 
-      {/* 02. EDITORIAL PRODUCT DISCOVERY */}
-      <ProductDiscovery />
+      {/* 02. MAHARASHTRA 3D MAP & FRANCHISE STORES (#franchise-map) - Karad HQ (with 3D Fish), Ishwarpur, Patan & Arabian Sea */}
+      <MaharashtraMapSection />
 
-      {/* 03. NUMBERED CAPABILITY LIST (01–05) */}
-      <Capabilities />
+      {/* 03. SIGNATURE CATCH (#signature) - "आमची खासियत" (Pomfret, Surmai, Tiger Prawns, Rawas) */}
+      <SignatureSection />
 
-      {/* 04. FRESHNESS TECHNOLOGY & COLD CHAIN PANELS */}
-      <FreshnessPanels />
+      {/* 03. ABOUT SECTION (#about) - "आमच्याबद्दल" (Ameer Nadaf Story, Ratnagiri/Malvan Auctions & Purity) */}
+      <AboutSection />
 
-      {/* 05. OWNER & FOUNDER VISION */}
-      <VisionBlock />
+      {/* 04. INTERACTIVE MENU (#menu) - "आमचे स्पेशल मेनू" (Category filter tabs like Hotel Atithi) */}
+      <MenuSection />
 
-      {/* 06. HARVEST TICKER */}
-      <Ticker />
+      {/* 05. WHY CHOOSE US (#services) - "आम्हाला का निवडाल?" (4 Core Value Pillars) */}
+      <ServicesSection />
 
-      {/* 07. TRUST STATEMENTS (01–04) */}
-      <TrustStatements />
+      {/* 06. GALLERY (#gallery) - "आमची झलक" (Chilled counter, hygiene, founder, community) */}
+      <GallerySection />
 
-      {/* 08. KARAD STORE OUTPOST & VISITING HOURS */}
-      <StoreOutpostSection />
+      {/* 07. CUSTOMER REVIEWS (#reviews) - "आमचे ग्राहक काय म्हणतात?" (Real Karad Testimonials) */}
+      <ReviewsSection />
 
-      {/* 09. CONNECT & CHANNELS */}
-      <LogoCluster />
+      {/* 08. WHATSAPP ORDER BUILDER (#order) - "आजच आपली ऑर्डर नोंदवा!" (Instant WhatsApp Order Form) */}
+      <OrderSection />
 
-      {/* 10. LOCAL CULINARY STORIES */}
-      <Stories />
+      {/* 09. FAQ ACCORDION (#faq) - "वारंवार विचारले जाणारे प्रश्न" */}
+      <FaqSection />
 
-      {/* 11. JOURNAL & MEDIA */}
-      <JournalSection />
+      {/* 10. CONTACT & MAP (#contact) - "आमच्यापर्यंत कसे पोहोचाल?" (Store Address, Timings & Google Maps) */}
+      <ContactSection />
     </>
   );
 }

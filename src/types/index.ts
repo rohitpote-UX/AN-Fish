@@ -18,7 +18,7 @@ export interface Species {
   image: string; // transparent cutout
   tasteNote: string;
   bestFor: BestForCooking[];
-  pricePerKg: string; // [FILL: ₹--- / kg]
+  pricePerKg: string; // e.g. "₹980 / kg"
   available: boolean;
   cleaningOptions: CleaningOption[];
 
@@ -50,6 +50,15 @@ export interface Branch {
   landmarkMr: string;
   landmarkEn: string;
   googleMapsUrl: string;
+  villageNameMr?: string;
+  districtMr?: string;
+  districtEn?: string;
+  type?: "hq" | "store" | "port";
+  pinX?: number;
+  pinY?: number;
+  image?: string;
+  taglineMr?: string;
+  taglineEn?: string;
 }
 
 export interface FAQItem {

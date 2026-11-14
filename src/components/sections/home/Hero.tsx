@@ -1,577 +1,308 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { useLocale } from "next-intl";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "@/lib/gsap";
-import { MessageCircle, ArrowDown, Anchor, ShieldCheck, ThermometerSnowflake, Sparkles, MapPin } from "lucide-react";
+import { MessageCircle, ArrowRight, MapPin, Clock, ShieldCheck, ChevronDown } from "lucide-react";
 import { PLACEHOLDERS } from "@/data/placeholders";
 
 export function Hero() {
   const locale = useLocale();
   const isMarathi = locale === "mr";
 
-  const heroRef = useRef<HTMLElement>(null);
-  const eyebrowRef = useRef<HTMLDivElement>(null);
-  const headlineLine1Ref = useRef<HTMLSpanElement>(null);
-  const headlineLine2Ref = useRef<HTMLSpanElement>(null);
-  const subheadRef = useRef<HTMLParagraphElement>(null);
-  const ctaGroupRef = useRef<HTMLDivElement>(null);
-  const trustBarRef = useRef<HTMLDivElement>(null);
-  const fishCenterRef = useRef<HTMLDivElement>(null);
-  const fishTopRightRef = useRef<HTMLDivElement>(null);
-  const fishBottomLeftRef = useRef<HTMLDivElement>(null);
-  const fishBottomRightRef = useRef<HTMLDivElement>(null);
-  const fishTopLeftRef = useRef<HTMLDivElement>(null);
-  const lowerPanelRef = useRef<HTMLDivElement>(null);
+  // 1. Changing Background Images (Cycling smoothly)
+  const [bgImageIndex, setBgImageIndex] = useState(0);
 
-  // Active highlighted species in hero (default: pomfret)
-  const [activeSpeciesId, setActiveSpeciesId] = React.useState<string>("pomfret");
-
-  // Coordinated Entrance Sequence (Preserving 70%+ White Canvas and Free Shape)
-  useGSAP(
-    () => {
-      if (!heroRef.current) return;
-
-      // Accessibility: strictly respect prefers-reduced-motion
-      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (prefersReducedMotion) {
-        gsap.set(
-          [
-            eyebrowRef.current,
-            headlineLine1Ref.current,
-            headlineLine2Ref.current,
-            subheadRef.current,
-            ctaGroupRef.current,
-            trustBarRef.current,
-            fishCenterRef.current,
-            fishTopRightRef.current,
-            fishBottomLeftRef.current,
-            fishBottomRightRef.current,
-            fishTopLeftRef.current,
-            lowerPanelRef.current,
-          ],
-          { opacity: 1, y: 0, scale: 1 }
-        );
-        return;
-      }
-
-      // Initial restrained states
-      gsap.set(eyebrowRef.current, { opacity: 0, y: 10 });
-      gsap.set(headlineLine1Ref.current, { opacity: 0, y: 18 });
-      gsap.set(headlineLine2Ref.current, { opacity: 0, y: 18 });
-      gsap.set(subheadRef.current, { opacity: 0, y: 14 });
-      gsap.set(ctaGroupRef.current, { opacity: 0, y: 12 });
-      gsap.set(trustBarRef.current, { opacity: 0, y: 10 });
-      gsap.set(fishCenterRef.current, { opacity: 0, scale: 0.94 });
-      gsap.set(
-        [
-          fishTopRightRef.current,
-          fishBottomLeftRef.current,
-          fishBottomRightRef.current,
-          fishTopLeftRef.current,
-        ],
-        { opacity: 0, y: 16 }
-      );
-      gsap.set(lowerPanelRef.current, { opacity: 0, y: 12 });
-
-      const tl = gsap.timeline({
-        defaults: { ease: "power2.out" },
-        delay: 0.05,
-      });
-
-      // Step 2 — Eyebrow label (fade + 10px upward)
-      tl.to(eyebrowRef.current, {
-        opacity: 1,
-        y: 0,
-        duration: 0.45,
-      })
-        // Step 3 — Main headline line 1
-        .to(
-          headlineLine1Ref.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.55,
-            ease: "power3.out",
-          },
-          "-=0.25"
-        )
-        // Step 4 — Italic cyan headline line 2
-        .to(
-          headlineLine2Ref.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            ease: "power3.out",
-          },
-          "-=0.35"
-        )
-        // Step 5 — Supporting paragraph
-        .to(
-          subheadRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.45,
-          },
-          "-=0.3"
-        )
-        // Step 6 — CTAs
-        .to(
-          ctaGroupRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.45,
-          },
-          "-=0.25"
-        )
-        // Step 7 — Central Free-Shape Fish reveal (scale 0.94 -> 1.0)
-        .to(
-          fishCenterRef.current,
-          {
-            opacity: 1,
-            scale: 1,
-            duration: 0.65,
-            ease: "power2.out",
-          },
-          "-=0.35"
-        )
-        // Step 8 — Satellite Free-Shape Seafood constellation float in
-        .to(
-          [
-            fishTopRightRef.current,
-            fishBottomLeftRef.current,
-            fishBottomRightRef.current,
-            fishTopLeftRef.current,
-          ],
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.55,
-            stagger: 0.08,
-            ease: "power2.out",
-          },
-          "-=0.3"
-        )
-        // Step 9 — Floating Outpost Telemetry Panel
-        .to(
-          lowerPanelRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.4,
-          },
-          "-=0.2"
-        )
-        // Trust milestones
-        .to(
-          trustBarRef.current,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.4,
-          },
-          "-=0.25"
-        );
-    },
-    { scope: heroRef, dependencies: [locale] }
+  const backgroundImages = useMemo(
+    () => [
+      "/media/counter-landscape.jpg",
+      "/media/hero/hero-underwater-fish.jpg",
+      "/media/family-dinner.jpg",
+      "/media/cutting-hygiene.jpg",
+    ],
+    []
   );
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setBgImageIndex((prev) => (prev + 1) % backgroundImages.length);
+    }, 7000);
+    return () => clearInterval(timer);
+  }, [backgroundImages.length]);
+
+  // 2. Typing & Erasing Effect for Tagline: "एकदा खाल की पुन्हा पुन्हा मागाल." <-> "मासे खावा, खुश रहा!"
+  const phrases = useMemo(() => {
+    return isMarathi
+      ? ["एकदा खाल की पुन्हा पुन्हा मागाल.", "मासे खावा, खुश रहा!"]
+      : ["Taste once, you'll ask for more.", "Eat fresh fish, stay happy!"];
+  }, [isMarathi]);
+
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [displayedText, setDisplayedText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const currentPhrase = phrases[phraseIndex];
+    const segmenter =
+      typeof Intl !== "undefined" && Intl.Segmenter
+        ? new Intl.Segmenter(isMarathi ? "mr" : "en", { granularity: "grapheme" })
+        : null;
+
+    const graphemes = segmenter
+      ? Array.from(segmenter.segment(currentPhrase), (s) => s.segment)
+      : Array.from(currentPhrase);
+
+    const currentGraphemes = segmenter
+      ? Array.from(segmenter.segment(displayedText), (s) => s.segment)
+      : Array.from(displayedText);
+
+    let timeoutId: NodeJS.Timeout;
+
+    if (!isDeleting) {
+      // Typing phase: type letter by letter
+      if (currentGraphemes.length < graphemes.length) {
+        timeoutId = setTimeout(() => {
+          setDisplayedText(graphemes.slice(0, currentGraphemes.length + 1).join(""));
+        }, 120);
+      } else {
+        // Complete phrase typed: pause before erasing so the user can read it
+        timeoutId = setTimeout(() => {
+          setIsDeleting(true);
+        }, 2200);
+      }
+    } else {
+      // Erasing phase: erase letter by letter
+      if (currentGraphemes.length > 0) {
+        timeoutId = setTimeout(() => {
+          setDisplayedText(graphemes.slice(0, currentGraphemes.length - 1).join(""));
+        }, 60);
+      } else {
+        // Complete erase: brief pause then switch to next phrase
+        timeoutId = setTimeout(() => {
+          setIsDeleting(false);
+          setPhraseIndex((prev) => (prev + 1) % phrases.length);
+        }, 400);
+      }
+    }
+
+    return () => clearTimeout(timeoutId);
+  }, [displayedText, isDeleting, phraseIndex, phrases, isMarathi]);
 
   const cleanPhone = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || PLACEHOLDERS.WHATSAPP_NUMBER).replace(
     /[^0-9]/g,
     ""
   );
+
   const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
     isMarathi
-      ? "नमस्कार AN Fish World कराड, मला आजच्या ताज्या आवकमधून ऑर्डर करायची आहे."
-      : "Hello AN Fish World Karad, I would like to place an order from today's fresh catch."
+      ? "नमस्कार AN Fish World कराड, मला आजच्या ताजी आवकमधून ऑर्डर करायची आहे."
+      : "Hello AN Fish World Karad, I would like to order from today's fresh catch."
   )}`;
 
-  const scrollToProducts = () => {
-    const el = document.getElementById("product-discovery");
+  const scrollToMenu = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const el = document.getElementById("signature") || document.getElementById("menu");
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  // 5 Real AN Fish World Species (Free Shape — No frame, no box, 100% white canvas)
-  const speciesList = [
-    {
-      id: "pomfret",
-      nameEn: "Silver Pomfret",
-      nameMr: "सिल्व्हर पापलेट",
-      tagEn: "Dawn Star Catch",
-      tagMr: "पहाटेची खास निवड",
-      rate: "₹1,150 / kg",
-      image: "/media/hero/pomfret-free.webp",
-      alt: "Fresh raw Silver Pomfret on crushed ice with lemon slices",
-    },
-    {
-      id: "surmai",
-      nameEn: "Kingfish Surmai Steaks",
-      nameMr: "किंग सुरमई स्टेक्स",
-      tagEn: "Crispy Fry Pick",
-      tagMr: "तवा फ्राय स्पेशल",
-      rate: "₹980 / kg",
-      image: "/media/hero/surmai-free.webp",
-      alt: "Raw Kingfish Surmai steaks on crushed ice with sea salt",
-    },
-    {
-      id: "prawns",
-      nameEn: "Jumbo Tiger Prawns",
-      nameMr: "रॉयल टायगर कोळंबी",
-      tagEn: "Sweet & Juicy",
-      tagMr: "गोड व रसाळ",
-      rate: "₹750 / kg",
-      image: "/media/hero/prawns-free.webp",
-      alt: "Fresh raw Jumbo Tiger Prawns on crushed ice with lime",
-    },
-    {
-      id: "rawas",
-      nameEn: "Indian Salmon Rawas",
-      nameMr: "इंडियन सामन (रावस)",
-      tagEn: "Omega-3 Rich",
-      tagMr: "ओमेगा-३ समृद्ध",
-      rate: "₹880 / kg",
-      image: "/media/hero/rawas-free.webp",
-      alt: "Indian Salmon Rawas steaks on crushed ice with rosemary",
-    },
-    {
-      id: "crab",
-      nameEn: "Live Ocean Mud Crab",
-      nameMr: "समुद्री चिमबोरी / खेकडा",
-      tagEn: "Live Fresh Catch",
-      tagMr: "जिवंत ताजी आवक",
-      rate: "Live Catch",
-      image: "/media/hero/crab-free.webp",
-      alt: "Fresh Ocean Mud Crab on crushed ice with herbs",
-    },
+  const tickerItems = [
+    isMarathi ? "सिल्व्हर पापलेट (लाडकी आवक)" : "Silver Pomfret",
+    isMarathi ? "किंग सुरमई स्टेक्स" : "King Surmai Steaks",
+    isMarathi ? "रॉयल टायगर कोळंबी" : "Royal Tiger Prawns",
+    isMarathi ? "इंडियन सामन (रावस)" : "Indian Salmon (Rawas)",
+    isMarathi ? "ताजा चंदेरी बांगडा" : "Fresh Mackerel (Bangda)",
+    isMarathi ? "जिवंत चिंबोरी / खेकडे" : "Live Sea Mud Crabs",
+    isMarathi ? "कृष्णा-कोयना रोहू" : "Freshwater Rohu",
+    isMarathi ? "कोयना काठ कटला" : "Freshwater Catla",
+    isMarathi ? "जिताडा / आशियाई सीबास" : "Asian Seabass (Jitada)",
   ];
-
-  const activeSpecies = speciesList.find((s) => s.id === activeSpeciesId) || speciesList[0];
 
   return (
     <section
-      ref={heroRef}
-      id="hero"
+      id="home"
       aria-label="AN Fish World Hero"
-      className="relative min-h-[90vh] lg:min-h-screen bg-white text-[#071A24] overflow-hidden pt-28 sm:pt-36 pb-16 lg:pb-24 flex flex-col justify-between"
+      className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-[#071A24] text-white"
     >
-      {/* 1. Luminous Atmospheric Caustics (70%+ White Canvas, purely subtle) */}
+      {/* 1. Background Imagery with Smooth Changing Transition */}
+      <div className="absolute inset-0 -z-20 overflow-hidden pointer-events-none select-none">
+        {backgroundImages.map((src, idx) => (
+          <Image
+            key={src}
+            src={src}
+            alt="AN Fish World Fresh Seafood Display"
+            fill
+            priority={idx === 0}
+            className={`object-cover object-center transition-opacity duration-[1800ms] ease-in-out animate-slow-zoom ${
+              bgImageIndex === idx ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* 2. Textured Overlays & Veils (Exact Hotel Atithi Match) */}
+      {/* Dark Oceanic Veil */}
+      <div aria-hidden="true" className="absolute inset-0 -z-10 veil-hero-ocean pointer-events-none" />
+
+      {/* Radial Vignette Center Veil */}
+      <div aria-hidden="true" className="absolute inset-0 -z-10 veil-hero-center pointer-events-none" />
+
+      {/* Golden & Cyan Textured Dot-Screen (Matches the Attached Screenshot) */}
       <div
-        className="absolute top-0 right-0 w-full h-[650px] bg-[radial-gradient(circle_at_85%_20%,rgba(11,157,216,0.06)_0%,transparent_60%)] pointer-events-none select-none"
         aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 dot-screen-hero opacity-60 mix-blend-screen"
       />
       <div
-        className="absolute bottom-0 left-0 w-full h-[400px] bg-[radial-gradient(circle_at_15%_90%,rgba(166,220,203,0.06)_0%,transparent_50%)] pointer-events-none select-none"
         aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 dot-screen-cyan opacity-40"
       />
 
-      {/* 2. Main Two-Column Editorial Hero Container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full flex-grow flex flex-col justify-center">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+      {/* Bottom Fade to Next Section */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-36 bg-gradient-to-t from-[#071A24] to-transparent"
+      />
+
+      {/* 3. Center Content Container (Logo -> Name -> Heading with Typing Effect -> Tagline -> 2 Buttons) */}
+      <div className="relative flex flex-1 items-center justify-center px-5 pb-20 pt-32 text-center lg:pt-36">
+        <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
           
-          {/* Left Editorial Text Column (6 Cols on LG) */}
-          <div className="lg:col-span-6 xl:col-span-6 text-left space-y-6 sm:space-y-7">
-            
-            {/* Step 2: Live Ticker Eyebrow Pill */}
-            <div
-              ref={eyebrowRef}
-              className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#EBF8FF] border border-[#0B9DD8]/25 text-xs font-mono-accent text-[#0B9DD8] uppercase tracking-wider font-bold shadow-xs select-none"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0B9DD8] opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0B9DD8]" />
-              </span>
-              <span>
-                {isMarathi
-                  ? "कराड मुख्य दालन • पहाटे ४:०० थेट आवक • ०°C शीतसाखळी"
-                  : "LIVE AT KARAD OUTPOST • 4:00 AM HARBOR AUCTION • 0°C COLD CHAIN"}
-              </span>
+          {/* Centered Circular Badge Logo */}
+          <div className="relative group">
+            <div className="mx-auto size-20 sm:size-[5.5rem] rounded-full shadow-[0_18px_44px_-14px_rgba(0,0,0,0.85)] ring-4 ring-[#0A9AD9]/40 bg-white p-1.5 transition-transform duration-300 hover:scale-105 flex items-center justify-center">
+              <Image
+                src="/brand/an-fish-logo-badge.webp"
+                alt="AN Fish World Official Badge"
+                width={88}
+                height={88}
+                priority
+                className="w-full h-full object-contain"
+              />
             </div>
+            {/* Luminous Glow Ring */}
+            <div className="absolute inset-0 rounded-full bg-[#0A9AD9]/20 blur-md pointer-events-none" />
+          </div>
 
-            {/* Step 3 & 4: Awwwards Editorial Display Headline with Playfair Serif Accent */}
-            <h1
-              className={`text-4xl sm:text-6xl lg:text-[4.5rem] font-extrabold text-[#071A24] tracking-[-0.035em] leading-[1.05] sm:leading-[1.02] ${
-                isMarathi ? "font-marathi-display" : "font-latin-display"
-              }`}
-            >
-              {isMarathi ? (
-                <>
-                  <span ref={headlineLine1Ref} className="block">
-                    पहाटेच्या बंदराची ताजी मासोळी,
-                  </span>
-                  <span
-                    ref={headlineLine2Ref}
-                    className="block font-editorial italic font-normal text-[#0B9DD8] tracking-tight mt-1 pb-1.5"
-                  >
-                    थेट तुमच्या घरच्या ताटात.
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span ref={headlineLine1Ref} className="block">
-                    Where Sea Freshness
-                  </span>
-                  <span
-                    ref={headlineLine2Ref}
-                    className="block font-editorial italic font-normal text-[#0B9DD8] tracking-tight mt-1 pb-1.5"
-                  >
-                    Meets Your Table.
-                  </span>
-                </>
-              )}
-            </h1>
-
-            {/* Step 5: Authoritative Supporting Copy */}
-            <p
-              ref={subheadRef}
-              className={`text-base sm:text-lg text-[#071A24]/75 max-w-xl font-normal leading-relaxed ${
-                isMarathi ? "font-marathi-body" : "font-sans"
-              }`}
-            >
+          {/* Centered Name / Sub-eyebrow */}
+          <div className="mt-5">
+            <span className="block font-marathi-display text-sm sm:text-base font-bold tracking-wide text-[#6EC6F0] drop-shadow-sm">
               {isMarathi
-                ? "रत्नागिरी व मालवण बंदरावरील पहाटे ४:०० च्या थेट लिलावातून निवडलेली आणि ०°C शीतसाखळीत सुरक्षित आणलेली ताजी मासोळी. समोर आरओ पाण्यात धुऊन व तुमच्या आवडीनुसार मोफत कट करून."
-                : "Hand-selected at 4:00 AM coastal harbour auctions across Ratnagiri and Malvan. Transported in unbroken 0°C liquid slurry, cleaned with purified RO water, and portioned to order at our Malkapur Karad outpost."}
-            </p>
-
-            {/* Step 6: Dual CTAs */}
-            <div
-              ref={ctaGroupRef}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-1"
-            >
-              {/* Primary Action: Order on WhatsApp */}
-              <a
-                id="hero-primary-whatsapp-cta"
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-8 py-4 rounded-full bg-[#071A24] hover:bg-[#0B9DD8] text-white text-xs sm:text-sm font-mono-accent font-bold uppercase tracking-wider shadow-md hover:shadow-[0_8px_30px_rgba(11,157,216,0.35)] transition-all duration-300 flex items-center justify-center gap-2.5 active:scale-95 cursor-pointer group/btn"
-              >
-                <MessageCircle className="w-4 h-4 fill-current text-[#0B9DD8] group-hover/btn:text-white transition-colors" />
-                <span>{isMarathi ? "व्हॉट्सॲपवर ऑर्डर द्या" : "Order on WhatsApp"}</span>
-              </a>
-
-              {/* Secondary Action: Explore Daily Catch */}
-              <button
-                id="hero-explore-fish-btn"
-                type="button"
-                onClick={scrollToProducts}
-                className="px-7 py-4 rounded-full bg-white hover:bg-[#F5F4EF] text-[#071A24] border border-[#071A24]/15 hover:border-[#0B9DD8] text-xs sm:text-sm font-mono-accent font-bold uppercase tracking-wider shadow-xs transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer active:scale-95 group/explore"
-              >
-                <span>{isMarathi ? "आजची ताजी आवक पहा" : "Explore Daily Catch"}</span>
-                <ArrowDown className="w-4 h-4 text-[#0B9DD8] transition-transform duration-200 group-hover/explore:translate-y-0.5" />
-              </button>
-            </div>
-
-            {/* Editorial Trust Milestones Grid */}
-            <div
-              ref={trustBarRef}
-              className="pt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-[#071A24]/10"
-            >
-              <div className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-[#071A24]/08 shadow-2xs hover:border-[#0B9DD8]/30 transition-colors">
-                <div className="w-8 h-8 rounded-xl bg-[#EBF8FF] text-[#0B9DD8] flex items-center justify-center shrink-0">
-                  <Anchor className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-[#071A24] block">
-                    {isMarathi ? "पहाटे ४:०० लिलाव" : "Dawn Auction"}
-                  </span>
-                  <span className="text-[10px] text-[#071A24]/60 font-mono-accent block">
-                    Ratnagiri & Malvan
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-[#071A24]/08 shadow-2xs hover:border-[#0B9DD8]/30 transition-colors">
-                <div className="w-8 h-8 rounded-xl bg-[#EBF8FF] text-[#0B9DD8] flex items-center justify-center shrink-0">
-                  <ThermometerSnowflake className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-[#071A24] block">
-                    {isMarathi ? "०°C शीतसाखळी" : "0°C Ice Slurry"}
-                  </span>
-                  <span className="text-[10px] text-[#071A24]/60 font-mono-accent block">
-                    Unbroken Cold Chain
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-[#071A24]/08 shadow-2xs hover:border-[#0B9DD8]/30 transition-colors">
-                <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-[#071A24] block">
-                    {isMarathi ? "१००% रसायनमुक्त" : "100% Pure Catch"}
-                  </span>
-                  <span className="text-[10px] text-[#071A24]/60 font-mono-accent block">
-                    RO Washed & Sliced
-                  </span>
-                </div>
-              </div>
-            </div>
-
+                ? "ए एन फिश वर्ल्ड · AN Fish World, Karad"
+                : "AN Fish World · Karad, Maharashtra"}
+            </span>
           </div>
 
-          {/* Right Column: 5 Free-Shape Seafood Images (No frame, no box, pure white, organic layout) */}
-          <div className="lg:col-span-6 xl:col-span-6 relative flex flex-col items-center justify-center">
-            
-            {/* Desktop & Tablet: Free-Shape Multi-Species Constellation Layout (Zero Box / Zero Frame) */}
-            <div className="relative w-full max-w-[560px] h-[480px] sm:h-[530px] lg:h-[560px] flex items-center justify-center select-none">
+          {/* Centered Bold Marathi Heading (100% Static) */}
+          <h1 className="mt-3">
+            <span className="block font-marathi-display text-[clamp(2.2rem,6.8vw,4.5rem)] leading-[1.2] font-black text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.7)]">
+              {isMarathi ? "अस्सल दर्जेदार चवीची" : "Authentic Sea Freshness"}
               
-              {/* 1. Center / Primary Focus: Silver Pomfret (Free shape, true transparent alpha, perfectly centered) */}
-              <div
-                className="absolute inset-0 m-auto z-20 cursor-pointer group/center select-none w-64 sm:w-76 lg:w-84 xl:w-92 aspect-square flex items-center justify-center"
-                onClick={() => setActiveSpeciesId("pomfret")}
-              >
-                <div
-                  ref={fishCenterRef}
-                  className="relative w-full h-full transition-transform duration-500 ease-out group-hover/center:scale-105"
-                >
-                  <Image
-                    src="/media/hero/pomfret-free-transparent.webp"
-                    alt="Silver Pomfret on crushed ice with lemon"
-                    fill
-                    sizes="(max-width: 768px) 280px, 400px"
-                    priority
-                    quality={95}
-                    className="object-contain drop-shadow-[0_16px_36px_rgba(7,26,36,0.12)]"
-                  />
-                  {/* Subtle Floating Label */}
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-white/95 border border-[#071A24]/10 shadow-sm text-[10px] sm:text-xs font-mono-accent font-bold text-[#071A24] whitespace-nowrap flex items-center gap-1.5 opacity-90 group-hover/center:opacity-100 transition-opacity">
-                    <Sparkles className="w-3.5 h-3.5 text-[#0B9DD8]" />
-                    <span>{isMarathi ? "सिल्व्हर पापलेट • ₹1,150" : "Silver Pomfret • ₹1,150"}</span>
-                  </div>
-                </div>
-              </div>
+              {/* Static bold golden line */}
+              <span className="mt-1 block text-[#FBBF24] drop-shadow-[0_4px_24px_rgba(251,191,36,0.35)]">
+                {isMarathi ? "कराडची लाडकी मासोळी" : "Karad's Beloved Seafood"}
+              </span>
+            </span>
+          </h1>
 
-              {/* 2. Top-Right: Kingfish Surmai Steaks (Free shape) */}
-              <div
-                className="absolute top-1 right-1 sm:right-3 z-15 cursor-pointer group/surmai"
-                onClick={() => setActiveSpeciesId("surmai")}
-              >
-                <div
-                  ref={fishTopRightRef}
-                  className="relative w-36 sm:w-44 lg:w-48 aspect-square transition-transform duration-500 ease-out group-hover/surmai:scale-110"
-                >
-                  <Image
-                    src="/media/hero/surmai-free-transparent.webp"
-                    alt="Raw Kingfish Surmai steaks on crushed ice"
-                    fill
-                    sizes="(max-width: 768px) 160px, 200px"
-                    quality={92}
-                    className="object-contain drop-shadow-[0_10px_22px_rgba(7,26,36,0.08)] transition-transform duration-300 group-hover/surmai:rotate-2"
-                  />
-                  <div className="absolute top-1 right-1 px-2.5 py-0.5 rounded-full bg-white/95 border border-[#071A24]/10 shadow-2xs text-[9px] sm:text-[10px] font-mono-accent font-bold text-[#071A24] whitespace-nowrap opacity-85 group-hover/surmai:opacity-100 transition-opacity">
-                    {isMarathi ? "सुरमई स्टेक्स" : "Surmai Steaks"}
-                  </div>
-                </div>
-              </div>
+          {/* Centered Bigger Tagline with Better Font & Dynamic Typing Effect (Strictly 1 line always) */}
+          <p className="mx-auto mt-6 w-full max-w-5xl font-marathi-display text-[clamp(0.72rem,1.85vw,1.35rem)] font-semibold leading-relaxed text-white/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] whitespace-nowrap text-center">
+            <span className="whitespace-nowrap">
+              {isMarathi
+                ? "कराडची लाडकी मासोळी... समुद्राची खरी चव..! — "
+                : "Karad's beloved seafood... Pure oceanic taste..! — "}
+            </span>
+            <span className="inline-block whitespace-nowrap text-[#38BDF8] font-bold drop-shadow-[0_2px_16px_rgba(56,189,248,0.5)]">
+              <span>{displayedText}</span>
+              <span
+                className="inline-block w-[3px] h-[0.85em] ml-1 bg-[#38BDF8] align-middle animate-pulse"
+                aria-hidden="true"
+              />
+            </span>
+          </p>
 
-              {/* 3. Bottom-Left: Jumbo Tiger Prawns (Free shape) */}
-              <div
-                className="absolute bottom-8 sm:bottom-10 left-1 sm:left-2 z-15 cursor-pointer group/prawns"
-                onClick={() => setActiveSpeciesId("prawns")}
-              >
-                <div
-                  ref={fishBottomLeftRef}
-                  className="relative w-36 sm:w-42 lg:w-46 aspect-square transition-transform duration-500 ease-out group-hover/prawns:scale-110"
-                >
-                  <Image
-                    src="/media/hero/prawns-free-transparent.webp"
-                    alt="Jumbo Tiger Prawns on crushed ice"
-                    fill
-                    sizes="(max-width: 768px) 150px, 190px"
-                    quality={92}
-                    className="object-contain drop-shadow-[0_10px_22px_rgba(7,26,36,0.08)] transition-transform duration-300 group-hover/prawns:-rotate-2"
-                  />
-                  <div className="absolute -bottom-1 left-2 px-2.5 py-0.5 rounded-full bg-white/95 border border-[#071A24]/10 shadow-2xs text-[9px] sm:text-[10px] font-mono-accent font-bold text-[#071A24] whitespace-nowrap opacity-85 group-hover/prawns:opacity-100 transition-opacity">
-                    {isMarathi ? "टायगर कोळंबी" : "Tiger Prawns"}
-                  </div>
-                </div>
-              </div>
-
-              {/* 4. Bottom-Right: Indian Salmon Rawas (Free shape) */}
-              <div
-                className="absolute bottom-6 right-2 sm:right-4 z-15 cursor-pointer group/rawas"
-                onClick={() => setActiveSpeciesId("rawas")}
-              >
-                <div
-                  ref={fishBottomRightRef}
-                  className="relative w-32 sm:w-38 lg:w-42 aspect-square transition-transform duration-500 ease-out group-hover/rawas:scale-110"
-                >
-                  <Image
-                    src="/media/hero/rawas-free-transparent.webp"
-                    alt="Indian Salmon Rawas steaks on crushed ice"
-                    fill
-                    sizes="(max-width: 768px) 140px, 180px"
-                    quality={92}
-                    className="object-contain drop-shadow-[0_10px_22px_rgba(7,26,36,0.08)] transition-transform duration-300 group-hover/rawas:rotate-1"
-                  />
-                  <div className="absolute -bottom-1 right-2 px-2.5 py-0.5 rounded-full bg-white/95 border border-[#071A24]/10 shadow-2xs text-[9px] sm:text-[10px] font-mono-accent font-bold text-[#071A24] whitespace-nowrap opacity-85 group-hover/rawas:opacity-100 transition-opacity">
-                    {isMarathi ? "रावस (सामन)" : "Rawas Salmon"}
-                  </div>
-                </div>
-              </div>
-
-              {/* 5. Top-Left: Ocean Mud Crab (Free shape) */}
-              <div
-                className="absolute top-3 left-1 sm:left-3 z-15 cursor-pointer group/crab"
-                onClick={() => setActiveSpeciesId("crab")}
-              >
-                <div
-                  ref={fishTopLeftRef}
-                  className="relative w-30 sm:w-36 lg:w-40 aspect-square transition-transform duration-500 ease-out group-hover/crab:scale-110"
-                >
-                  <Image
-                    src="/media/hero/crab-free-transparent.webp"
-                    alt="Ocean Mud Crab on crushed ice"
-                    fill
-                    sizes="(max-width: 768px) 130px, 170px"
-                    quality={92}
-                    className="object-contain drop-shadow-[0_10px_22px_rgba(7,26,36,0.08)] transition-transform duration-300 group-hover/crab:-rotate-1"
-                  />
-                  <div className="absolute top-1 left-1 px-2.5 py-0.5 rounded-full bg-white/95 border border-[#071A24]/10 shadow-2xs text-[9px] sm:text-[10px] font-mono-accent font-bold text-[#071A24] whitespace-nowrap opacity-85 group-hover/crab:opacity-100 transition-opacity">
-                    {isMarathi ? "चिमबोरी / खेकडा" : "Mud Crab"}
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Step 8B: Sleek Standalone Telemetry Pill (Free shape, not enclosing the fish) */}
-            <div
-              ref={lowerPanelRef}
-              className="mt-4 inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3 px-4 py-2 rounded-full bg-white border border-[#071A24]/10 shadow-sm text-xs select-none"
+          {/* The 2 Buttons: [व्हॉट्सॲपवर ऑर्डर द्या] & [आजची ताजी आवक पहा] */}
+          <div className="mt-8 sm:mt-10 flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center w-full sm:w-auto">
+            
+            {/* Button 1: [व्हॉट्सॲपवर ऑर्डर द्या] (Gradient with WhatsApp Icon & Arrow) */}
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative inline-flex items-center justify-center gap-2.5 rounded-full font-bold tracking-wide transition-all duration-300 shadow-[0_18px_40px_-14px_rgba(10,154,217,0.75)] hover:-translate-y-0.5 hover:shadow-[0_22px_46px_-14px_rgba(10,154,217,0.95)] px-7 py-3.5 text-base sm:px-9 sm:py-4 bg-gradient-to-r from-[#0A9AD9] via-[#0284C7] to-[#25D366] text-white active:scale-95 cursor-pointer font-marathi-display"
+              aria-label="Order fresh fish on WhatsApp"
             >
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="font-bold text-[#071A24]">
-                  {isMarathi ? "कराड थेट आवक" : "Karad Outpost Live Batch"}
-                </span>
-              </div>
-              <span className="text-[#071A24]/20 hidden sm:inline">•</span>
-              <span className="font-mono-accent text-[#0B9DD8] font-bold text-[11px]">
-                TEMP: 0.2°C
-              </span>
-              <span className="text-[#071A24]/20 hidden sm:inline">•</span>
-              <span className="text-[#071A24]/70 font-mono-accent text-[11px] flex items-center gap-1">
-                <MapPin className="w-3 h-3 text-[#0B9DD8]" />
-                <span>Malkapur, Karad</span>
-              </span>
-              <span className="text-[#071A24]/20 hidden sm:inline">•</span>
-              <span className="text-emerald-700 font-medium text-[11px]">
-                {isMarathi ? "मोफत समोर कटिंग" : "Free Custom Cuts"}
-              </span>
-            </div>
+              <MessageCircle className="w-5 h-5 fill-current shrink-0" />
+              <span>{isMarathi ? "व्हॉट्सॲपवर ऑर्डर द्या" : "Order on WhatsApp"}</span>
+              <ArrowRight className="w-4 h-4 ml-0.5 transition-transform duration-300 group-hover:translate-x-1" />
+            </a>
+
+            {/* Button 2: [आजची ताजी आवक पहा] (Frosted Glass Border Button) */}
+            <a
+              href="#signature"
+              onClick={scrollToMenu}
+              className="relative inline-flex items-center justify-center gap-2 rounded-full font-bold tracking-wide transition-all duration-300 border-2 border-white/45 bg-black/40 hover:bg-white/20 text-white px-7 py-3.5 text-base sm:px-9 sm:py-4 backdrop-blur-sm active:scale-95 cursor-pointer font-marathi-display"
+              aria-label="View Today's Fresh Fish Catch"
+            >
+              <span>{isMarathi ? "आजची ताजी आवक पहा" : "View Today's Catch"}</span>
+            </a>
 
           </div>
 
+          {/* Centered Bottom Quick Signals (Exact Reference Style) */}
+          <ul className="mt-10 flex flex-wrap items-center justify-center gap-y-2 gap-x-5 text-xs sm:text-sm font-semibold text-white/85">
+            <li className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-[#FBBF24] shrink-0" />
+              <span>कराड · जि. सातारा</span>
+            </li>
+
+            <li aria-hidden="true" className="hidden h-3.5 w-px bg-white/25 sm:block" />
+
+            <li className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-[#FBBF24] shrink-0" />
+              <span>{isMarathi ? "ऑर्डरनंतर ३० मिनिटांत ताजी मासोळी घरपोच" : "Fresh delivery within 30-45 mins"}</span>
+            </li>
+
+            <li aria-hidden="true" className="hidden h-3.5 w-px bg-white/25 sm:block" />
+
+            <li className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>{isMarathi ? "१००% फॉर्मेलिन व केमिकलमुक्त" : "100% Formalin & Chemical Free"}</span>
+            </li>
+          </ul>
+
+        </div>
+
+        {/* Bouncing Chevron Scroll Down Indicator */}
+        <a
+          href="#signature"
+          onClick={scrollToMenu}
+          aria-label="Scroll to signature catch"
+          className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full p-2 text-white/70 hover:text-[#FBBF24] transition-colors hidden sm:block"
+        >
+          <ChevronDown className="w-7 h-7 animate-bounce" />
+        </a>
+      </div>
+
+      {/* 4. Marquee Catch Ribbon at Bottom of Hero (Matching Hotel Atithi Style) */}
+      <div className="relative z-10 border-t border-[#FBBF24]/30 bg-gradient-to-r from-[#0A9AD9] via-[#0284C7] to-[#0A9AD9] text-white shadow-lg overflow-hidden py-3">
+        <div className="marquee-track">
+          <ul className="flex shrink-0 items-center">
+            {tickerItems.map((item, idx) => (
+              <li key={idx} className="flex items-center font-marathi-display text-sm sm:text-base font-bold text-white tracking-wide">
+                <span>{item}</span>
+                <span className="mx-4 sm:mx-6 text-[0.65em] text-[#FBBF24]">◆</span>
+              </li>
+            ))}
+          </ul>
+          <ul className="flex shrink-0 items-center" aria-hidden="true">
+            {tickerItems.map((item, idx) => (
+              <li key={`dup-${idx}`} className="flex items-center font-marathi-display text-sm sm:text-base font-bold text-white tracking-wide">
+                <span>{item}</span>
+                <span className="mx-4 sm:mx-6 text-[0.65em] text-[#FBBF24]">◆</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

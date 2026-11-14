@@ -230,19 +230,19 @@ export function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
         <div className="flex items-center gap-4">
           <span className="uppercase tracking-[0.08em] text-white/40">Follow:</span>
           <a
-            href="https://instagram.com"
+            href="https://www.instagram.com/an.fishworld"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Instagram"
+            aria-label="Instagram (@an.fishworld)"
             className="p-2 rounded-full bg-white/5 border border-white/10 hover:border-[#6EC6F0] hover:text-[#6EC6F0] transition-colors"
           >
             <InstagramIcon className="w-4 h-4" />
           </a>
           <a
-            href="https://youtube.com"
+            href="https://www.youtube.com/@anfishworld"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="YouTube"
+            aria-label="YouTube (@anfishworld)"
             className="p-2 rounded-full bg-white/5 border border-white/10 hover:border-[#6EC6F0] hover:text-[#6EC6F0] transition-colors"
           >
             <YoutubeIcon className="w-4 h-4" />

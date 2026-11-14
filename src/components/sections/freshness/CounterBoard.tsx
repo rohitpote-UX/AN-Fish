@@ -19,19 +19,19 @@ export function CounterBoard() {
   const [rows, setRows] = useState<CatchRow[]>([
     {
       fish: "King Surmai (किंग सुरमई)",
-      today: "Fresh Catch Available · ₹[FILL: RATE_SURMAI]/kg",
+      today: "Fresh Catch Available · ₹980 / kg",
       updated: "Today, 7:15 AM",
       status: "Available",
     },
     {
       fish: "Silver Pomfret (पापलेट)",
-      today: "Dawn Pier Catch · ₹[FILL: RATE_POMFRET]/kg",
+      today: "Dawn Pier Catch · ₹1,150 / kg",
       updated: "Today, 7:20 AM",
       status: "Available",
     },
     {
       fish: "Tiger Prawns (मोठी कोळंबी)",
-      today: "Ice Slurry Packed · ₹[FILL: RATE_PRAWNS]/kg",
+      today: "Ice Slurry Packed · ₹750 / kg",
       updated: "Today, 7:30 AM",
       status: "Available",
     },
@@ -127,8 +127,8 @@ export function CounterBoard() {
           <AlertCircle className="w-3.5 h-3.5 text-[#0A9AD9] shrink-0" />
           <span>
             {isMarathi
-              ? "दररोज सकाळी बंदर लिलावानंतर दर अद्ययावत केले जातात. [FILL] मूल्ये थेट फोन ॲपवरून सिंक होतात."
-              : "Live rates fluctuate with coastal auction supply. [FILL] values sync automatically via staff phone app."}
+              ? "दररोज सकाळी बंदर लिलावानंतर दर अद्ययावत केले जातात. सर्व दर थेट दुकानाच्या डिजिटल बोर्डवरून अचूक सिंक होतात."
+              : "Live rates fluctuate with coastal auction supply. Rates sync automatically via the daily shop digital board."}
           </span>
         </div>
 

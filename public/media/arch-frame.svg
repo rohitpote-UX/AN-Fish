@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" fill="none" class="w-full h-full">
+  <defs>
+    <linearGradient id="archGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24" />
+      <stop offset="50%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0A9AD9" />
+    </linearGradient>
+    <linearGradient id="archCyan" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#0A9AD9" stop-opacity="0.4" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Stepped Arch with Shoulder Transition -->
+  <path
+    d="M 20 280 L 20 115 L 32 115 L 32 104 A 88 88 0 0 1 208 104 L 208 115 L 220 115 L 220 280 Z"
+    stroke="url(#archGold)"
+    stroke-width="2"
+    stroke-linejoin="round"
+  />
+
+  <!-- Concentric Arch 2 -->
+  <path
+    d="M 32 272 L 32 104 A 88 88 0 0 1 208 104 L 208 272"
+    stroke="url(#archCyan)"
+    stroke-width="1.6"
+    stroke-linejoin="round"
+  />
+
+  <!-- Concentric Arch 3 -->
+  <path
+    d="M 42 264 L 42 104 A 78 78 0 0 1 198 104 L 198 264"
+    stroke="url(#archCyan)"
+    stroke-width="1.2"
+    stroke-linejoin="round"
+    stroke-opacity="0.75"
+  />
+
+  <!-- Inner Arch 4 (Inner Window Frame) -->
+  <path
+    d="M 52 256 L 52 104 A 68 68 0 0 1 188 104 L 188 256 Z"
+    stroke="url(#archGold)"
+    stroke-width="1.8"
+    stroke-linejoin="round"
+  />
+
+  <!-- Stepped Base Moldings -->
+  <line x1="20" y1="280" x2="220" y2="280" stroke="url(#archGold)" stroke-width="2.2" />
+  <line x1="32" y1="272" x2="208" y2="272" stroke="url(#archCyan)" stroke-width="1.6" />
+  <line x1="42" y1="264" x2="198" y2="264" stroke="url(#archCyan)" stroke-width="1.2" stroke-opacity="0.75" />
+  <line x1="52" y1="256" x2="188" y2="256" stroke="url(#archGold)" stroke-width="1.8" />
+</svg>

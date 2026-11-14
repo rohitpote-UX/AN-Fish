@@ -15,9 +15,9 @@ export const FAQS_LIST: FAQItem[] = [
     questionMr: "कराडमध्ये होम डिलिव्हरी किती वेळात मिळते?",
     questionEn: "What is the delivery time within Karad?",
     answerMr:
-      "ऑर्डर नोंदवल्यानंतर [FILL: 45 MINS IN KARAD] मध्ये मासोळी ताजी कापून, बर्फाच्या सीलबंद पॅकिंगमध्ये आपल्या घरी पोहोचवली जाते.",
+      "ऑर्डर नोंदवल्यानंतर ३० ते ४५ मिनिटांत मासोळी ताजी कापून, बर्फाच्या सीलबंद पॅकिंगमध्ये आपल्या घरी पोहोचवली जाते.",
     answerEn:
-      "Once your order is confirmed, custom butchering takes under 15 minutes and delivery reaches your doorstep within [FILL: 45 MINS IN KARAD] in insulated ice-chilled packaging.",
+      "Once your order is confirmed, custom butchering takes under 15 minutes and delivery reaches your doorstep within 30 to 45 minutes in insulated ice-chilled packaging.",
   },
   {
     id: "cleaning-standards",

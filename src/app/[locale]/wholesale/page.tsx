@@ -155,7 +155,7 @@ export default async function WholesalePage({
               <ul className="space-y-3 text-xs sm:text-sm text-[#E9F7FF]/80">
                 <li className="flex items-center justify-between py-1.5 border-b border-white/5">
                   <span className="text-white/60">Minimum Order Qty (MOQ):</span>
-                  <span className="font-mono-accent text-white font-bold">[FILL: 10 KG BULK]</span>
+                  <span className="font-mono-accent text-white font-bold">10 KG (Commercial)</span>
                 </li>
                 <li className="flex items-center justify-between py-1.5 border-b border-white/5">
                   <span className="text-white/60">Daily Dispatch Time:</span>

@@ -1,28 +1,26 @@
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
-import { Baloo_2, Noto_Sans_Devanagari, Playfair_Display } from "next/font/google";
 
 export const geistSans = GeistSans;
 export const geistMono = GeistMono;
 
-export const baloo2 = Baloo_2({
-  subsets: ["devanagari", "latin"],
-  variable: "--font-baloo",
-  display: "swap",
-  weight: ["500", "600", "700", "800"],
-});
+/**
+ * Turbopack-safe font token definitions.
+ * Google fonts ('Baloo 2', 'Noto Sans Devanagari', 'Playfair Display') are loaded
+ * via preconnected Google Fonts CDN in layout.tsx to prevent Turbopack's internal
+ * "next/font/google queries have exactly one entry" module resolution bug.
+ */
+export const baloo2 = {
+  variable: "font-baloo",
+  className: "font-baloo",
+};
 
-export const notoSansDevanagari = Noto_Sans_Devanagari({
-  subsets: ["devanagari", "latin"],
-  variable: "--font-noto-devanagari",
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
-});
+export const notoSansDevanagari = {
+  variable: "font-noto-devanagari",
+  className: "font-noto-devanagari",
+};
 
-export const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair",
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-});
+export const playfair = {
+  variable: "font-playfair",
+  className: "font-playfair",
+};

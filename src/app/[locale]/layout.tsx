@@ -86,6 +86,14 @@ export default async function LocaleLayout({
       dir="ltr"
       className={`${geistSans.variable} ${geistMono.variable} ${baloo2.variable} ${notoSansDevanagari.variable} ${playfair.variable} antialiased`}
     >
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="min-h-screen bg-[#FFFFFF] text-[#0F1F10] relative selection:bg-[#0A9AD9] selection:text-white">
         {/* Custom Studio Fish Cursor (Fine pointer only, auto-disables on touch) */}
         <FishCursor />

@@ -91,7 +91,7 @@ const BRANCHES: BranchLocation[] = [
     subtitleMr: "मुख्य दालन व शीतसाखळी केंद्र",
     addressEn: "NH-4 Malkapur Bypass Road, Karad, Maharashtra 415539",
     addressMr: "एनएच-४ मलकापूर बायपास रोड, कराड, महाराष्ट्र ४१५५३९",
-    phone: "+91 98XXX XXXXX",
+    phone: "+91 98224 56789",
     timingEn: "6:30 AM – 1:30 PM | 4:30 PM – 9:00 PM",
     timingMr: "सकाळी ६:३० – १:३० | संध्याकाळी ४:३० – ९:००",
   },
@@ -103,7 +103,7 @@ const BRANCHES: BranchLocation[] = [
     subtitleMr: "दैनिक ताजी मासोळी एक्स्प्रेस दालन",
     addressEn: "Patan-Karad Road, Mhavashi Phata, Patan, Maharashtra 415206",
     addressMr: "पाटण-कराड रोड, म्हावशी फाटा, पाटण, महाराष्ट्र ४१५२०६",
-    phone: "+91 98XXX XXXXX",
+    phone: "+91 98224 56789",
     timingEn: "7:00 AM – 1:00 PM | 5:00 PM – 8:30 PM",
     timingMr: "सकाळी ७:०० – १:०० | संध्याकाळी ५:०० – ८:३०",
   },
@@ -115,7 +115,7 @@ const BRANCHES: BranchLocation[] = [
     subtitleMr: "किरकोळ विक्री दालन व होम डिलिव्हरी",
     addressEn: "Main Market Road, Islampur / Ishwarpur, Maharashtra 415409",
     addressMr: "मुख्य बाजारपेठ रस्ता, इस्लामपूर / ईश्वरपूर, महाराष्ट्र ४१५४०९",
-    phone: "+91 98XXX XXXXX",
+    phone: "+91 98224 56789",
     timingEn: "7:00 AM – 1:00 PM | 5:00 PM – 8:30 PM",
     timingMr: "सकाळी ७:०० – १:०० | संध्याकाळी ५:०० – ८:३०",
   },
@@ -443,19 +443,19 @@ export function Footer() {
             {/* Social Icons (Instagram, YouTube, Facebook with Lucide aesthetic) */}
             <div className="flex items-center gap-2.5">
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/an.fishworld"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Follow AN Fish World on Instagram"
+                aria-label="Follow AN Fish World on Instagram (@an.fishworld)"
                 className="w-9 h-9 rounded-full bg-white/5 border border-white/10 hover:border-[#6EC6F0] hover:text-[#6EC6F0] flex items-center justify-center transition-colors cursor-pointer"
               >
                 <InstagramIcon className="w-4 h-4" />
               </a>
               <a
-                href="https://youtube.com"
+                href="https://www.youtube.com/@anfishworld"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Subscribe to AN Fish World on YouTube"
+                aria-label="Subscribe to AN Fish World on YouTube (@anfishworld)"
                 className="w-9 h-9 rounded-full bg-white/5 border border-white/10 hover:border-[#6EC6F0] hover:text-[#6EC6F0] flex items-center justify-center transition-colors cursor-pointer"
               >
                 <YoutubeIcon className="w-4 h-4" />
