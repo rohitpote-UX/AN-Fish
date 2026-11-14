@@ -12,6 +12,7 @@ import {
 } from "@/app/fonts";
 import "@/app/globals.css";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
+import { Preloader } from "@/components/layout/Preloader";
 import { Header } from "@/components/layout/Header";
 import { FishCursor } from "@/components/layout/FishCursor";
 import { DepthMeter } from "@/components/layout/DepthMeter";
@@ -95,6 +96,9 @@ export default async function LocaleLayout({
         />
       </head>
       <body className="min-h-screen bg-[#FFFFFF] text-[#0F1F10] relative selection:bg-[#0A9AD9] selection:text-white">
+        {/* Awwwards-Style 3-Second First-Load Animated Intro Screen */}
+        <Preloader />
+
         {/* Custom Studio Fish Cursor (Fine pointer only, auto-disables on touch) */}
         <FishCursor />
 

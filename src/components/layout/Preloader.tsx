@@ -1,210 +1,291 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { gsap } from "@/lib/gsap";
-import { useScrollStore } from "@/store/scroll";
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import { Compass, Waves, Sparkles, Anchor, Fish, ArrowRight } from "lucide-react";
 
 export function Preloader() {
+  const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [percent, setPercent] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const fishContainerRef = useRef<HTMLDivElement>(null);
-  const wavePathRef = useRef<SVGPathElement>(null);
-  const waterGroupRef = useRef<SVGGElement>(null);
-
-  const reducedMotion = useScrollStore((state) => state.reducedMotion);
+  const [isExiting, setIsExiting] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // 1. Accessibility: skip on reduced motion
-    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (motionQuery.matches || reducedMotion) {
-      sessionStorage.setItem("an_preloader_seen", "1");
+    setMounted(true);
+
+    // 1. Check for reduced motion
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // 2. Play only on first load in this session
+    const hasSeenIntro =
+      typeof window !== "undefined" &&
+      sessionStorage.getItem("an_fish_first_intro_seen");
+
+    if (prefersReducedMotion || hasSeenIntro) {
       return;
     }
 
-    // 2. Play once per session
-    if (typeof window !== "undefined" && sessionStorage.getItem("an_preloader_seen")) {
-      return;
-    }
-
+    // Activate the preloader
     setVisible(true);
 
-    let progressObj = { value: 0 };
-    let waveOffset = { value: 0 };
-    let animationFrameId: number | null = null;
+    // Lock body scrolling during the 3-second entrance
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
 
-    // 3. Real asset loading: fonts + min 1.2s delay, capped at 2.8s
-    const startTimestamp = Date.now();
-    const minDelay = 1200;
-    const maxDelay = 2800;
+    // 3. Smooth non-linear progress counter spanning 2400ms (0 -> 100%)
+    const startTime = performance.now();
+    const duration = 2400; // 2.4s count up, 0.6s cinematic curtain reveal = 3.0s total
 
-    const fontsReady = typeof document !== "undefined" && document.fonts ? document.fonts.ready : Promise.resolve();
+    let animationFrameId: number;
 
-    // Sine wave generator for water surface
-    const updateWave = () => {
-      if (!wavePathRef.current) return;
-      const p = progressObj.value; // 0 to 100
-      const waterY = 60 - (p / 100) * 60; // 60 -> 0
-      const offset = waveOffset.value;
-      const amplitude = p >= 98 || p <= 2 ? 0 : 2.5;
+    const updateProgress = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const t = Math.min(1, elapsed / duration);
 
-      // Construct sine curve across 0 to 100
-      const d = `
-        M -20 ${waterY}
-        Q ${10 + offset} ${waterY - amplitude}, ${35 + offset} ${waterY}
-        T ${70 + offset} ${waterY}
-        T ${120 + offset} ${waterY}
-        L 120 70
-        L -20 70
-        Z
-      `;
-      wavePathRef.current.setAttribute("d", d);
-      setPercent(Math.round(p));
+      // Smooth custom ease-out curve (fast initial rise, decelerates gracefully to 100%)
+      const easedT = 1 - Math.pow(1 - t, 2.6);
+      const currentVal = Math.min(100, Math.floor(easedT * 100));
+
+      setProgress(currentVal);
+
+      if (t < 1) {
+        animationFrameId = requestAnimationFrame(updateProgress);
+      } else {
+        setProgress(100);
+
+        // At 2400ms, start the 600ms Awwwards curtain exit animation
+        setTimeout(() => {
+          setIsExiting(true);
+
+          // Complete at 3000ms
+          setTimeout(() => {
+            document.body.style.overflow = originalOverflow;
+            sessionStorage.setItem("an_fish_first_intro_seen", "true");
+            setVisible(false);
+          }, 600);
+        }, 120);
+      }
     };
 
-    // Animate wave crest drifting horizontally
-    const waveTween = gsap.to(waveOffset, {
-      value: 30,
-      duration: 1.5,
-      ease: "sine.inOut",
-      repeat: -1,
-      yoyo: true,
-      onUpdate: updateWave,
-    });
-
-    // Rise water from 0 to 90% while assets load
-    const riseTween = gsap.to(progressObj, {
-      value: 85,
-      duration: 1.4,
-      ease: "power2.out",
-      onUpdate: updateWave,
-    });
-
-    // When assets finish, smoothly complete from 85 -> 100%
-    const finalizeLoading = () => {
-      const elapsed = Date.now() - startTimestamp;
-      const remainingTime = Math.max(0, minDelay - elapsed);
-
-      setTimeout(() => {
-        gsap.to(progressObj, {
-          value: 100,
-          duration: 0.5,
-          ease: "power3.out",
-          onUpdate: updateWave,
-          onComplete: () => {
-            // MOMENT 1 Climax: Fish scales up smoothly, filling the screen with ocean blue
-            waveTween.kill();
-
-            const tl = gsap.timeline({
-              onComplete: () => {
-                sessionStorage.setItem("an_preloader_seen", "1");
-                window.dispatchEvent(new CustomEvent("an_preloader_done"));
-                setVisible(false);
-              },
-            });
-
-            tl.to(fishContainerRef.current, {
-              scale: 22,
-              duration: 0.85,
-              ease: "expo.inOut",
-            });
-
-            tl.to(
-              containerRef.current,
-              {
-                opacity: 0,
-                duration: 0.5,
-                ease: "power2.out",
-              },
-              "-=0.35"
-            );
-          },
-        });
-      }, remainingTime);
-    };
-
-    Promise.race([
-      fontsReady,
-      new Promise((res) => setTimeout(res, maxDelay)),
-    ]).then(finalizeLoading);
+    animationFrameId = requestAnimationFrame(updateProgress);
 
     return () => {
-      waveTween.kill();
-      riseTween.kill();
-      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      cancelAnimationFrame(animationFrameId);
+      document.body.style.overflow = originalOverflow;
     };
-  }, [reducedMotion]);
+  }, []);
 
-  if (!visible) return null;
+  const handleSkip = () => {
+    setIsExiting(true);
+    setTimeout(() => {
+      document.body.style.overflow = "";
+      sessionStorage.setItem("an_fish_first_intro_seen", "true");
+      setVisible(false);
+    }, 400);
+  };
+
+  if (!mounted || !visible) return null;
+
+  // Dynamic status text across the 3-second journey
+  const getStageInfo = (p: number) => {
+    if (p < 30) {
+      return {
+        step: "०१",
+        label: "अरबी समुद्र • रत्नागिरी व मालवण बंदरे",
+        sub: "Dawn 4:00 AM harbour catch selected from deep waters",
+      };
+    }
+    if (p < 65) {
+      return {
+        step: "०२",
+        label: "०°C नैसर्गिक गारवा • १००% फॉर्मेलिनमुक्त",
+        sub: "Pure crushed ice slurry preservation with zero chemicals",
+      };
+    }
+    if (p < 95) {
+      return {
+        step: "०३",
+        label: "कराड मुख्य केंद्र • २५+ दालनांचे नेटवर्क",
+        sub: "Connecting Maharashtra's largest seafood franchise hub",
+      };
+    }
+    return {
+      step: "०४",
+      label: "कराडची लाडकी मासोळी • स्वागत आहे",
+      sub: "Welcome to AN Fish World — Enjoy Pure Ocean Freshness",
+    };
+  };
+
+  const stage = getStageInfo(progress);
 
   return (
-    <div
-      ref={containerRef}
-      aria-hidden="true"
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#05080C] select-none pointer-events-auto"
+    <aside
+      aria-label="AN Fish World Loading Experience"
+      className={`fixed inset-0 z-[9999] flex flex-col justify-between bg-[#040D17] text-white select-none pointer-events-auto transition-transform duration-700 ease-[cubic-bezier(0.85,0,0.15,1)] will-change-transform ${
+        isExiting ? "-translate-y-full" : "translate-y-0"
+      }`}
     >
-      {/* Centred Fish Container */}
-      <div ref={fishContainerRef} className="relative w-40 h-24 sm:w-48 sm:h-28 will-change-transform">
-        <svg
-          viewBox="0 0 100 60"
-          className="w-full h-full overflow-visible"
-        >
-          <defs>
-            {/* Fish Silhouette Clip Path */}
-            <clipPath id="preloader-fish-clip">
-              <path d="M 5 30 C 25 10, 60 10, 85 30 C 60 50, 25 50, 5 30 Z M 85 30 L 98 15 L 94 30 L 98 45 Z" />
-            </clipPath>
-
-            {/* Ocean Liquid Gradient */}
-            <linearGradient id="water-fill-gradient" x1="0" y1="1" x2="0" y2="0">
-              <stop offset="0%" stopColor="#063A63" />
-              <stop offset="60%" stopColor="#0A9AD9" />
-              <stop offset="100%" stopColor="#6EC6F0" />
-            </linearGradient>
-          </defs>
-
-          {/* 1. Water liquid rising inside the fish clip */}
-          <g clipPath="url(#preloader-fish-clip)">
-            <g ref={waterGroupRef}>
-              <path
-                ref={wavePathRef}
-                fill="url(#water-fill-gradient)"
-                d="M -20 60 L 120 60 L 120 70 L -20 70 Z"
-              />
-            </g>
-          </g>
-
-          {/* 2. Crisp White 1.5px Fish Outline */}
-          <path
-            d="M 5 30 C 25 10, 60 10, 85 30 C 60 50, 25 50, 5 30 Z"
-            fill="none"
-            stroke="#FFFFFF"
-            strokeWidth="1.5"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M 85 30 L 98 15 L 94 30 L 98 45 Z"
-            fill="none"
-            stroke="#FFFFFF"
-            strokeWidth="1.5"
-            strokeLinejoin="round"
-          />
-
-          {/* 3. Fish Eye */}
-          <circle cx="25" cy="27" r="3" fill="#FFFFFF" />
-          <circle cx="26" cy="26" r="1.2" fill="#05080C" />
-        </svg>
+      {/* AMBIENT LIGHT FLARES & NOISE TEXTURE */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Soft Cyan Ambient Glow Top-Left */}
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#0A9AD9]/20 blur-[120px] animate-pulse" />
+        {/* Soft Warm Gold Ambient Glow Center-Right */}
+        <div
+          className="absolute top-1/2 -right-32 w-[32rem] h-[32rem] -translate-y-1/2 rounded-full bg-[#FBBF24]/12 blur-[140px]"
+          style={{ animationDuration: "3s" }}
+        />
+        {/* Deep Ocean Bottom Glow */}
+        <div className="absolute -bottom-40 left-1/2 -translate-x-1/2 w-full max-w-4xl h-80 rounded-full bg-[#0284C7]/20 blur-[130px]" />
       </div>
 
-      {/* Counter & Technical Telemetry */}
-      <div className="mt-8 text-center space-y-1">
-        <div className="font-mono text-xs tracking-[0.08em] text-[#6EC6F0] uppercase font-bold">
-          {percent < 100 ? `SURFACING CATCH • ${percent}%` : "ENTERING THE DEEP • 100%"}
+      {/* TOP BAR: Telemetry & Skip Button */}
+      <header className="relative z-20 w-full px-6 sm:px-12 pt-6 sm:pt-8 flex items-center justify-between text-xs tracking-widest text-white/60 font-mono">
+        <div className="flex items-center gap-3">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          <span className="text-white/80 font-bold uppercase tracking-wider hidden xs:inline">
+            17.2894° N, 74.1818° E // KARAD, MH
+          </span>
+          <span className="text-[#38BDF8] xs:hidden">AN FISH WORLD</span>
         </div>
-        <div className="text-[10px] font-mono tracking-widest text-white/30 uppercase">
-          AN Fish World • Karad
+
+        <div className="flex items-center gap-4">
+          <span className="hidden sm:inline-flex items-center gap-1.5 text-white/50 text-[11px]">
+            <Compass className="w-3.5 h-3.5 text-[#FBBF24] animate-spin" style={{ animationDuration: "8s" }} />
+            <span>0°C FRESH CHAIN</span>
+          </span>
+
+          {/* Quick Skip Button */}
+          <button
+            type="button"
+            onClick={handleSkip}
+            className="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white/80 hover:text-white text-[11px] font-sans font-bold flex items-center gap-1.5 transition-all cursor-pointer backdrop-blur-md active:scale-95"
+            aria-label="Skip Intro"
+          >
+            <span>पुढे जा</span>
+            <ArrowRight className="w-3 h-3 text-[#FBBF24]" />
+          </button>
         </div>
-      </div>
-    </div>
+      </header>
+
+      {/* CENTERPIECE: Awwwards-Style Animated Circular Compass & Leaping Fish Orbit */}
+      <main className="relative z-20 flex flex-col items-center justify-center my-auto px-4 text-center">
+        {/* Animated Orbital Compass Ring */}
+        <div className="relative w-44 h-44 sm:w-56 sm:h-56 flex items-center justify-center mb-8">
+          {/* Sonar Expanding Waves */}
+          <div
+            className="absolute inset-0 rounded-full border border-[#38BDF8]/20 animate-ping pointer-events-none"
+            style={{ animationDuration: "2.2s" }}
+          />
+          <div
+            className="absolute -inset-4 rounded-full border border-[#FBBF24]/15 animate-pulse pointer-events-none"
+            style={{ animationDuration: "1.8s" }}
+          />
+
+          {/* Outer Dashed Rotating Ring */}
+          <div
+            className="absolute inset-0 rounded-full border-2 border-dashed border-[#38BDF8]/40 animate-spin"
+            style={{ animationDuration: "12s" }}
+          />
+
+          {/* Inner Glowing Dial Ring */}
+          <div className="absolute inset-3 sm:inset-4 rounded-full border border-[#FBBF24]/50 shadow-[0_0_30px_rgba(251,191,36,0.25)] flex items-center justify-center bg-gradient-to-b from-[#0A2637]/80 to-[#04101A]/90 backdrop-blur-md">
+            
+            {/* Center Fish Emblem with Dynamic Radiant Glow */}
+            <div className="relative flex flex-col items-center justify-center">
+              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-[#D97706] via-[#FBBF24] to-[#F59E0B] p-0.5 shadow-[0_0_30px_rgba(251,191,36,0.8)] border border-white/60 flex items-center justify-center">
+                <Fish className="w-7 h-7 sm:w-8 sm:h-8 text-[#071A24] fill-current animate-bounce" style={{ animationDuration: "1.5s" }} />
+              </div>
+
+              {/* Glowing Pulse Dot */}
+              <span className="absolute -bottom-1 w-2.5 h-2.5 rounded-full bg-[#38BDF8] ring-4 ring-[#38BDF8]/40 animate-pulse" />
+            </div>
+
+            {/* Orbiting Satellite Dot (Simulates Satellite Tracking of Fresh Vessels) */}
+            <div
+              className="absolute inset-0 animate-spin pointer-events-none"
+              style={{ animationDuration: "3s", animationTimingFunction: "linear" }}
+            >
+              <div className="w-3 h-3 rounded-full bg-[#FBBF24] shadow-[0_0_12px_#FBBF24] -translate-x-1.5 -translate-y-1.5" />
+            </div>
+          </div>
+        </div>
+
+        {/* Brand Name with Golden Typography */}
+        <div className="space-y-2 max-w-lg mx-auto">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0A2637] border border-[#FBBF24]/40 shadow-lg text-[11px] sm:text-xs font-bold font-marathi-display text-[#FBBF24]">
+            <Sparkles className="w-3.5 h-3.5 text-[#FBBF24] fill-current animate-pulse" />
+            <span>ए एन फिश वर्ल्ड • AN FISH WORLD</span>
+          </div>
+
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black font-marathi-display tracking-tight text-white drop-shadow-md">
+            कराडची लाडकी मासोळी...
+          </h1>
+
+          <p className="text-sm sm:text-base font-bold font-marathi-body text-[#38BDF8] tracking-wide">
+            समुद्राची खरी चव..! — एकदा खाल की पुन्हा पुन्हा मागाल.
+          </p>
+        </div>
+
+        {/* Dynamic Storytelling Stage Subtitle */}
+        <div className="mt-6 flex flex-col items-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs sm:text-sm text-white/90 font-marathi-body transition-all duration-300">
+            <span className="font-mono text-[#FBBF24] font-bold">{stage.step}</span>
+            <span className="w-1 h-1 rounded-full bg-white/40" />
+            <span className="font-semibold text-white">{stage.label}</span>
+          </div>
+          <p className="text-[11px] sm:text-xs text-white/50 font-mono mt-1 transition-all duration-300">
+            {stage.sub}
+          </p>
+        </div>
+      </main>
+
+      {/* BOTTOM BAR: Monumental Numeric Counter & 2px Glowing Progress Track */}
+      <footer className="relative z-20 w-full px-6 sm:px-12 pb-6 sm:pb-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Progress Percent & Live Status Info */}
+          <div className="flex items-end justify-between mb-3 font-mono">
+            <div>
+              <span className="text-[10px] text-white/50 uppercase tracking-widest block">
+                CARGO HARBOUR STATUS
+              </span>
+              <span className="text-xs sm:text-sm text-emerald-400 font-bold flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>{progress < 100 ? "0°C FRESH COLD-CHAIN LOCK" : "ALL SYSTEMS READY"}</span>
+              </span>
+            </div>
+
+            {/* Monumental Counter */}
+            <div className="text-right">
+              <span className="text-4xl sm:text-6xl font-black font-mono tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-[#6EC6F0] to-[#FBBF24]">
+                {String(progress).padStart(2, "0")}
+                <span className="text-xl sm:text-2xl font-bold text-[#FBBF24] ml-1">%</span>
+              </span>
+            </div>
+          </div>
+
+          {/* 2px Awwwards Razor Progress Track */}
+          <div className="relative w-full h-1.5 sm:h-2 rounded-full bg-white/10 overflow-hidden backdrop-blur-sm border border-white/10 shadow-inner">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-[#0284C7] via-[#38BDF8] to-[#FBBF24] transition-all duration-75 ease-out shadow-[0_0_20px_rgba(56,189,248,0.9)] relative"
+              style={{ width: `${progress}%` }}
+            >
+              {/* Glowing leading spark */}
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow-[0_0_15px_#FFFFFF] ring-2 ring-[#FBBF24]" />
+            </div>
+          </div>
+
+          {/* Footer Sub-telemetry */}
+          <div className="flex items-center justify-between text-[10px] text-white/40 font-mono mt-2.5">
+            <span>RATNAGIRI • MALVAN • KARAD HQ</span>
+            <span>25+ FRANCHISE OUTLETS</span>
+          </div>
+        </div>
+      </footer>
+
+      {/* Bottom Trailing Cyan Accent Border on Curtain Lift */}
+      <div className="absolute bottom-0 inset-x-0 h-[3px] bg-gradient-to-r from-[#0284C7] via-[#38BDF8] to-[#FBBF24] shadow-[0_0_20px_rgba(56,189,248,1)] pointer-events-none" />
+    </aside>
   );
 }
