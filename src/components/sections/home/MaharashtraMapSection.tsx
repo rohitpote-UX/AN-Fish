@@ -22,7 +22,6 @@ import {
   Check,
   Fish,
   Anchor,
-  Search,
   Truck,
   TrendingUp,
 } from "lucide-react";
@@ -44,7 +43,6 @@ export function MaharashtraMapSection() {
   const [selectedRegion, setSelectedRegion] = useState<string>("all");
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>("karad-hq");
   const [hoveredStoreId, setHoveredStoreId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Region Filters
   const REGION_FILTERS: RegionFilter[] = [
@@ -286,23 +284,6 @@ export function MaharashtraMapSection() {
     if (!selectedStoreId) return null;
     return BRANCHES_LIST.find((b) => b.id === selectedStoreId) || null;
   }, [selectedStoreId]);
-
-  // Filtered branches for directory list below
-  const directoryBranches = useMemo(() => {
-    let list = BRANCHES_LIST.filter(isBranchMatched);
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      list = list.filter(
-        (b) =>
-          b.nameMr.toLowerCase().includes(q) ||
-          b.nameEn.toLowerCase().includes(q) ||
-          b.villageNameMr?.toLowerCase().includes(q) ||
-          b.addressMr.toLowerCase().includes(q) ||
-          b.landmarkMr.toLowerCase().includes(q)
-      );
-    }
-    return list;
-  }, [selectedRegion, searchQuery]);
 
   return (
     <section
@@ -821,109 +802,38 @@ export function MaharashtraMapSection() {
           </div>
         </div>
 
-        {/* VILLAGE & STORE DIRECTORY SECTION (QUICK FINDER BELOW MAP) */}
-        <div className="mt-12 sm:mt-14 pt-8 sm:pt-10 border-t border-white/10">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div>
-              <h3 className="text-xl sm:text-2xl font-black font-marathi-display text-white flex items-center gap-2">
-                <Store className="w-5 h-5 text-[#FBBF24]" />
+        {/* STREAMLINED STORE DIRECTORY (Header & View All 25 Stores Button in One Clean Line with Generous Whitespace) */}
+        <div className="mt-14 sm:mt-18 pt-8 sm:pt-10 border-t border-white/10">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 p-5 sm:p-7 rounded-2xl bg-gradient-to-r from-[#061A26]/90 via-[#0A2637]/80 to-[#061A26]/90 border border-white/10 shadow-xl backdrop-blur-md">
+            <div className="space-y-1.5 max-w-2xl">
+              <h3 className="text-lg sm:text-xl md:text-2xl font-black font-marathi-display text-white flex items-center gap-2.5">
+                <Store className="w-5 h-5 text-[#FBBF24] shrink-0" />
                 <span>
                   {isMarathi
                     ? "सर्व अधिकृत दालनांची यादी (आपले जवळचे दालन निवडा)"
                     : "Official Outlets Directory (Select Your Nearest Branch)"}
                 </span>
               </h3>
-              <p className="text-xs sm:text-sm text-white/70 font-marathi-body mt-1">
+              <p className="text-xs sm:text-sm text-white/70 font-marathi-body leading-relaxed pl-7.5">
                 {isMarathi
                   ? "प्रत्येक दालनाच्या लिंकवर क्लिक करून त्या दुकानातील आजचा उपलब्ध साठा, पत्ता व थेट संपर्क पहा."
-                  : "Click any branch to view today's available stock, exact address, and WhatsApp."}
+                  : "Click any branch link to view today's live stock, address, and direct WhatsApp contact."}
               </p>
             </div>
 
-            {/* Instant Search Bar */}
-            <div className="relative w-full md:w-72">
-              <Search className="w-4 h-4 text-white/50 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={
-                  isMarathi
-                    ? "गाव किंवा शहर शोधा (उदा. पाटण, विटा)..."
-                    : "Search village (e.g. Patan, Vita)..."
-                }
-                className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[#061A26] border border-white/15 text-xs text-white placeholder-white/40 focus:outline-none focus:border-[#38BDF8]"
-              />
+            <div className="shrink-0 pl-7.5 lg:pl-0">
+              <Link
+                href={`/${locale}/branches`}
+                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-gradient-to-r from-[#0A9AD9] via-[#0284C7] to-[#0A9AD9] hover:brightness-110 text-white font-black text-xs sm:text-sm uppercase tracking-wider font-marathi-display shadow-[0_4px_20px_rgba(10,154,217,0.35)] border border-white/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                <Store className="w-4 h-4 text-[#FBBF24]" />
+                <span>
+                  {isMarathi
+                    ? "महाराष्ट्रातील सर्व २५ दालने पहा (View All 25 Stores) →"
+                    : "View All 25 Stores Across Maharashtra →"}
+                </span>
+              </Link>
             </div>
-          </div>
-
-          {/* Directory Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {directoryBranches.slice(0, 12).map((branch) => {
-              const isHQ = branch.id === "karad-hq";
-              const isPort = branch.type === "port";
-              return (
-                <Link
-                  key={branch.id}
-                  href={`/${locale}/branches/${branch.slug}`}
-                  className="min-h-0 group p-4 rounded-2xl bg-[#061E2C]/90 hover:bg-[#0A293D] border border-white/10 hover:border-[#38BDF8]/60 transition-all duration-300 flex flex-col justify-between shadow-lg"
-                >
-                  <div>
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <span
-                        className={`text-[0.62rem] font-bold px-2 py-0.5 rounded-full ${
-                          isHQ
-                            ? "bg-[#FBBF24]/20 text-[#FBBF24] border border-[#FBBF24]/30"
-                            : isPort
-                            ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                            : "bg-[#0A9AD9]/20 text-[#38BDF8] border border-[#0A9AD9]/30"
-                        }`}
-                      >
-                        {isHQ
-                          ? "★ मुख्य केंद्र (HQ)"
-                          : isPort
-                          ? "सागरी बंदर केंद्र"
-                          : "अधिकृत दालन"}
-                      </span>
-                      <span className="text-[0.65rem] text-emerald-400 font-bold flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                        <span>आज चालू</span>
-                      </span>
-                    </div>
-
-                    <h4 className="text-sm font-black font-marathi-display text-white group-hover:text-[#FBBF24] transition-colors line-clamp-1">
-                      {isMarathi ? branch.nameMr : branch.nameEn}
-                    </h4>
-
-                    <p className="text-[0.68rem] text-white/60 font-marathi-body mt-1 line-clamp-2">
-                      {isMarathi ? branch.addressMr : branch.addressEn}
-                    </p>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs font-bold font-marathi-display text-[#38BDF8] group-hover:text-[#FBBF24]">
-                    <span>
-                      {isMarathi ? "उपलब्ध साठा व दालन पहा" : "View Live Stock"}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* View All Outlets Link Button if more than 12 */}
-          <div className="mt-8 text-center">
-            <Link
-              href={`/${locale}/branches`}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#082232] hover:bg-[#0C2F45] border border-white/20 hover:border-[#38BDF8] text-white font-bold text-sm transition-all shadow-md font-marathi-display"
-            >
-              <Store className="w-4 h-4 text-[#FBBF24]" />
-              <span>
-                {isMarathi
-                  ? `महाराष्ट्रातील सर्व २५ दालने पहा (View All 25 Stores) →`
-                  : `View All 25 Stores Across Maharashtra →`}
-              </span>
-            </Link>
           </div>
         </div>
 
