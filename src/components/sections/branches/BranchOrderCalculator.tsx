@@ -37,6 +37,7 @@ const SPICE_OPTIONS = [
 
 export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorProps) {
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
 
   const [selectedFish, setSelectedFish] = useState(FISH_OPTIONS[0]);
   const [selectedWeight, setSelectedWeight] = useState(WEIGHT_OPTIONS[1]);
@@ -53,6 +54,14 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
         `🌶️ मसाला: ${selectedSpice.nameMr} (${selectedSpice.extra})\n` +
         `🚚 प्रकार: ${orderType === "delivery" ? "३० मिनिटांत घरपोच डिलिव्हरी" : "दालनातून स्वतः पिकअप"}\n\n` +
         `कृपया आजची उपलब्धता व एकूण बिल पाठवा. धन्यवाद!`
+      : isHindi
+      ? `नमस्ते AN Fish World (${branch.nameMr})!\n\nमुझे सीधे आज की ताज़ा आवक से ऑर्डर करना है:\n` +
+        `🐟 मछली: ${selectedFish.nameMr} (${selectedFish.rate})\n` +
+        `⚖️ वज़न: ${selectedWeight}\n` +
+        `🔪 मुफ्त कटिंग: ${selectedCut.nameMr}\n` +
+        `🌶️ मसाला: ${selectedSpice.nameMr} (${selectedSpice.extra})\n` +
+        `🚚 प्रकार: ${orderType === "delivery" ? "३० मिनट में होम डिलीवरी" : "शाखा से पिकअप"}\n\n` +
+        `कृपया आज की उपलब्धता और कुल बिल भेजें। धन्यवाद!`
       : `Hello AN Fish World (${branch.nameEn})!\n\nI want to place an order from today's catch:\n` +
         `🐟 Fish: ${selectedFish.nameEn} (${selectedFish.rate})\n` +
         `⚖️ Weight: ${selectedWeight}\n` +
@@ -71,14 +80,14 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
         <div>
           <span className="text-xs font-bold text-[#FBBF24] uppercase tracking-wider flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5" />
-            {isMarathi ? "त्वरित ऑर्डर कॅल्क्युलेटर" : "Instant Order Builder"}
+            {isMarathi ? "त्वरित ऑर्डर कॅल्क्युलेटर" : isHindi ? "त्वरित ऑर्डर कैलकुलेटर" : "Instant Order Builder"}
           </span>
           <h3 className="text-xl sm:text-2xl font-black font-marathi-display text-white mt-1">
-            {isMarathi ? "मासोळी निवडा व थेट व्हॉट्सॲपवर मागवा" : "Select Catch & Order via WhatsApp"}
+            {isMarathi ? "मासोळी निवडा व थेट व्हॉट्सॲपवर मागवा" : isHindi ? "मछली चुनें व सीधे व्हाट्सएप पर मंगवाएं" : "Select Catch & Order via WhatsApp"}
           </h3>
         </div>
         <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">
-          ● {isMarathi ? "थेट दालन संपर्क" : "Direct Branch"}
+          ● {isMarathi ? "थेट दालन संपर्क" : isHindi ? "सीधा शाखा संपर्क" : "Direct Branch"}
         </span>
       </div>
 
@@ -86,7 +95,7 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
         {/* 1. Fish Choice */}
         <div>
           <label className="block text-xs font-bold font-marathi-display text-white/90 mb-2">
-            १. मासोळीचा प्रकार निवडा (Select Fish):
+            {isMarathi ? "१. मासोळीचा प्रकार निवडा (Select Fish):" : isHindi ? "१. मछली का प्रकार चुनें (Select Fish):" : "1. Select Fish Catch:"}
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {FISH_OPTIONS.map((f) => {
@@ -103,7 +112,7 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
                   }`}
                 >
                   <span className="block text-xs font-bold font-marathi-display truncate text-white">
-                    {isMarathi ? f.nameMr : f.nameEn}
+                    {isMarathi || isHindi ? f.nameMr : f.nameEn}
                   </span>
                   <span className="block text-[0.68rem] font-black text-[#FBBF24] mt-0.5">
                     {f.rate}
@@ -117,7 +126,7 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
         {/* 2. Weight */}
         <div>
           <label className="block text-xs font-bold font-marathi-display text-white/90 mb-2">
-            २. हवे असलेले वजन निवडा (Weight):
+            {isMarathi ? "२. हवे असलेले वजन निवडा (Weight):" : isHindi ? "२. मनचाहा वज़न चुनें (Weight):" : "2. Select Weight:"}
           </label>
           <div className="flex flex-wrap gap-2">
             {WEIGHT_OPTIONS.map((w) => {
@@ -143,7 +152,7 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
         {/* 3. Free Cutting Option */}
         <div>
           <label className="block text-xs font-bold font-marathi-display text-white/90 mb-2">
-            ३. मोफत चोख कटिंग प्रकार (Free Cutting Style):
+            {isMarathi ? "३. मोफत चोख कटिंग प्रकार (Free Cutting Style):" : isHindi ? "३. मुफ्त कटिंग शैली (Free Cutting Style):" : "3. Free Cutting Style:"}
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {CUT_OPTIONS.map((c) => {
@@ -160,7 +169,7 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
                   }`}
                 >
                   <span className="text-xs font-bold font-marathi-display text-white">
-                    {isMarathi ? c.nameMr : c.nameEn}
+                    {isMarathi || isHindi ? c.nameMr : c.nameEn}
                   </span>
                   {active && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 ml-2" />}
                 </button>
@@ -172,7 +181,7 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
         {/* 4. Masala Add-on */}
         <div>
           <label className="block text-xs font-bold font-marathi-display text-white/90 mb-2">
-            ४. सोबत ए एन स्पेशल मसाला हवा आहे का? (Spice Add-on):
+            {isMarathi ? "४. सोबत ए एन स्पेशल मसाला हवा आहे का? (Spice Add-on):" : isHindi ? "४. साथ में ए एन स्पेशल मसाला चाहिए? (Spice Add-on):" : "4. Special Masala Add-on:"}
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             {SPICE_OPTIONS.map((s) => {
@@ -189,7 +198,7 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
                   }`}
                 >
                   <span className="text-xs font-semibold font-marathi-display text-white truncate">
-                    {isMarathi ? s.nameMr : s.nameEn}
+                    {isMarathi || isHindi ? s.nameMr : s.nameEn}
                   </span>
                   <span className="text-[0.68rem] text-[#FBBF24] font-bold shrink-0 ml-1">
                     {s.extra}
@@ -203,7 +212,7 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
         {/* 5. Delivery vs Store Pickup */}
         <div className="pt-2">
           <label className="block text-xs font-bold font-marathi-display text-white/90 mb-2">
-            ५. पुरवठा पद्धत (Delivery Mode):
+            {isMarathi ? "५. पुरवठा पद्धत (Delivery Mode):" : isHindi ? "५. डिलीवरी का तरीका (Delivery Mode):" : "5. Delivery Mode:"}
           </label>
           <div className="grid grid-cols-2 gap-3">
             <button
@@ -215,9 +224,9 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
                   : "bg-[#04151F] border-white/10 text-white/70"
               }`}
             >
-              <span className="block text-xs font-bold text-white">⚡ ३० मिनिटांत घरपोच</span>
+              <span className="block text-xs font-bold text-white">{isMarathi ? "⚡ ३० मिनिटांत घरपोच" : isHindi ? "⚡ ३० मिनट में होम डिलीवरी" : "⚡ 30-Min Home Delivery"}</span>
               <span className="text-[0.65rem] text-emerald-400 font-semibold block mt-0.5">
-                स्थानिक १५ किमी परिसर
+                {isMarathi ? "स्थानिक १५ किमी परिसर" : isHindi ? "स्थानीय १५ किमी क्षेत्र" : "Local 15 km Radius"}
               </span>
             </button>
 
@@ -230,9 +239,9 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
                   : "bg-[#04151F] border-white/10 text-white/70"
               }`}
             >
-              <span className="block text-xs font-bold text-white">🏪 दालनातून स्वतः पिकअप</span>
+              <span className="block text-xs font-bold text-white">{isMarathi ? "🏪 दालनातून स्वतः पिकअप" : isHindi ? "🏪 शाखा से खुद पिकअप" : "🏪 In-Store Pickup"}</span>
               <span className="text-[0.65rem] text-[#38BDF8] font-semibold block mt-0.5">
-                तयार करून ठेवले जाईल
+                {isMarathi ? "तयार करून ठेवले जाईल" : isHindi ? "तैयार करके रखा जाएगा" : "Pre-packed & Ready"}
               </span>
             </button>
           </div>
@@ -250,12 +259,14 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
             <span>
               {isMarathi
                 ? `व्हॉट्सॲपवर ही ऑर्डर पाठवा (${selectedFish.nameMr.split(" ")[0]} - ${selectedWeight})`
+                : isHindi
+                ? `व्हाट्सएप पर यह ऑर्डर भेजें (${selectedFish.nameMr.split(" ")[0]} - ${selectedWeight})`
                 : `Send Order via WhatsApp (${selectedFish.nameEn} - ${selectedWeight})`}
             </span>
           </a>
 
           <p className="text-center text-[0.68rem] text-white/60 font-marathi-body mt-2">
-            💡 एका क्लिकवर थेट {isMarathi ? branch.villageNameMr || branch.nameMr : branch.nameEn} दालनाच्या व्यवस्थापकाशी चॅट सुरू होईल.
+            💡 {isMarathi ? `एका क्लिकवर थेट ${branch.villageNameMr || branch.nameMr} दालनाच्या व्यवस्थापकाशी चॅट सुरू होईल.` : isHindi ? `एक क्लिक पर सीधे ${branch.villageNameMr || branch.nameMr} शाखा के प्रबंधक से चैट शुरू होगी।` : `One click starts direct chat with the manager of ${branch.nameEn}.`}
           </p>
         </div>
       </div>

@@ -34,11 +34,11 @@ export default async function ContactPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!routing.locales.includes(locale as "mr" | "en")) notFound();
+  if (!routing.locales.includes(locale as any)) notFound();
   setRequestLocale(locale);
 
   const t = await getTranslations("contactPage");
-  const isMarathi = locale === "mr";
+  const isMarathi = locale === "mr" || locale === "hi";
 
   return (
     <div

@@ -28,6 +28,7 @@ import { PLACEHOLDERS } from "@/data/placeholders";
 export function ServicesSection() {
   const locale = useLocale();
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
   const [activeImageModal, setActiveImageModal] = useState<string | null>(null);
 
   const cleanPhone = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || PLACEHOLDERS.WHATSAPP_NUMBER).replace(
@@ -38,6 +39,8 @@ export function ServicesSection() {
   const getMasalaOrderUrl = (masalaName?: string) => {
     const text = isMarathi
       ? `नमस्कार AN Fish कराड, मला ${masalaName ? `"${masalaName}"` : "AN Spices मसाले"} आणि ताजी मासोळी ऑर्डर करायची आहे.`
+      : isHindi
+      ? `नमस्ते AN Fish कराड, मुझे ${masalaName ? `"${masalaName}"` : "AN Spices मसाले"} और ताजी मछली ऑर्डर करनी है।`
       : `Hello AN Fish Karad, I would like to order ${masalaName ? `"${masalaName}"` : "AN Spices"} with fresh fish.`;
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
   };
@@ -169,10 +172,26 @@ export function ServicesSection() {
   ];
 
   const additionalBadges = [
-    isMarathi ? "अचूक डिजिटल वजन काटा (शून्य फेरफार)" : "Precision Digital Weighing Scales",
-    isMarathi ? "हॉटेल्स व केटरर्ससाठी घाऊक पुरवठा" : "Bulk Supply for Hotels & Caterers",
-    isMarathi ? "लग्न व घरगुती कार्यक्रमांसाठी स्पेशल ऑर्डर्स" : "Wedding & Family Feast Party Orders",
-    isMarathi ? "रविवारी स्पेशल पहाटेची ताजी मासोळी" : "Sunday Dawn Special Family Hours",
+    isMarathi
+      ? "अचूक डिजिटल वजन काटा (शून्य फेरफार)"
+      : isHindi
+      ? "सटीक डिजिटल तराजू (शून्य हेरफेर)"
+      : "Precision Digital Weighing Scales",
+    isMarathi
+      ? "हॉटेल्स व केटरर्ससाठी घाऊक पुरवठा"
+      : isHindi
+      ? "होटलों व केटरर्स के लिए थोक आपूर्ति"
+      : "Bulk Supply for Hotels & Caterers",
+    isMarathi
+      ? "लग्न व घरगुती कार्यक्रमांसाठी स्पेशल ऑर्डर्स"
+      : isHindi
+      ? "शादी व पारिवारिक आयोजनों के लिए स्पेशल ऑर्डर"
+      : "Wedding & Family Feast Party Orders",
+    isMarathi
+      ? "रविवारी स्पेशल पहाटेची ताजी मासोळी"
+      : isHindi
+      ? "रविवार स्पेशल सुबह की ताजी मछली"
+      : "Sunday Dawn Special Family Hours",
   ];
 
   return (
@@ -186,16 +205,24 @@ export function ServicesSection() {
         <div className="text-center max-w-3xl mx-auto mb-14 lg:mb-18 space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF8FF] border border-[#0B9DD8]/30 text-xs font-bold text-[#0B9DD8] uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5 text-[#0B9DD8]" />
-            <span>{isMarathi ? "कराडकरांचा पसंतीचा ब्रँड • अस्सल गावरान विश्वास" : "The AN Fish Standards & Trust"}</span>
+            <span>
+              {isMarathi
+                ? "कराडकरांचा पसंतीचा ब्रँड • अस्सल गावरान विश्वास"
+                : isHindi
+                ? "कराडवासियों का पसंदीदा ब्रांड • खरा भरोसा"
+                : "The AN Fish Standards & Trust"}
+            </span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight font-marathi-display text-[#071A24]">
-            {isMarathi ? "आम्हाला का निवडाल?" : "Why Choose AN Fish?"}
+            {isMarathi ? "आम्हाला का निवडाल?" : isHindi ? "हमें क्यों चुनें?" : "Why Choose AN Fish?"}
           </h2>
 
           <p className="text-sm sm:text-base text-[#071A24]/75 font-marathi-body leading-relaxed">
             {isMarathi
               ? "केवळ मासे विकणे हा आमचा उद्देश नाही, तर प्रत्येक कराडकरांच्या कुटुंबाला आरोग्यास हितकारक, शुद्ध आणि समुद्रासारखाच चविष्ट गावरान अनुभव देणे ही आमची जबाबदारी आहे."
+              : isHindi
+              ? "केवल मछली बेचना हमारा उद्देश्य नहीं है, बल्कि प्रत्येक कराडवासी के परिवार को स्वास्थ्यप्रद, शुद्ध और समुद्र जैसा ही स्वादिष्ट अनुभव देना हमारी जिम्मेदारी है।"
               : "Our commitment to pristine cold-chain standards, ethical weighing, and authentic coastal flavour in every kitchen."}
           </p>
         </div>
@@ -263,11 +290,11 @@ export function ServicesSection() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                   <div className="absolute bottom-3 inset-x-3 flex items-center justify-between text-xs font-bold">
                     <span className="px-3 py-1 rounded-full bg-[#F59E0B] text-[#071A24] font-extrabold shadow-md">
-                      {isMarathi ? "प्रत्यक्ष दुकानातील रॅक" : "Live Store Rack"}
+                      {isMarathi ? "प्रत्यक्ष दुकानातील रॅक" : isHindi ? "स्टोर का डिस्प्ले रैक" : "Live Store Rack"}
                     </span>
                     <span className="inline-flex items-center gap-1 text-white/90 bg-black/60 px-2.5 py-1 rounded-full backdrop-blur-xs">
                       <ZoomIn className="size-3.5" />
-                      {isMarathi ? "मोठे करा" : "Zoom"}
+                      {isMarathi ? "मोठे करा" : isHindi ? "बड़ा करें" : "Zoom"}
                     </span>
                   </div>
                 </div>
@@ -275,6 +302,8 @@ export function ServicesSection() {
               <p className="text-[0.72rem] text-white/60 font-marathi-body mt-2 text-center">
                 {isMarathi
                   ? "कराड दालनातील अधिकृत AN Spices डिस्प्ले रॅक"
+                  : isHindi
+                  ? "कराड स्टोर में आधिकारिक AN Spices डिस्प्ले रैक"
                   : "Official AN Spices rack at Karad counter"}
               </p>
             </div>
@@ -283,18 +312,28 @@ export function ServicesSection() {
             <div className="lg:col-span-7 space-y-5">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F59E0B]/20 text-amber-300 border border-[#F59E0B]/40 text-xs font-bold uppercase tracking-wider">
                 <UtensilsCrossed className="size-3.5 text-amber-300" />
-                <span>{isMarathi ? "माशांसोबत मसालाही आमचाच!" : "Fresh Catch + Authentic Spices"}</span>
+                <span>
+                  {isMarathi
+                    ? "माशांसोबत मसालाही आमचाच!"
+                    : isHindi
+                    ? "मछली के साथ मसाला भी हमारा ही!"
+                    : "Fresh Catch + Authentic Spices"}
+                </span>
               </div>
 
               <div>
                 <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-marathi-display text-white leading-tight">
                   {isMarathi
                     ? "मालवणी, आगरी कोळी व कोकणी मसाल्यांचे एकमेव केंद्र"
+                    : isHindi
+                    ? "मालवणी, आगरी कोली व कोंकणी मसालों का एकमात्र केंद्र"
                     : "AN Spices — Authentic Malvani, Agri Koli & Konkani Blends"}
                 </h3>
                 <p className="mt-2.5 text-sm sm:text-base text-white/80 font-marathi-body leading-relaxed">
                   {isMarathi
                     ? "ताजी मासोळी आणली, पण घरी रस्सा आणि फ्राय गावरान चवीचा झाला नाही तर मज्जा येत नाही! म्हणूनच AN Fish घेऊन आले आहे खास घरगुती पद्धतीने बनवलेले मसाले — जे तुमच्या प्रत्येक जेवणाला देतील अस्सल कोकणी व मालवणी बाज."
+                    : isHindi
+                    ? "ताजी मछली लाए, लेकिन घर पर करी और फ्राई असली स्वाद का न बने तो मज़ा नहीं आता! इसीलिए AN Fish लेकर आया है खास घरेलू पद्धति से तैयार मसाले — जो आपके हर भोजन को देंगे असली कोंकणी व मालवणी स्वाद।"
                     : "Fresh fish deserves genuine coastal seasoning. Our proprietary in-house stone-ground blends bring authentic Malvani, Koliwada and Konkani coastal flavours straight to your family table."}
                 </p>
               </div>
@@ -308,14 +347,14 @@ export function ServicesSection() {
                   >
                     <div className="flex items-center justify-between gap-2 mb-1">
                       <span className="font-bold text-xs sm:text-sm text-amber-300 font-marathi-display">
-                        {isMarathi ? spice.nameMr : spice.nameEn}
+                        {isMarathi || isHindi ? spice.nameMr : spice.nameEn}
                       </span>
                       <span className="text-[0.65rem] px-2 py-0.5 rounded-full bg-[#F59E0B]/20 text-amber-200 font-semibold shrink-0">
-                        {isMarathi ? spice.badgeMr : spice.badgeEn}
+                        {isMarathi || isHindi ? spice.badgeMr : spice.badgeEn}
                       </span>
                     </div>
                     <p className="text-[0.75rem] text-white/70 font-marathi-body leading-snug">
-                      {isMarathi ? spice.descMr : spice.descEn}
+                      {isMarathi || isHindi ? spice.descMr : spice.descEn}
                     </p>
                   </div>
                 ))}
@@ -330,7 +369,13 @@ export function ServicesSection() {
                   className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all duration-200 shadow-lg cursor-pointer"
                 >
                   <MessageCircle className="size-4 fill-current" />
-                  <span>{isMarathi ? "मसाला व मासे ऑर्डर करा" : "Order Spices on WhatsApp"}</span>
+                  <span>
+                    {isMarathi
+                      ? "मसाला व मासे ऑर्डर करा"
+                      : isHindi
+                      ? "मसाला व मछली ऑर्डर करें"
+                      : "Order Spices on WhatsApp"}
+                  </span>
                 </a>
 
                 <a
@@ -338,7 +383,13 @@ export function ServicesSection() {
                   className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-[#F59E0B] hover:text-[#071A24] text-white font-bold text-xs sm:text-sm transition-all duration-200 border border-white/15 cursor-pointer"
                 >
                   <PhoneCall className="size-4" />
-                  <span>{isMarathi ? "डिस्ट्रीब्युटरशिप: ९१३०६३९५२४" : "Distributorship: 9130639524"}</span>
+                  <span>
+                    {isMarathi
+                      ? "डिस्ट्रीब्युटरशिप: ९१३०६३९५२४"
+                      : isHindi
+                      ? "डिस्ट्रीब्यूटरशिप: ९१३०६३९५२४"
+                      : "Distributorship: 9130639524"}
+                  </span>
                 </a>
               </div>
             </div>
@@ -351,16 +402,28 @@ export function ServicesSection() {
           <div className="text-center max-w-3xl mx-auto mb-10 space-y-2">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF8FF] border border-[#0A9AD9]/30 text-xs font-bold text-[#0A9AD9] uppercase tracking-wider">
               <Heart className="size-3.5 text-rose-500 fill-rose-500" />
-              <span>{isMarathi ? "आरोग्याची गावरान गुरुकिल्ली" : "Pure Health from River & Sea"}</span>
+              <span>
+                {isMarathi
+                  ? "आरोग्याची गावरान गुरुकिल्ली"
+                  : isHindi
+                  ? "उत्तम स्वास्थ्य की कुंजी"
+                  : "Pure Health from River & Sea"}
+              </span>
             </div>
 
             <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-marathi-display text-[#071A24]">
-              {isMarathi ? "मासे खाण्याचे अनमोल फायदे" : "Proven Health Benefits of Eating Fresh Fish"}
+              {isMarathi
+                ? "मासे खाण्याचे अनमोल फायदे"
+                : isHindi
+                ? "मछली खाने के अनमोल फायदे"
+                : "Proven Health Benefits of Eating Fresh Fish"}
             </h3>
 
             <p className="text-sm text-[#071A24]/75 font-marathi-body">
               {isMarathi
                 ? "गावरान ताकद, निरोगी हृदय आणि तीक्ष्ण नजर — आमच्या कराड दालनातील अधिकृत फलकावर सांगितलेले १० आरोग्यदायी फायदे."
+                : isHindi
+                ? "प्राकृतिक शक्ति, स्वस्थ हृदय और तीक्ष्ण नजर — हमारे कराड स्टोर के आधिकारिक फलक पर बताए गए १० स्वास्थ्य लाभ।"
                 : "Authentic nutritional guidance displayed directly on the AN Fish World Karad store guidance board."}
             </p>
           </div>
@@ -380,10 +443,10 @@ export function ServicesSection() {
                     </div>
                     <div>
                       <h4 className="text-sm font-bold font-marathi-display text-[#071A24] group-hover:text-[#0A9AD9] transition-colors">
-                        {isMarathi ? b.titleMr : b.titleEn}
+                        {isMarathi || isHindi ? b.titleMr : b.titleEn}
                       </h4>
                       <p className="mt-1 text-xs text-[#071A24]/70 font-marathi-body leading-relaxed">
-                        {isMarathi ? b.descMr : b.descEn}
+                        {isMarathi || isHindi ? b.descMr : b.descEn}
                       </p>
                     </div>
                   </div>
@@ -408,11 +471,11 @@ export function ServicesSection() {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#071A24]/90 via-transparent to-transparent" />
                   <div className="absolute bottom-3 inset-x-3 flex items-center justify-between text-xs font-bold">
                     <span className="px-3 py-1 rounded-full bg-[#0A9AD9] text-white font-extrabold shadow-md">
-                      {isMarathi ? "अधिकृत माहिती फलक" : "In-Store Wall Guide"}
+                      {isMarathi ? "अधिकृत माहिती फलक" : isHindi ? "आधिकारिक सूचना बोर्ड" : "In-Store Wall Guide"}
                     </span>
                     <span className="inline-flex items-center gap-1 text-white bg-black/60 px-2.5 py-1 rounded-full backdrop-blur-xs">
                       <ZoomIn className="size-3.5" />
-                      {isMarathi ? "मोठे करा" : "Zoom"}
+                      {isMarathi ? "मोठे करा" : isHindi ? "बड़ा करें" : "Zoom"}
                     </span>
                   </div>
                 </div>
@@ -420,6 +483,8 @@ export function ServicesSection() {
               <p className="text-[0.72rem] text-[#071A24]/60 font-marathi-body mt-2 text-center">
                 {isMarathi
                   ? "कराड मुख्य दालनात लावलेला अधिकृत 'मासे खाण्याचे फायदे' फलक"
+                  : isHindi
+                  ? "कराड मुख्य स्टोर पर लगा हुआ आधिकारिक 'मछली खाने के फायदे' बोर्ड"
                   : "Official 'Benefits of Eating Fish' board at Karad store"}
               </p>
             </div>
@@ -463,13 +528,17 @@ export function ServicesSection() {
             </div>
             <div className="p-3 flex items-center justify-between text-white">
               <span className="text-xs text-white/70">
-                {isMarathi ? "प्रत्यक्ष AN Fish World दालनाची छायाचित्रे" : "Real AN Fish World Outlet Photography"}
+                {isMarathi
+                  ? "प्रत्यक्ष AN Fish World दालनाची छायाचित्रे"
+                  : isHindi
+                  ? "प्रत्यक्ष AN Fish World स्टोर की तस्वीरें"
+                  : "Real AN Fish World Outlet Photography"}
               </span>
               <button
                 onClick={() => setActiveImageModal(null)}
                 className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-[#0A9AD9] hover:text-[#071A24] text-xs font-bold transition-colors cursor-pointer"
               >
-                {isMarathi ? "बंद करा" : "Close"}
+                {isMarathi ? "बंद करा" : isHindi ? "बंद करें" : "Close"}
               </button>
             </div>
           </div>

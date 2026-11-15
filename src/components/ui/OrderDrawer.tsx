@@ -30,6 +30,7 @@ export function OrderDrawer() {
   const tFish = useTranslations("fish");
   const locale = useLocale();
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
 
   const isDepthOpen = useDepthStore((state) => state.isOrderDrawerOpen);
   const closeDepthOrderDrawer = useDepthStore((state) => state.closeOrderDrawer);
@@ -114,14 +115,14 @@ export function OrderDrawer() {
     if (cart.length > 0) {
       cart.forEach((item) => {
         allItems.push(
-          `${isMarathi ? item.fish.marathiName : tFish(item.fish.nameKey)} (${item.weight}, ${item.cut}) x ${item.quantity}`
+          `${isMarathi || isHindi ? item.fish.marathiName : tFish(item.fish.nameKey)} (${item.weight}, ${item.cut}) x ${item.quantity}`
         );
       });
     }
 
     if (basketItems.length > 0) {
       basketItems.forEach((item) => {
-        const name = isMarathi
+        const name = isMarathi || isHindi
           ? item.species.marathiName || item.species.nameMr
           : (item.species.nameKey ? tFish(item.species.nameKey) : item.species.nameEn);
         const cut = item.cut || item.cleaningOption || "standard";
@@ -132,11 +133,11 @@ export function OrderDrawer() {
     if (allItems.length === 0) {
       if (selectedFish) {
         allItems.push(
-          `${isMarathi ? selectedFish.marathiName : tFish(selectedFish.nameKey)} (Curry Cut, 1kg)`
+          `${isMarathi || isHindi ? selectedFish.marathiName : tFish(selectedFish.nameKey)} (Curry Cut, 1kg)`
         );
       } else if (activeSpecies) {
         allItems.push(
-          `${isMarathi ? activeSpecies.marathiName || activeSpecies.nameMr : activeSpecies.nameEn} (Curry Cut, 1kg)`
+          `${isMarathi || isHindi ? activeSpecies.marathiName || activeSpecies.nameMr : activeSpecies.nameEn} (Curry Cut, 1kg)`
         );
       } else {
         allItems.push("Daily Fresh Catch Inquiry");
@@ -210,7 +211,7 @@ export function OrderDrawer() {
                   <h3
                     id="order-drawer-title"
                     className={`${
-                      isMarathi ? "font-marathi-display" : "font-latin-display"
+                      isMarathi || isHindi ? "font-marathi-display" : "font-latin-display"
                     } text-xl font-bold text-white`}
                   >
                     {t("title")}
@@ -257,7 +258,7 @@ export function OrderDrawer() {
                     >
                       <div>
                         <div className="text-sm font-bold text-white">
-                          {isMarathi
+                          {isMarathi || isHindi
                             ? item.fish.marathiName
                             : tFish(item.fish.nameKey)}
                         </div>
@@ -284,7 +285,7 @@ export function OrderDrawer() {
                     >
                       <div>
                         <div className="text-sm font-bold text-white">
-                          {isMarathi
+                          {isMarathi || isHindi
                             ? item.species.marathiName || item.species.nameMr
                             : (item.species.nameKey ? tFish(item.species.nameKey) : item.species.nameEn)}
                         </div>
@@ -310,7 +311,7 @@ export function OrderDrawer() {
                     Selected Catch:
                   </div>
                   <div className="text-base font-bold text-white">
-                    {isMarathi
+                    {isMarathi || isHindi
                       ? selectedFish.marathiName
                       : tFish(selectedFish.nameKey)}
                   </div>
@@ -324,7 +325,7 @@ export function OrderDrawer() {
                     Selected Catch:
                   </div>
                   <div className="text-base font-bold text-white">
-                    {isMarathi
+                    {isMarathi || isHindi
                       ? activeSpecies.marathiName || activeSpecies.nameMr
                       : (activeSpecies.nameKey ? tFish(activeSpecies.nameKey) : activeSpecies.nameEn)}
                   </div>

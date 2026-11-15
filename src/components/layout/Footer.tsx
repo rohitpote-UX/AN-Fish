@@ -358,6 +358,7 @@ function FishVideoWordmark({ reducedMotion }: { reducedMotion: boolean }) {
 export function Footer() {
   const locale = useLocale();
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
   const turbulenceRef = useRef<SVGFETurbulenceElement>(null);
   const displacementRef = useRef<SVGFEDisplacementMapElement>(null);
   const wordmarkRef = useRef<HTMLDivElement>(null);
@@ -433,10 +434,10 @@ export function Footer() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-white/10 gap-4">
             <div>
               <span className="text-xs font-mono-accent uppercase tracking-widest text-[#0A9AD9] font-bold block">
-                // {isMarathi ? "आमची दालने व पत्ते" : "Retail Outposts & Hubs"}
+                // {isMarathi ? "आमची दालने व पत्ते" : isHindi ? "हमारी शाखाएं व पते" : "Retail Outposts & Hubs"}
               </span>
               <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-1">
-                {isMarathi ? "कराड आणि पश्चिम महाराष्ट्रातील दालने" : "Our Branch Locations"}
+                {isMarathi ? "कराड आणि पश्चिम महाराष्ट्रातील दालने" : isHindi ? "कराड और पश्चिम महाराष्ट्र की शाखाएं" : "Our Branch Locations"}
               </h3>
             </div>
 
@@ -481,20 +482,20 @@ export function Footer() {
                 <div>
                   <div className="flex items-center gap-2 text-xs font-mono-accent text-[#6EC6F0] uppercase tracking-wider font-bold">
                     <MapPin className="w-3.5 h-3.5 text-[#0A9AD9]" />
-                    <span>{isMarathi ? branch.subtitleMr : branch.subtitleEn}</span>
+                    <span>{isMarathi || isHindi ? branch.subtitleMr : branch.subtitleEn}</span>
                   </div>
                   <h4 className="text-lg font-bold text-white tracking-tight mt-1.5">
-                    {isMarathi ? branch.cityMr : branch.cityEn}
+                    {isMarathi || isHindi ? branch.cityMr : branch.cityEn}
                   </h4>
                   <p className="text-xs text-white/70 leading-relaxed mt-2 font-mono-accent">
-                    {isMarathi ? branch.addressMr : branch.addressEn}
+                    {isMarathi || isHindi ? branch.addressMr : branch.addressEn}
                   </p>
                 </div>
 
                 <div className="pt-3 border-t border-white/10 space-y-1.5 text-xs font-mono-accent">
                   <div className="flex items-center gap-2 text-white/60">
                     <Clock className="w-3.5 h-3.5 text-[#0A9AD9]" />
-                    <span>{isMarathi ? branch.timingMr : branch.timingEn}</span>
+                    <span>{isMarathi || isHindi ? branch.timingMr : branch.timingEn}</span>
                   </div>
                   <div className="flex items-center gap-2 text-[#6EC6F0] font-semibold">
                     <Phone className="w-3.5 h-3.5 text-[#0A9AD9]" />
@@ -511,7 +512,7 @@ export function Footer() {
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.id} className="space-y-4">
               <span className="text-xs font-mono-accent uppercase tracking-wider text-[#0A9AD9] font-bold block">
-                // {isMarathi ? col.titleMr : col.titleEn}
+                // {isMarathi || isHindi ? col.titleMr : col.titleEn}
               </span>
               <ul className="space-y-2.5 text-sm font-medium">
                 {col.links.map((link) => (
@@ -520,7 +521,7 @@ export function Footer() {
                       href={link.href}
                       className="text-white/70 hover:text-white transition-colors flex items-center gap-1.5 group/link"
                     >
-                      <span>{isMarathi ? link.labelMr : link.labelEn}</span>
+                      <span>{isMarathi || isHindi ? link.labelMr : link.labelEn}</span>
                       <ArrowRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all text-[#0A9AD9]" />
                     </Link>
                   </li>
@@ -551,7 +552,7 @@ export function Footer() {
             &ldquo;खुश रहा, मासे खावा&rdquo;
           </p>
           <span className="text-[11px] font-mono-accent uppercase tracking-widest text-[#0A9AD9] mt-1.5 block font-semibold">
-            — {isMarathi ? "कराडची लाडकी फिश कंपनी" : "AN Fish World Karad"}
+            — {isMarathi ? "कराडची लाडकी फिश कंपनी" : isHindi ? "कराड की चहेती फिश कंपनी" : "AN Fish World Karad"}
           </span>
         </div>
 
@@ -585,14 +586,16 @@ export function Footer() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                   </span>
-                  <span>{isMarathi ? "डिजिटल अनुभव व निर्मिती" : "DIGITAL CRAFT & ENGINEERING"}</span>
+                  <span>{isMarathi ? "डिजिटल अनुभव व निर्मिती" : isHindi ? "डिजिटल अनुभव व निर्माण" : "DIGITAL CRAFT & ENGINEERING"}</span>
                 </div>
                 <h4 className="text-base sm:text-lg font-bold text-white font-latin-display tracking-tight">
-                  {isMarathi ? "संकल्पना, डिझाईन आणि अत्याधुनिक तंत्रज्ञान" : "Engineered with Passion for AN Fish World"}
+                  {isMarathi ? "संकल्पना, डिझाईन आणि अत्याधुनिक तंत्रज्ञान" : isHindi ? "संकल्पना, डिज़ाइन और अत्याधुनिक तकनीक" : "Engineered with Passion for AN Fish World"}
                 </h4>
                 <p className="text-xs text-white/60 font-mono-accent leading-relaxed">
                   {isMarathi
                     ? "कराड, महाराष्ट्र • Next.js, WebGL आणि आधुनिक डिझाईन सह निर्मित"
+                    : isHindi
+                    ? "कराड, महाराष्ट्र • Next.js, WebGL और आधुनिक डिज़ाइन के साथ निर्मित"
                     : "Karad, Maharashtra • Built with Next.js, Tailwind, GSAP & WebGL"}
                 </p>
               </div>
@@ -616,7 +619,7 @@ export function Footer() {
                   <div className="text-left relative z-10">
                     <div className="flex items-center gap-1.5">
                       <span className="text-[9px] font-mono-accent uppercase tracking-wider text-[#6EC6F0] font-bold">
-                        {isMarathi ? "वेबसाईट निर्मिती" : "DEVELOPED BY"}
+                        {isMarathi ? "वेबसाईट निर्मिती" : isHindi ? "वेबसाइट निर्माण" : "DEVELOPED BY"}
                       </span>
                     </div>
                     <div className="text-sm sm:text-base font-bold tracking-tight text-white group-hover/ab:text-[#6EC6F0] transition-colors flex items-center gap-1.5 mt-0.5">
@@ -638,7 +641,7 @@ export function Footer() {
                 <div className="sm:hidden flex items-center gap-2 py-0.5">
                   <span className="h-px w-6 bg-white/15" />
                   <span className="text-[10px] font-mono-accent uppercase tracking-widest text-white/40 font-semibold">
-                    {isMarathi ? "सहकार्याने" : "IN COLLABORATION WITH"}
+                    {isMarathi ? "सहकार्याने" : isHindi ? "सहयोग" : "IN COLLABORATION WITH"}
                   </span>
                   <span className="h-px w-6 bg-white/15" />
                 </div>
@@ -660,7 +663,7 @@ export function Footer() {
                   <div className="text-left relative z-10">
                     <div className="flex items-center gap-1.5">
                       <span className="text-[9px] font-mono-accent uppercase tracking-wider text-amber-300/90 font-bold">
-                        {isMarathi ? "सहकार्याने" : "COLLABORATION"}
+                        {isMarathi ? "सहकार्याने" : isHindi ? "सहयोग" : "COLLABORATION"}
                       </span>
                     </div>
                     <div className="text-sm sm:text-base font-bold tracking-tight text-white group-hover/gs:text-amber-300 transition-colors flex items-center gap-1.5 mt-0.5">
@@ -693,7 +696,7 @@ export function Footer() {
               aria-label="Back to Top"
               className="group/top flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#0A9AD9]/50 text-white transition-all cursor-pointer active:scale-95 shadow-sm hover:shadow-[0_0_20px_rgba(10,154,217,0.25)] shrink-0"
             >
-              <span className="font-semibold text-xs tracking-wider">Back to top</span>
+              <span className="font-semibold text-xs tracking-wider">{isMarathi ? "वर जा" : isHindi ? "ऊपर जाएं" : "Back to top"}</span>
               <ArrowUp className="w-3.5 h-3.5 text-[#0A9AD9] transition-transform duration-300 group-hover/top:-translate-y-1" />
             </button>
           </div>

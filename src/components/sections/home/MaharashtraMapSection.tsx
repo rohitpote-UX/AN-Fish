@@ -32,6 +32,7 @@ import { Branch } from "@/types";
 interface RegionFilter {
   id: string;
   labelMr: string;
+  labelHi: string;
   labelEn: string;
   count: number;
 }
@@ -39,6 +40,7 @@ interface RegionFilter {
 export function MaharashtraMapSection() {
   const locale = useLocale();
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
 
   const [selectedRegion, setSelectedRegion] = useState<string>("all");
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>("karad-hq");
@@ -46,14 +48,14 @@ export function MaharashtraMapSection() {
 
   // Region Filters
   const REGION_FILTERS: RegionFilter[] = [
-    { id: "all", labelMr: "सर्व २५ दालने", labelEn: "All 25 Outlets", count: 25 },
-    { id: "karad", labelMr: "👑 कराड मुख्य केंद्र", labelEn: "Karad HQ", count: 3 },
-    { id: "satara", labelMr: "सातारा जिल्हा", labelEn: "Satara Dist.", count: 8 },
-    { id: "sangli", labelMr: "सांगली जिल्हा", labelEn: "Sangli Dist.", count: 6 },
-    { id: "kolhapur", labelMr: "कोल्हापूर", labelEn: "Kolhapur Dist.", count: 2 },
-    { id: "pune", labelMr: "पुणे", labelEn: "Pune Dist.", count: 3 },
-    { id: "solapur", labelMr: "सोलापूर", labelEn: "Solapur Dist.", count: 1 },
-    { id: "coastal", labelMr: "अरबी समुद्र बंदरे", labelEn: "Coastal Ports", count: 2 },
+    { id: "all", labelMr: "सर्व २५ दालने", labelHi: "सभी २५ शाखाएं", labelEn: "All 25 Outlets", count: 25 },
+    { id: "karad", labelMr: "👑 कराड मुख्य केंद्र", labelHi: "👑 कराड मुख्य केंद्र", labelEn: "Karad HQ", count: 3 },
+    { id: "satara", labelMr: "सातारा जिल्हा", labelHi: "सातारा जिला", labelEn: "Satara Dist.", count: 8 },
+    { id: "sangli", labelMr: "सांगली जिल्हा", labelHi: "सांगली जिला", labelEn: "Sangli Dist.", count: 6 },
+    { id: "kolhapur", labelMr: "कोल्हापूर", labelHi: "कोल्हापुर", labelEn: "Kolhapur Dist.", count: 2 },
+    { id: "pune", labelMr: "पुणे", labelHi: "पुणे", labelEn: "Pune Dist.", count: 3 },
+    { id: "solapur", labelMr: "सोलापूर", labelHi: "सोलापुर", labelEn: "Solapur Dist.", count: 1 },
+    { id: "coastal", labelMr: "अरबी समुद्र बंदरे", labelHi: "अरब सागर बंदरगाह", labelEn: "Coastal Ports", count: 2 },
   ];
 
   // Specific label orientations to keep the map clean, spacious and clutter-free
@@ -313,6 +315,8 @@ export function MaharashtraMapSection() {
             <span className="tracking-wide">
               {isMarathi
                 ? "संपूर्ण महाराष्ट्रात २५+ अधिकृत दालने"
+                : isHindi
+                ? "पूरे महाराष्ट्र में २५+ अधिकृत शाखाएं"
                 : "25+ Official Seafood Stores Across Maharashtra"}
             </span>
           </div>
@@ -323,6 +327,13 @@ export function MaharashtraMapSection() {
                 महाराष्ट्राच्या कानाकोपऱ्यात{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FBBF24] via-[#F59E0B] to-[#38BDF8]">
                   कराडची लाडकी मासोळी..!
+                </span>
+              </>
+            ) : isHindi ? (
+              <>
+                महाराष्ट्र के कोने-कोने में{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FBBF24] via-[#F59E0B] to-[#38BDF8]">
+                  कराड की चहेती मछली..!
                 </span>
               </>
             ) : (
@@ -338,6 +349,8 @@ export function MaharashtraMapSection() {
           <p className="mt-3 sm:mt-4 text-xs sm:text-base md:text-lg text-white/80 font-marathi-body max-w-3xl mx-auto leading-relaxed">
             {isMarathi
               ? "कराड मुख्य केंद्रासह सातारा, सांगली, कोल्हापूर, पुणे, सोलापूर आणि थेट अरबी समुद्र बंदरांवर आमचे नेटवर्क. कोणत्याही दुकानावर (Pin) क्लिक करा आणि त्या दालनाचा आजचा उपलब्ध मासोळी साठा व माहिती पहा!"
+              : isHindi
+              ? "कराड मुख्य केंद्र के साथ सातारा, सांगली, कोल्हापुर, पुणे, सोलापुर और सीधे अरब सागर बंदरगाहों पर हमारा नेटवर्क। किसी भी दुकान (Pin) पर क्लिक करें और उस शाखा का आज का उपलब्ध मछली स्टॉक व जानकारी देखें!"
               : "From our Karad central hub across Satara, Sangli, Kolhapur, Pune, Solapur, and Arabian Sea harbour docks. Click any store pin to open its live landing page with today's catch!"}
           </p>
 
@@ -356,7 +369,7 @@ export function MaharashtraMapSection() {
                       : "bg-[#061B2B]/90 hover:bg-[#0A2A3D] text-white/80 hover:text-white border border-white/10"
                   }`}
                 >
-                  <span>{isMarathi ? r.labelMr : r.labelEn}</span>
+                  <span>{isMarathi ? r.labelMr : isHindi ? r.labelHi : r.labelEn}</span>
                   <span
                     className={`text-[0.68rem] px-1.5 py-0.5 rounded-full ${
                       active ? "bg-white/20 text-white font-black" : "bg-black/40 text-white/70"
@@ -379,11 +392,13 @@ export function MaharashtraMapSection() {
               <span className="w-2.5 h-2.5 rounded-full bg-[#FBBF24] animate-ping shrink-0 mt-1 sm:mt-0" />
               <p className="text-[14px] sm:text-[14px] font-medium text-white/90 leading-relaxed font-marathi-body">
                 <strong className="font-bold text-[#FBBF24] font-marathi-display mr-1">
-                  {isMarathi ? "दालन निवडा (Click Pin):" : "Select Location (Click Pin):"}
+                  {isMarathi ? "दालन निवडा (Click Pin):" : isHindi ? "शाखा चुनें (Click Pin):" : "Select Location (Click Pin):"}
                 </strong>
                 <span>
                   {isMarathi
                     ? "नकाशावरील कोणत्याही पिनवर क्लिक करून स्वतंत्र दालन पेज व आजचा साठा उघडा."
+                    : isHindi
+                    ? "नक्शे पर किसी भी पिन पर क्लिक करके उस शाखा का समर्पित पेज व आज का स्टॉक देखें।"
                     : "Click any location pin to open its dedicated store portfolio & live stock."}
                 </span>
               </p>
@@ -393,15 +408,15 @@ export function MaharashtraMapSection() {
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] sm:text-[13px] text-white/80 shrink-0 font-marathi-display">
               <span className="inline-flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#FBBF24] ring-2 ring-[#FBBF24]/40" />
-                <span>कराड HQ</span>
+                <span>{isMarathi ? "कराड HQ" : isHindi ? "कराड HQ" : "Karad HQ"}</span>
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#38BDF8] ring-2 ring-[#38BDF8]/40" />
-                <span>अधिकृत दालने</span>
+                <span>{isMarathi ? "अधिकृत दालने" : isHindi ? "अधिकृत शाखाएं" : "Official Stores"}</span>
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-emerald-400/40" />
-                <span>सागरी बंदरे</span>
+                <span>{isMarathi ? "सागरी बंदरे" : isHindi ? "सागरी बंदरगाह" : "Sea Ports"}</span>
               </span>
             </div>
           </div>
@@ -544,8 +559,8 @@ export function MaharashtraMapSection() {
                       <Link
                         href={`/${locale}/branches/${branch.slug}`}
                         className="min-h-0 w-full h-full flex items-center justify-center"
-                        title={isMarathi ? branch.nameMr : branch.nameEn}
-                        aria-label={isMarathi ? branch.nameMr : branch.nameEn}
+                        title={isMarathi || isHindi ? branch.nameMr : branch.nameEn}
+                        aria-label={isMarathi || isHindi ? branch.nameMr : branch.nameEn}
                         onClick={(e) => {
                           // On mobile (<768px), first tap selects and displays clean bottom card; second tap or card button navigates
                           if (typeof window !== "undefined" && window.innerWidth < 768) {
@@ -624,7 +639,7 @@ export function MaharashtraMapSection() {
                           }`}
                         >
                           {isHQ ? "👑 " : isPort ? "⚓ " : "📍 "}
-                          {isMarathi ? posConfig.shortNameMr : posConfig.shortNameEn}
+                          {isMarathi || isHindi ? posConfig.shortNameMr : posConfig.shortNameEn}
                         </div>
                       </Link>
                     </div>
@@ -636,7 +651,7 @@ export function MaharashtraMapSection() {
                           <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-black/40 border border-white/10 shrink-0">
                             <Image
                               src={branch.image || "/media/gallery/karad-outlet-tour.webp"}
-                              alt={isMarathi ? branch.nameMr : branch.nameEn}
+                              alt={isMarathi || isHindi ? branch.nameMr : branch.nameEn}
                               fill
                               sizes="50px"
                               className="object-cover"
@@ -645,28 +660,30 @@ export function MaharashtraMapSection() {
                           <div>
                             <span className="text-[0.6rem] font-bold uppercase tracking-wider text-[#FBBF24] block">
                               {isHQ
-                                ? "★ मुख्य केंद्र (HQ)"
+                                ? isMarathi ? "★ मुख्य केंद्र (HQ)" : isHindi ? "★ मुख्य केंद्र (HQ)" : "★ Main HQ"
                                 : isPort
-                                ? "सागरी बंदर केंद्र"
-                                : "अधिकृत दालन"}
+                                ? isMarathi ? "सागरी बंदर केंद्र" : isHindi ? "सागरी बंदरगाह केंद्र" : "Sea Port Hub"
+                                : isMarathi ? "अधिकृत दालन" : isHindi ? "अधिकृत शाखा" : "Official Store"}
                             </span>
                             <h4 className="text-xs font-black font-marathi-display text-white line-clamp-1">
-                              {isMarathi ? branch.nameMr : branch.nameEn}
+                              {isMarathi || isHindi ? branch.nameMr : branch.nameEn}
                             </h4>
                             <span className="text-[0.62rem] text-white/70 block">
-                              {isMarathi ? branch.districtMr : branch.districtEn}
+                              {isMarathi || isHindi ? branch.districtMr : branch.districtEn}
                             </span>
                           </div>
                         </div>
 
                         <p className="text-[0.65rem] text-white/80 line-clamp-2 font-marathi-body mb-2">
-                          {isMarathi ? branch.taglineMr : branch.taglineEn}
+                          {isMarathi || isHindi ? branch.taglineMr : branch.taglineEn}
                         </p>
 
                         <div className="flex items-center justify-between pt-2 border-t border-white/10 text-[0.65rem] font-bold text-[#38BDF8]">
-                          <span className="text-emerald-400">● आज ताजी आवक</span>
+                          <span className="text-emerald-400">
+                            ● {isMarathi ? "आज ताजी आवक" : isHindi ? "आज ताजी आवक" : "Fresh Catch"}
+                          </span>
                           <span className="flex items-center gap-1 text-[#FBBF24]">
-                            <span>दालन पहा</span>
+                            <span>{isMarathi ? "दालन पहा" : isHindi ? "शाखा देखें" : "View Store"}</span>
                             <ArrowRight className="w-3 h-3" />
                           </span>
                         </div>
@@ -687,7 +704,7 @@ export function MaharashtraMapSection() {
                   <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-black/40 border border-white/10 shrink-0">
                     <Image
                       src={selectedBranch.image || "/media/gallery/karad-outlet-tour.webp"}
-                      alt={isMarathi ? selectedBranch.nameMr : selectedBranch.nameEn}
+                      alt={isMarathi || isHindi ? selectedBranch.nameMr : selectedBranch.nameEn}
                       fill
                       sizes="60px"
                       className="object-cover"
@@ -696,16 +713,16 @@ export function MaharashtraMapSection() {
                   <div>
                     <span className="text-[0.62rem] font-bold uppercase tracking-wider text-[#FBBF24] block">
                       {selectedBranch.type === "hq"
-                        ? "★ कराड मुख्य केंद्र (HQ)"
+                        ? isMarathi ? "★ कराड मुख्य केंद्र (HQ)" : isHindi ? "★ कराड मुख्य केंद्र (HQ)" : "★ Main HQ"
                         : selectedBranch.type === "port"
-                        ? "सागरी बंदर केंद्र"
-                        : "अधिकृत दालन"}
+                        ? isMarathi ? "सागरी बंदर केंद्र" : isHindi ? "सागरी बंदरगाह केंद्र" : "Sea Port Hub"
+                        : isMarathi ? "अधिकृत दालन" : isHindi ? "अधिकृत शाखा" : "Official Store"}
                     </span>
                     <h4 className="text-sm font-black font-marathi-display text-white line-clamp-1">
-                      {isMarathi ? selectedBranch.nameMr : selectedBranch.nameEn}
+                      {isMarathi || isHindi ? selectedBranch.nameMr : selectedBranch.nameEn}
                     </h4>
                     <span className="text-xs text-white/70 block font-marathi-body">
-                      {isMarathi ? selectedBranch.districtMr : selectedBranch.districtEn}
+                      {isMarathi || isHindi ? selectedBranch.districtMr : selectedBranch.districtEn}
                     </span>
                   </div>
                 </div>
@@ -722,11 +739,13 @@ export function MaharashtraMapSection() {
               </div>
 
               <p className="text-xs text-white/80 font-marathi-body line-clamp-2 mb-3 leading-relaxed">
-                {isMarathi ? selectedBranch.taglineMr : selectedBranch.taglineEn}
+                {isMarathi || isHindi ? selectedBranch.taglineMr : selectedBranch.taglineEn}
               </p>
 
               <div className="flex items-center justify-between text-xs font-bold text-emerald-400 mb-3 pt-2 border-t border-white/10">
-                <span>● {isMarathi ? "आज ताजी आवक उपलब्ध" : "Fresh Catch Available"}</span>
+                <span>
+                  ● {isMarathi ? "आज ताजी आवक उपलब्ध" : isHindi ? "आज ताजी आवक उपलब्ध" : "Fresh Catch Available"}
+                </span>
                 <span className="text-white/60 font-mono-accent text-[0.68rem]">
                   {selectedBranch.phone}
                 </span>
@@ -737,7 +756,13 @@ export function MaharashtraMapSection() {
                 href={`/${locale}/branches/${selectedBranch.slug}`}
                 className="w-full min-h-[44px] flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-[#0A9AD9] via-[#0284C7] to-[#25D366] text-white font-black text-sm uppercase tracking-wider font-marathi-display shadow-lg hover:brightness-110 active:scale-[0.98] transition-all cursor-pointer"
               >
-                <span>{isMarathi ? "दालन व उपलब्ध साठा पहा →" : "View Store & Stock →"}</span>
+                <span>
+                  {isMarathi
+                    ? "दालन व उपलब्ध साठा पहा →"
+                    : isHindi
+                    ? "शाखा व उपलब्ध स्टॉक देखें →"
+                    : "View Store & Stock →"}
+                </span>
               </Link>
             </div>
           )}
@@ -751,10 +776,10 @@ export function MaharashtraMapSection() {
             </div>
             <div>
               <h4 className="text-[14px] sm:text-[15px] font-bold text-white font-marathi-display leading-snug">
-                थेट बंदरावरून आवक
+                {isMarathi ? "थेट बंदरावरून आवक" : isHindi ? "सीधे बंदरगाह से आवक" : "Direct Harbor Catch"}
               </h4>
               <p className="text-[12px] sm:text-[13px] text-white/65 font-marathi-body mt-0.5 leading-normal">
-                दररोज पहाटे ४:०० ची निवड
+                {isMarathi ? "दररोज पहाटे ४:०० ची निवड" : isHindi ? "हर सुबह ४:०० बजे का चयन" : "Daily 4:00 AM Harvest"}
               </p>
             </div>
           </div>
@@ -765,10 +790,10 @@ export function MaharashtraMapSection() {
             </div>
             <div>
               <h4 className="text-[14px] sm:text-[15px] font-bold text-white font-marathi-display leading-snug">
-                ०°C नैसर्गिक गारवा
+                {isMarathi ? "०°C नैसर्गिक गारवा" : isHindi ? "०°C प्राकृतिक ठंडक" : "0°C Natural Chill"}
               </h4>
               <p className="text-[12px] sm:text-[13px] text-white/65 font-marathi-body mt-0.5 leading-normal">
-                १००% फॉर्मेलिनमुक्त हमी
+                {isMarathi ? "१००% फॉर्मेलिनमुक्त हमी" : isHindi ? "१००% फॉर्मेलिन मुक्त गारंटी" : "100% Formalin-Free"}
               </p>
             </div>
           </div>
@@ -779,10 +804,10 @@ export function MaharashtraMapSection() {
             </div>
             <div>
               <h4 className="text-[14px] sm:text-[15px] font-bold text-white font-marathi-display leading-snug">
-                ३० मिनिटांत घरपोच
+                {isMarathi ? "३० मिनिटांत घरपोच" : isHindi ? "३० मिनट में घरपहुंच" : "30-Min Express Delivery"}
               </h4>
               <p className="text-[12px] sm:text-[13px] text-white/65 font-marathi-body mt-0.5 leading-normal">
-                स्थानिक दालनातून एक्सप्रेस सेवा
+                {isMarathi ? "स्थानिक दालनातून एक्सप्रेस सेवा" : isHindi ? "नजदीकी शाखा से एक्सप्रेस सेवा" : "Express From Local Store"}
               </p>
             </div>
           </div>
@@ -793,10 +818,10 @@ export function MaharashtraMapSection() {
             </div>
             <div>
               <h4 className="text-[14px] sm:text-[15px] font-bold text-white font-marathi-display leading-snug">
-                २५+ सक्रिय दालने
+                {isMarathi ? "२५+ सक्रिय दालने" : isHindi ? "२५+ सक्रिय शाखाएं" : "25+ Active Outlets"}
               </h4>
               <p className="text-[12px] sm:text-[13px] text-white/65 font-marathi-body mt-0.5 leading-normal">
-                महाराष्ट्रातील सर्वात मोठे नेटवर्क
+                {isMarathi ? "महाराष्ट्रातील सर्वात मोठे नेटवर्क" : isHindi ? "महाराष्ट्र का सबसे बड़ा नेटवर्क" : "Largest Network"}
               </p>
             </div>
           </div>
@@ -811,12 +836,16 @@ export function MaharashtraMapSection() {
                 <span>
                   {isMarathi
                     ? "सर्व अधिकृत दालनांची यादी (आपले जवळचे दालन निवडा)"
+                    : isHindi
+                    ? "सभी अधिकृत शाखाओं की सूची (अपनी नजदीकी शाखा चुनें)"
                     : "Official Outlets Directory (Select Your Nearest Branch)"}
                 </span>
               </h3>
               <p className="text-xs sm:text-sm text-white/70 font-marathi-body leading-relaxed pl-7.5">
                 {isMarathi
                   ? "प्रत्येक दालनाच्या लिंकवर क्लिक करून त्या दुकानातील आजचा उपलब्ध साठा, पत्ता व थेट संपर्क पहा."
+                  : isHindi
+                  ? "प्रत्येक शाखा के लिंक पर क्लिक करके उस दुकान का आज का उपलब्ध स्टॉक, पता व सीधा संपर्क देखें।"
                   : "Click any branch link to view today's live stock, address, and direct WhatsApp contact."}
               </p>
             </div>
@@ -830,6 +859,8 @@ export function MaharashtraMapSection() {
                 <span>
                   {isMarathi
                     ? "महाराष्ट्रातील सर्व २५ दालने पहा (View All 25 Stores) →"
+                    : isHindi
+                    ? "महाराष्ट्र की सभी २५ शाखाएं देखें (View All 25 Stores) →"
                     : "View All 25 Stores Across Maharashtra →"}
                 </span>
               </Link>
@@ -843,17 +874,25 @@ export function MaharashtraMapSection() {
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FBBF24]/15 text-[#FBBF24] border border-[#FBBF24]/30 text-xs font-bold">
               <TrendingUp className="w-3.5 h-3.5" />
               <span>
-                {isMarathi ? "फ्रँचायझी संधी (Business Partnership)" : "Franchise Opportunity"}
+                {isMarathi
+                  ? "फ्रँचायझी संधी (Business Partnership)"
+                  : isHindi
+                  ? "फ़्रैंचाइज़ी अवसर (Business Partnership)"
+                  : "Franchise Opportunity"}
               </span>
             </div>
             <h3 className="text-lg sm:text-2xl font-black font-marathi-display text-white">
               {isMarathi
                 ? "आपल्या गावात / शहरात AN Fish World फ्रँचायझी सुरू करा!"
+                : isHindi
+                ? "अपने गाँव / शहर में AN Fish World फ़्रैंचाइज़ी शुरू करें!"
                 : "Start an AN Fish World Store in Your Town or Village!"}
             </h3>
             <p className="text-xs sm:text-sm text-white/75 font-marathi-body max-w-2xl">
               {isMarathi
                 ? "थेट बंदरावरून दररोज पहाटे अखंड ताजी आवक, ०°C कोल्ड चेन पुरवठा आणि कराडच्या लाडक्या ब्रँडचा संपूर्ण पाठबळ. कमी गुंतवणुकीत खात्रीशीर नफा!"
+                : isHindi
+                ? "सीधे बंदरगाह से हर सुबह ताजी आवक, ०°C कोल्ड चेन नेटवर्क और कराड के चहेते ब्रांड का पूरा सहयोग। कम निवेश में निश्चित मुनाफा!"
                 : "Direct harbor supplies, 0°C cold chain network, and end-to-end operational support. Partner with Maharashtra's fastest growing seafood brand."}
             </p>
           </div>
@@ -862,6 +901,8 @@ export function MaharashtraMapSection() {
             href={`https://wa.me/${PLACEHOLDERS.CONTACT_PHONE.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
               isMarathi
                 ? "नमस्कार, मला AN Fish World ची नवीन फ्रँचायझी दालन सुरू करण्याविषयी सविस्तर माहिती हवी आहे."
+                : isHindi
+                ? "नमस्ते, मुझे AN Fish World की नई फ़्रैंचाइज़ी शाखा शुरू करने के बारे में विस्तृत जानकारी चाहिए।"
                 : "Hello, I want details regarding opening an AN Fish World franchise store."
             )}`}
             target="_blank"
@@ -869,7 +910,7 @@ export function MaharashtraMapSection() {
             className="shrink-0 w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#FBBF24] to-[#F59E0B] hover:from-[#F59E0B] hover:to-[#D97706] text-[#071A24] font-black text-sm uppercase tracking-wider transition-all duration-300 shadow-[0_4px_20px_rgba(251,191,36,0.4)] cursor-pointer font-marathi-display"
           >
             <MessageCircle className="w-4 h-4 fill-current shrink-0" />
-            <span>{isMarathi ? "फ्रँचायझी चौकशी करा" : "Inquire Franchise"}</span>
+            <span>{isMarathi ? "फ्रँचायझी चौकशी करा" : isHindi ? "फ़्रैंचाइज़ी पूछताछ करें" : "Inquire Franchise"}</span>
           </a>
         </div>
 

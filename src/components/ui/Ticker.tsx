@@ -74,6 +74,7 @@ const TICKER_ITEMS: TickerCardItem[] = [
 export function Ticker() {
   const locale = useLocale();
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
 
   // Duplicate items for continuous seamless CSS marquee
   const items = [...TICKER_ITEMS, ...TICKER_ITEMS];
@@ -93,7 +94,7 @@ export function Ticker() {
             >
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-mono-accent uppercase tracking-wider text-[#0A9AD9] font-bold">
-                  {isMarathi ? item.tagMr : item.tagEn}
+                  {isMarathi || isHindi ? item.tagMr : item.tagEn}
                 </span>
                 <div className="w-8 h-8 rounded-lg bg-[#EBF8FF] flex items-center justify-center text-[#0A9AD9]">
                   <Icon className="w-4 h-4" />
@@ -102,10 +103,10 @@ export function Ticker() {
 
               <div>
                 <h3 className="text-base font-bold text-[#0F1F10] tracking-tight">
-                  {isMarathi ? item.titleMr : item.titleEn}
+                  {isMarathi || isHindi ? item.titleMr : item.titleEn}
                 </h3>
                 <p className="text-xs text-[#0F1F10]/65 mt-1.5 line-clamp-2 leading-relaxed">
-                  {isMarathi ? item.detailMr : item.detailEn}
+                  {isMarathi || isHindi ? item.detailMr : item.detailEn}
                 </p>
               </div>
             </div>

@@ -9,6 +9,7 @@ import { MessageCircle, Phone } from "lucide-react";
 export function StickyActions() {
   const locale = useLocale();
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
   const isMenuOpen = useScrollStore((state) => state.isMenuOpen);
 
   const phoneTel = PLACEHOLDERS.CONTACT_PHONE.replace(/[^0-9+]/g, "");
@@ -20,6 +21,8 @@ export function StickyActions() {
   const whatsappUrl = `https://wa.me/${cleanWhatsApp}?text=${encodeURIComponent(
     isMarathi
       ? "नमस्कार AN Fish World कराड, मला आजच्या ताजी आवकमधून ऑर्डर करायची आहे."
+      : isHindi
+      ? "नमस्ते AN Fish World कराड, मुझे आज की ताजी आवक से ऑर्डर करना है।"
       : "Hello AN Fish World Karad, I would like to order fresh fish."
   )}`;
 
@@ -63,7 +66,7 @@ export function StickyActions() {
         {/* Desktop Text Details */}
         <span className="relative hidden leading-tight sm:block text-left">
           <span className="block text-[0.62rem] font-bold uppercase tracking-[0.16em] text-white/90 font-marathi-display">
-            {isMarathi ? "कॉल करा" : "Call Now"}
+            {isMarathi ? "कॉल करा" : isHindi ? "कॉल करें" : "Call Now"}
           </span>
           <span className="block text-sm font-extrabold tabular-nums text-white">
             {PLACEHOLDERS.CONTACT_PHONE}

@@ -12,14 +12,15 @@ type CategoryFilter = "all" | "sea" | "river" | "shellfish" | "cuts";
 export function MenuSection() {
   const locale = useLocale();
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
   const [selectedFilter, setSelectedFilter] = useState<CategoryFilter>("all");
 
   const filterTabs = [
-    { id: "all" as CategoryFilter, labelMr: "सर्व मासोळी (All)", labelEn: "All Varieties" },
-    { id: "sea" as CategoryFilter, labelMr: "सागरी मासे (Sea Fish)", labelEn: "Sea Catch" },
-    { id: "river" as CategoryFilter, labelMr: "गोड्या पाण्यातील (River)", labelEn: "Freshwater River" },
-    { id: "shellfish" as CategoryFilter, labelMr: "कोळंबी व खेकडे (Shellfish)", labelEn: "Prawns & Crabs" },
-    { id: "cuts" as CategoryFilter, labelMr: "स्पेशल कट्स (Ready Cuts)", labelEn: "Kitchen Ready Cuts" },
+    { id: "all" as CategoryFilter, labelMr: "सर्व मासोळी (All)", labelHi: "सभी मछलियां (All)", labelEn: "All Varieties" },
+    { id: "sea" as CategoryFilter, labelMr: "सागरी मासे (Sea Fish)", labelHi: "समुद्री मछली (Sea Fish)", labelEn: "Sea Catch" },
+    { id: "river" as CategoryFilter, labelMr: "गोड्या पाण्यातील (River)", labelHi: "मीठे पानी की (River)", labelEn: "Freshwater River" },
+    { id: "shellfish" as CategoryFilter, labelMr: "कोळंबी व खेकडे (Shellfish)", labelHi: "झींगा व केकड़ा (Shellfish)", labelEn: "Prawns & Crabs" },
+    { id: "cuts" as CategoryFilter, labelMr: "स्पेशल कट्स (Ready Cuts)", labelHi: "स्पेशल कट्स (Ready Cuts)", labelEn: "Kitchen Ready Cuts" },
   ];
 
   const filteredItems = FISH_CATALOG.filter((item) => {
@@ -38,6 +39,8 @@ export function MenuSection() {
   const getOrderWhatsAppUrl = (fish: FishItem) => {
     const text = isMarathi
       ? `नमस्कार AN Fish World कराड, मला ताजी मासोळी मेनूमधून "${fish.marathiName}" ऑर्डर करायची आहे. कृपया आजचा दर आणि डिलिव्हरी वेळ सांगा.`
+      : isHindi
+      ? `नमस्ते AN Fish World कराड, मुझे ताजी मछली मेनू से "${fish.marathiName}" ऑर्डर करनी है। कृपया आज का भाव और डिलीवरी समय बताएं।`
       : `Hello AN Fish World Karad, I would like to order "${fish.scientificName}" from your fresh fish catalog. Please confirm price and delivery.`;
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
   };
@@ -68,14 +71,14 @@ export function MenuSection() {
   };
 
   const getCutLabels = (cuts: FishItem["cuts"]) => {
-    const cutMap: Record<string, { mr: string; en: string }> = {
-      fry: { mr: "तवा फ्राय", en: "Fry Cut" },
-      curry: { mr: "कालवण / करी", en: "Curry Cut" },
-      wholeCleaned: { mr: "अखंड स्वच्छ", en: "Whole Cleaned" },
-      fillet: { mr: "फिलेट", en: "Fillet" },
-      boneless: { mr: "बोनलेस", en: "Boneless" },
+    const cutMap: Record<string, { mr: string; hi: string; en: string }> = {
+      fry: { mr: "तवा फ्राय", hi: "तवा फ्राई", en: "Fry Cut" },
+      curry: { mr: "कालवण / करी", hi: "करी कट", en: "Curry Cut" },
+      wholeCleaned: { mr: "अखंड स्वच्छ", hi: "साफ साबुत", en: "Whole Cleaned" },
+      fillet: { mr: "फिलेट", hi: "फिलेट", en: "Fillet" },
+      boneless: { mr: "बोनलेस", hi: "बोनलेस", en: "Boneless" },
     };
-    return cuts.map((c) => (isMarathi ? cutMap[c]?.mr || c : cutMap[c]?.en || c));
+    return cuts.map((c) => (isMarathi ? cutMap[c]?.mr || c : isHindi ? cutMap[c]?.hi || c : cutMap[c]?.en || c));
   };
 
   return (
@@ -89,16 +92,24 @@ export function MenuSection() {
         <div className="text-center max-w-3xl mx-auto mb-10 lg:mb-14 space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF8FF] border border-[#0B9DD8]/30 text-xs font-bold text-[#0B9DD8] uppercase tracking-wider">
             <Utensils className="w-3.5 h-3.5 text-[#0B9DD8]" />
-            <span>{isMarathi ? "दैनिक ताजी आवक व दरपत्रक" : "Daily Fresh Catch & Price Guide"}</span>
+            <span>
+              {isMarathi
+                ? "दैनिक ताजी आवक व दरपत्रक"
+                : isHindi
+                ? "दैनिक ताजी आवक व दर सूची"
+                : "Daily Fresh Catch & Price Guide"}
+            </span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight font-marathi-display text-[#071A24]">
-            {isMarathi ? "आमचे स्पेशल मेनू" : "Our Fresh Fish Menu"}
+            {isMarathi ? "आमचे स्पेशल मेनू" : isHindi ? "हमारा स्पेशल मेनू" : "Our Fresh Fish Menu"}
           </h2>
 
           <p className="text-sm sm:text-base text-[#071A24]/75 font-marathi-body leading-relaxed">
             {isMarathi
               ? "रोजची ताजी मासोळी, योग्य कटिंग आणि स्वच्छतेची १००% हमी. आपल्या आवडीनुसार निवडा आणि एका क्लिकवर ऑर्डर करा."
+              : isHindi
+              ? "दैनिक ताजी आवक, उचित कटिंग और स्वच्छता की १००% गारंटी। अपनी पसंद अनुसार चुनें और एक क्लिक में ऑर्डर करें।"
               : "Daily harbour arrivals with complimentary custom cutting and zero chemical preservation. Choose below to order."}
           </p>
         </div>
@@ -117,7 +128,7 @@ export function MenuSection() {
                     : "bg-white text-[#071A24]/70 border border-[#071A24]/10 hover:border-[#0A9AD9] hover:text-[#0A9AD9]"
                 }`}
               >
-                {isMarathi ? tab.labelMr : tab.labelEn}
+                {isMarathi ? tab.labelMr : isHindi ? tab.labelHi : tab.labelEn}
               </button>
             );
           })}
@@ -139,15 +150,15 @@ export function MenuSection() {
                   <div className="flex items-center justify-between gap-2 mb-3">
                     <span className="text-[0.72rem] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#EBF8FF] text-[#0A9AD9] border border-[#0A9AD9]/20">
                       {fish.category === "sea"
-                        ? isMarathi ? "सागरी मासा" : "Sea Catch"
+                        ? isMarathi ? "सागरी मासा" : isHindi ? "समुद्री मछली" : "Sea Catch"
                         : fish.category === "river"
-                        ? isMarathi ? "गोड्या पाण्यातील" : "River Catch"
-                        : isMarathi ? "कोळंबी / कवचधारी" : "Shellfish"}
+                        ? isMarathi ? "गोड्या पाण्यातील" : isHindi ? "मीठे पानी की" : "River Catch"
+                        : isMarathi ? "कोळंबी / कवचधारी" : isHindi ? "झींगा / क्रस्टेशियन" : "Shellfish"}
                     </span>
 
                     <span className="text-[0.72rem] text-emerald-600 font-semibold flex items-center gap-1">
                       <Check className="w-3.5 h-3.5" />
-                      {isMarathi ? "ताजी आवक" : "Fresh Arrival"}
+                      {isMarathi ? "ताजी आवक" : isHindi ? "ताजी आवक" : "Fresh Arrival"}
                     </span>
                   </div>
 
@@ -175,7 +186,7 @@ export function MenuSection() {
                   {/* Available Cuts */}
                   <div className="mt-3 pt-3 border-t border-[#071A24]/08">
                     <span className="text-[0.68rem] uppercase font-bold text-[#071A24]/50 block mb-1.5">
-                      {isMarathi ? "उपलब्ध कटिंग पद्धती:" : "Available Cuts:"}
+                      {isMarathi ? "उपलब्ध कटिंग पद्धती:" : isHindi ? "उपलब्ध कटिंग प्रकार:" : "Available Cuts:"}
                     </span>
                     <div className="flex flex-wrap gap-1.5">
                       {cuts.map((cut, idx) => (
@@ -194,13 +205,17 @@ export function MenuSection() {
                 <div className="mt-6 pt-4 border-t border-[#071A24]/08 flex items-center justify-between gap-3">
                   <div>
                     <span className="block text-[0.68rem] text-[#071A24]/50 font-semibold uppercase">
-                      {isMarathi ? "दैनिक दर" : "Daily Rate"}
+                      {isMarathi ? "दैनिक दर" : isHindi ? "दैनिक भाव" : "Daily Rate"}
                     </span>
                     <span className="text-base font-extrabold text-[#071A24] tabular-nums">
                       {fish.price}
                     </span>
                     <span className="block text-[0.65rem] text-[#071A24]/60">
-                      {isMarathi ? `किमान: ${fish.minOrderWeight}` : `Min: ${fish.minOrderWeight}`}
+                      {isMarathi
+                        ? `किमान: ${fish.minOrderWeight}`
+                        : isHindi
+                        ? `न्यूनतम: ${fish.minOrderWeight}`
+                        : `Min: ${fish.minOrderWeight}`}
                     </span>
                   </div>
 
@@ -212,7 +227,7 @@ export function MenuSection() {
                     aria-label={`Order ${fish.marathiName} on WhatsApp`}
                   >
                     <MessageCircle className="w-3.5 h-3.5 fill-current" />
-                    <span>{isMarathi ? "ऑर्डर करा" : "Order"}</span>
+                    <span>{isMarathi ? "ऑर्डर करा" : isHindi ? "ऑर्डर करें" : "Order"}</span>
                   </a>
                 </div>
               </div>
@@ -224,11 +239,17 @@ export function MenuSection() {
         <div className="mt-14 p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-[#071A24] to-[#0D2634] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border border-white/10">
           <div className="space-y-2 text-center md:text-left">
             <h3 className="text-xl sm:text-2xl font-bold font-marathi-display text-white">
-              {isMarathi ? "आपल्या आवडीचा मासा या यादीत दिसत नाही का?" : "Looking for a Specific Rare Catch?"}
+              {isMarathi
+                ? "आपल्या आवडीचा मासा या यादीत दिसत नाही का?"
+                : isHindi
+                ? "क्या आपकी पसंद की मछली इस सूची में नहीं है?"
+                : "Looking for a Specific Rare Catch?"}
             </h3>
             <p className="text-xs sm:text-sm text-white/75 font-marathi-body max-w-xl">
               {isMarathi
                 ? "आम्ही दररोज पहाटे थेट बंदरावर असतो. आपल्याला हवी असलेली कोणतीही खास मासोळी किंवा मोठ्या प्रमाणातील ऑर्डरसाठी त्वरित संपर्क करा."
+                : isHindi
+                ? "हम प्रतिदिन सुबह सीधे बंदरगाह पर उपस्थित रहते हैं। अपनी पसंद की किसी भी खास मछली या बड़े ऑर्डर के लिए तुरंत संपर्क करें।"
                 : "Our sourcing team is at the coast daily. Call or WhatsApp us directly for custom bulk orders or special harbour requests."}
             </p>
           </div>
@@ -237,7 +258,7 @@ export function MenuSection() {
             href="#order"
             className="shrink-0 inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#0A9AD9] hover:bg-[#6EC6F0] text-[#071A24] font-extrabold text-xs uppercase tracking-wider transition-all duration-200 shadow-md"
           >
-            <span>{isMarathi ? "थेट ऑर्डर नोंदणी करा" : "Custom Order Now"}</span>
+            <span>{isMarathi ? "थेट ऑर्डर नोंदणी करा" : isHindi ? "सीधे ऑर्डर दर्ज करें" : "Custom Order Now"}</span>
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>

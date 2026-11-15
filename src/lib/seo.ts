@@ -16,8 +16,13 @@ export function generatePageMetadata({
   descriptionEn: string;
 }): Metadata {
   const isMarathi = locale === "mr";
-  const title = isMarathi ? `${titleMr} | ए एन फिश वर्ल्ड` : `${titleEn} | AN Fish World`;
-  const description = isMarathi ? descriptionMr : descriptionEn;
+  const isHindi = locale === "hi";
+  const title = isMarathi
+    ? `${titleMr} | ए एन फिश वर्ल्ड`
+    : isHindi
+    ? `${titleMr} | ए एन फिश वर्ल्ड`
+    : `${titleEn} | AN Fish World`;
+  const description = isMarathi || isHindi ? descriptionMr : descriptionEn;
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://anfishworld.com";
 
   return {

@@ -29,10 +29,10 @@ export default async function PrivacyPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!routing.locales.includes(locale as "mr" | "en")) notFound();
+  if (!routing.locales.includes(locale as any)) notFound();
   setRequestLocale(locale);
 
-  const isMarathi = locale === "mr";
+  const isMarathi = locale === "mr" || locale === "hi";
 
   return (
     <div className="pt-32 pb-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">

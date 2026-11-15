@@ -21,17 +21,18 @@ type FilterType = "all" | "video" | "counter" | "hygiene" | "community";
 export function GallerySection() {
   const locale = useLocale();
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
 
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [activeModalItem, setActiveModalItem] = useState<GalleryMediaItem | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const filterTabs: Array<{ id: FilterType; mr: string; en: string }> = [
-    { id: "all", mr: "सर्व (All)", en: "All Media" },
-    { id: "video", mr: "व्हिडिओ व रील्स (Reels)", en: "Videos & Reels" },
-    { id: "counter", mr: "ताजी मासोळी प्रदर्शन (Counter)", en: "Fresh Counter" },
-    { id: "hygiene", mr: "स्वच्छता व कटिंग (Hygiene)", en: "Clean & Cut" },
-    { id: "community", mr: "खवय्ये व परिवार (Community)", en: "Community" },
+  const filterTabs: Array<{ id: FilterType; mr: string; hi: string; en: string }> = [
+    { id: "all", mr: "सर्व (All)", hi: "सभी (All)", en: "All Media" },
+    { id: "video", mr: "व्हिडिओ व रील्स (Reels)", hi: "वीडियो व रील्स (Reels)", en: "Videos & Reels" },
+    { id: "counter", mr: "ताजी मासोळी प्रदर्शन (Counter)", hi: "ताजी मछली काउंटर (Counter)", en: "Fresh Counter" },
+    { id: "hygiene", mr: "स्वच्छता व कटिंग (Hygiene)", hi: "स्वच्छता व कटिंग (Hygiene)", en: "Clean & Cut" },
+    { id: "community", mr: "खवय्ये व परिवार (Community)", hi: "ग्राहक व परिवार (Community)", en: "Community" },
   ];
 
   const filteredItems = REAL_GALLERY_ITEMS.filter((item) => {
@@ -48,6 +49,8 @@ export function GallerySection() {
   const getInquiryUrl = (item: GalleryMediaItem) => {
     const text = isMarathi
       ? `नमस्कार AN Fish World कराड, मी वेबसाइटवर "${item.titleMr}" चा व्हिडिओ पाहिला. मला आजच्या ताजी आवकमधून ऑर्डर करायची आहे.`
+      : isHindi
+      ? `नमस्ते AN Fish World कराड, मैंने वेबसाइट पर "${item.titleMr}" देखा। मुझे आज की ताजी आवक से ऑर्डर करना है।`
       : `Hello AN Fish World Karad, I saw "${item.titleEn}" on your website. I would like to inquire about today's fresh catch.`;
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
   };
@@ -77,16 +80,24 @@ export function GallerySection() {
         <div className="text-center max-w-3xl mx-auto mb-10 space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0A9AD9]/15 border border-[#0A9AD9]/30 text-xs font-semibold text-[#6EC6F0] uppercase tracking-wider">
             <Camera className="w-3.5 h-3.5 text-[#6EC6F0]" />
-            <span>{isMarathi ? "प्रत्यक्ष दालनाची दृश्ये" : "Real Outlet & Sourcing Views"}</span>
+            <span>
+              {isMarathi
+                ? "प्रत्यक्ष दालनाची दृश्ये"
+                : isHindi
+                ? "स्टोर की वास्तविक झलक"
+                : "Real Outlet & Sourcing Views"}
+            </span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight font-marathi-display text-white">
-            {isMarathi ? "आमची झलक" : "Our Visual Gallery"}
+            {isMarathi ? "आमची झलक" : isHindi ? "हमारी झलक" : "Our Visual Gallery"}
           </h2>
 
           <p className="text-sm sm:text-base text-white/75 font-marathi-body leading-relaxed">
             {isMarathi
               ? "स्वच्छता, ताजेपणा आणि आपुलकीची सेवा — आमच्या कराड दालनातील आणि सागरी प्रवासातील काही क्षणचित्रे."
+              : isHindi
+              ? "स्वच्छता, ताजगी और आत्मीय सेवा — हमारे कराड स्टोर और समुद्री सफर की कुछ प्रमुख तस्वीरें।"
               : "Witness our hygiene standards, dawn harbor selections, and modern Karad retail experience."}
           </p>
         </div>
@@ -110,11 +121,15 @@ export function GallerySection() {
                 </span>
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[0.68rem] font-bold border border-emerald-500/30">
                   <CheckCircle2 className="size-3" />
-                  {isMarathi ? OFFICIAL_PROFILE_INFO.instagramFollowersMr : `${OFFICIAL_PROFILE_INFO.instagramFollowers} Followers`}
+                  {isMarathi
+                    ? OFFICIAL_PROFILE_INFO.instagramFollowersMr
+                    : isHindi
+                    ? "४,०००+ फॉलोअर्स"
+                    : `${OFFICIAL_PROFILE_INFO.instagramFollowers} Followers`}
                 </span>
               </div>
               <p className="text-xs text-[#6EC6F0] font-marathi-body mt-0.5 line-clamp-1">
-                &ldquo;{isMarathi ? OFFICIAL_PROFILE_INFO.bioTaglineMr : OFFICIAL_PROFILE_INFO.bioTaglineEn}&rdquo;
+                &ldquo;{isMarathi || isHindi ? OFFICIAL_PROFILE_INFO.bioTaglineMr : OFFICIAL_PROFILE_INFO.bioTaglineEn}&rdquo;
               </p>
             </div>
           </div>
@@ -126,7 +141,7 @@ export function GallerySection() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-[#0A9AD9] text-white hover:text-[#071A24] font-bold text-xs transition-colors duration-200 border border-white/10"
             >
-              <span>{isMarathi ? "इन्स्टाग्राम प्रोफाइल" : "Instagram"}</span>
+              <span>{isMarathi ? "इन्स्टाग्राम प्रोफाइल" : isHindi ? "इंस्टाग्राम प्रोफ़ाइल" : "Instagram"}</span>
               <ExternalLink className="size-3.5" />
             </a>
             <a
@@ -136,7 +151,7 @@ export function GallerySection() {
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs transition-transform duration-200 hover:scale-105 shadow-sm"
             >
               <MessageCircle className="size-3.5 fill-current" />
-              <span>{isMarathi ? "व्हॉट्सॲप ग्रुप" : "WhatsApp Group"}</span>
+              <span>{isMarathi ? "व्हॉट्सॲप ग्रुप" : isHindi ? "व्हाट्सएप ग्रुप" : "WhatsApp Group"}</span>
             </a>
           </div>
         </div>
@@ -155,7 +170,7 @@ export function GallerySection() {
                     : "bg-white/5 text-white/70 border border-white/10 hover:border-[#0A9AD9] hover:text-white"
                 }`}
               >
-                {isMarathi ? tab.mr : tab.en}
+                {isMarathi ? tab.mr : isHindi ? tab.hi : tab.en}
               </button>
             );
           })}
@@ -172,7 +187,7 @@ export function GallerySection() {
               <div className="relative aspect-4/3 w-full overflow-hidden bg-black/40">
                 <Image
                   src={item.thumbnailSrc}
-                  alt={isMarathi ? item.titleMr : item.titleEn}
+                  alt={isMarathi || isHindi ? item.titleMr : item.titleEn}
                   width={640}
                   height={480}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-108"
@@ -182,11 +197,11 @@ export function GallerySection() {
                 <div className="absolute top-3 inset-x-3 flex items-center justify-between gap-2 z-10 pointer-events-none">
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.68rem] font-bold bg-[#071A24]/85 text-[#6EC6F0] border border-[#0A9AD9]/40 backdrop-blur-xs">
                     <Film className="w-3 h-3 text-[#0A9AD9]" />
-                    <span>{isMarathi ? item.badgeMr : item.badgeEn}</span>
+                    <span>{isMarathi || isHindi ? item.badgeMr : item.badgeEn}</span>
                   </span>
 
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.68rem] font-extrabold bg-black/80 text-amber-300 border border-amber-400/30 backdrop-blur-xs">
-                    <span>{isMarathi ? item.viewsMr : item.viewsEn}</span>
+                    <span>{isMarathi || isHindi ? item.viewsMr : item.viewsEn}</span>
                   </span>
                 </div>
 
@@ -203,10 +218,10 @@ export function GallerySection() {
                 {/* Caption Details */}
                 <div className="absolute bottom-0 inset-x-0 p-5 text-white z-10">
                   <h3 className="text-base font-bold font-marathi-display text-white group-hover:text-[#6EC6F0] transition-colors leading-snug">
-                    {isMarathi ? item.titleMr : item.titleEn}
+                    {isMarathi || isHindi ? item.titleMr : item.titleEn}
                   </h3>
                   <p className="text-xs text-white/75 line-clamp-1 mt-1 font-marathi-body">
-                    {isMarathi ? item.descMr : item.descEn}
+                    {isMarathi || isHindi ? item.descMr : item.descEn}
                   </p>
                 </div>
               </div>
@@ -229,10 +244,10 @@ export function GallerySection() {
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#0A9AD9]/20 text-[#6EC6F0] text-xs font-bold border border-[#0A9AD9]/30">
                     <Film className="size-3 text-[#0A9AD9]" />
-                    <span>{isMarathi ? activeModalItem.badgeMr : activeModalItem.badgeEn}</span>
+                    <span>{isMarathi || isHindi ? activeModalItem.badgeMr : activeModalItem.badgeEn}</span>
                   </span>
                   <span className="text-xs text-amber-300 font-extrabold hidden sm:inline">
-                    {isMarathi ? activeModalItem.viewsMr : activeModalItem.viewsEn}
+                    {isMarathi || isHindi ? activeModalItem.viewsMr : activeModalItem.viewsEn}
                   </span>
                 </div>
 
@@ -260,7 +275,7 @@ export function GallerySection() {
                 ) : (
                   <Image
                     src={activeModalItem.thumbnailSrc}
-                    alt={isMarathi ? activeModalItem.titleMr : activeModalItem.titleEn}
+                    alt={isMarathi || isHindi ? activeModalItem.titleMr : activeModalItem.titleEn}
                     width={960}
                     height={540}
                     className="w-full h-full object-contain"
@@ -272,10 +287,10 @@ export function GallerySection() {
               <div className="p-4 sm:p-5 bg-[#0D2634] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-white/10">
                 <div className="space-y-1">
                   <h4 className="text-base sm:text-lg font-bold font-marathi-display text-white">
-                    {isMarathi ? activeModalItem.titleMr : activeModalItem.titleEn}
+                    {isMarathi || isHindi ? activeModalItem.titleMr : activeModalItem.titleEn}
                   </h4>
                   <p className="text-xs sm:text-sm text-white/75 font-marathi-body">
-                    {isMarathi ? activeModalItem.descMr : activeModalItem.descEn}
+                    {isMarathi || isHindi ? activeModalItem.descMr : activeModalItem.descEn}
                   </p>
                 </div>
 
@@ -287,13 +302,13 @@ export function GallerySection() {
                     className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-md cursor-pointer"
                   >
                     <MessageCircle className="size-4 fill-current" />
-                    <span>{isMarathi ? "व्हॉट्सॲपवर चौकशी करा" : "WhatsApp Inquiry"}</span>
+                    <span>{isMarathi ? "व्हॉट्सॲपवर चौकशी करा" : isHindi ? "व्हाट्सएप पर पूछताछ करें" : "WhatsApp Inquiry"}</span>
                   </a>
                   <button
                     onClick={() => setActiveModalItem(null)}
                     className="hidden sm:inline-flex px-4 py-2.5 rounded-xl bg-white/10 hover:bg-[#0A9AD9] hover:text-[#071A24] text-white text-xs font-bold transition-colors cursor-pointer"
                   >
-                    {isMarathi ? "बंद करा" : "Close"}
+                    {isMarathi ? "बंद करा" : isHindi ? "बंद करें" : "Close"}
                   </button>
                 </div>
               </div>

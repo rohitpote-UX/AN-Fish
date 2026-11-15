@@ -97,7 +97,7 @@ export interface FreshnessPageConfig {
 
 export function FreshnessPageTemplate({ config }: { config: FreshnessPageConfig }) {
   const locale = useLocale();
-  const isMarathi = locale === "mr";
+  const isMarathi = locale === "mr" || locale === "hi";
 
   const heroRef = useRef<HTMLElement>(null);
   const sequenceRef = useRef<HTMLDivElement>(null);

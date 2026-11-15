@@ -33,11 +33,11 @@ export default async function WholesalePage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!routing.locales.includes(locale as "mr" | "en")) notFound();
+  if (!routing.locales.includes(locale as any)) notFound();
   setRequestLocale(locale);
 
   const t = await getTranslations("wholesalePage");
-  const isMarathi = locale === "mr";
+  const isMarathi = locale === "mr" || locale === "hi";
 
   const b2bPillars = [
     {

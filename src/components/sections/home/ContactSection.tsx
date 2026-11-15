@@ -8,6 +8,7 @@ import { PLACEHOLDERS } from "@/data/placeholders";
 export function ContactSection() {
   const locale = useLocale();
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
 
   const phoneTel = PLACEHOLDERS.CONTACT_PHONE.replace(/[^0-9+]/g, "");
   const cleanWhatsApp = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || PLACEHOLDERS.WHATSAPP_NUMBER).replace(
@@ -18,6 +19,8 @@ export function ContactSection() {
   const whatsappUrl = `https://wa.me/${cleanWhatsApp}?text=${encodeURIComponent(
     isMarathi
       ? "नमस्कार AN Fish World कराड, मला आपल्या दालनाचा पत्ता व आजची ताजी आवक जाणून घ्यायची आहे."
+      : isHindi
+      ? "नमस्ते AN Fish World कराड, मुझे आपके स्टोर का पता व आज की ताजी आवक जाननी है।"
       : "Hello AN Fish World Karad, I would like to enquire about your store address and today's fresh catch."
   )}`;
 
@@ -32,16 +35,18 @@ export function ContactSection() {
         <div className="text-center max-w-3xl mx-auto mb-14 lg:mb-18 space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF8FF] border border-[#0B9DD8]/30 text-xs font-bold text-[#0B9DD8] uppercase tracking-wider">
             <Store className="w-3.5 h-3.5 text-[#0B9DD8]" />
-            <span>{isMarathi ? "कराड मुख्य दालन" : "Karad Retail Outpost"}</span>
+            <span>{isMarathi ? "कराड मुख्य दालन" : isHindi ? "कराड मुख्य स्टोर" : "Karad Retail Outpost"}</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight font-marathi-display text-[#071A24]">
-            {isMarathi ? "आमच्यापर्यंत कसे पोहोचाल?" : "How to Reach AN Fish World"}
+            {isMarathi ? "आमच्यापर्यंत कसे पोहोचाल?" : isHindi ? "हम तक कैसे पहुंचें?" : "How to Reach AN Fish World"}
           </h2>
 
           <p className="text-sm sm:text-base text-[#071A24]/75 font-marathi-body leading-relaxed">
             {isMarathi
               ? "कराड शहराच्या केंद्रस्थानी असलेले आमचे दालन. स्वतः भेट द्या किंवा घरपोच ताजी मासोळी मागवा."
+              : isHindi
+              ? "कराड शहर के केंद्र में स्थित हमारा मुख्य स्टोर। स्वयं पधारें या घरपहुंच ताजी मछली मंगाएं।"
               : "Centrally located in Karad, Satara. Visit our chilled counter or get fresh delivery right to your doorstep."}
           </p>
         </div>
@@ -59,7 +64,7 @@ export function ContactSection() {
                   <MapPin className="w-5 h-5 text-[#0A9AD9]" />
                 </div>
                 <h3 className="text-lg font-bold font-marathi-display text-[#071A24]">
-                  {isMarathi ? "दालनाचा पत्ता" : "Store Address"}
+                  {isMarathi ? "दालनाचा पत्ता" : isHindi ? "स्टोर का पता" : "Store Address"}
                 </h3>
               </div>
               <p className="text-sm text-[#071A24]/80 font-marathi-body leading-relaxed pt-1">
@@ -68,7 +73,11 @@ export function ContactSection() {
                 {PLACEHOLDERS.STORE_ADDRESS_KARAD}
                 <br />
                 <span className="text-xs text-[#071A24]/60">
-                  {isMarathi ? `जवळ: ${PLACEHOLDERS.STORE_LANDMARK}` : `Landmark: ${PLACEHOLDERS.STORE_LANDMARK}`}
+                  {isMarathi
+                    ? `जवळ: ${PLACEHOLDERS.STORE_LANDMARK}`
+                    : isHindi
+                    ? `नजदीक: ${PLACEHOLDERS.STORE_LANDMARK}`
+                    : `Landmark: ${PLACEHOLDERS.STORE_LANDMARK}`}
                 </span>
               </p>
             </div>
@@ -80,18 +89,22 @@ export function ContactSection() {
                   <Clock className="w-5 h-5 text-[#0A9AD9]" />
                 </div>
                 <h3 className="text-lg font-bold font-marathi-display text-[#071A24]">
-                  {isMarathi ? "दुकान उघडे असण्याच्या वेळा" : "Store Operating Hours"}
+                  {isMarathi ? "दुकान उघडे असण्याच्या वेळा" : isHindi ? "स्टोर खुलने का समय" : "Store Operating Hours"}
                 </h3>
               </div>
               <div className="text-sm text-[#071A24]/80 space-y-1 pt-1 font-marathi-body">
                 <p className="font-semibold text-[#071A24]">
-                  {isMarathi ? "सोमवार – रविवार (सर्व दिवस)" : "Monday – Sunday (All Days)"}
+                  {isMarathi ? "सोमवार – रविवार (सर्व दिवस)" : isHindi ? "सोमवार – रविवार (सभी दिन)" : "Monday – Sunday (All Days)"}
                 </p>
                 <p className="text-xs sm:text-sm text-[#0A9AD9] font-bold">
                   {PLACEHOLDERS.DAILY_HOURS}
                 </p>
                 <p className="text-xs text-emerald-600 font-semibold pt-1">
-                  {isMarathi ? "रविवारी पहाटे खास ताजी आवक उपलब्ध!" : "Sunday dawn special fresh harbour arrivals!"}
+                  {isMarathi
+                    ? "रविवारी पहाटे खास ताजी आवक उपलब्ध!"
+                    : isHindi
+                    ? "रविवार सुबह खास ताजी आवक उपलब्ध!"
+                    : "Sunday dawn special fresh harbour arrivals!"}
                 </p>
               </div>
             </div>
@@ -103,7 +116,7 @@ export function ContactSection() {
                 className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-[#071A24] hover:bg-[#0A9AD9] text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-md text-center"
               >
                 <Phone className="w-4 h-4 text-emerald-400" />
-                <span>{isMarathi ? "कॉल करा" : "Call Store"}</span>
+                <span>{isMarathi ? "कॉल करा" : isHindi ? "कॉल करें" : "Call Store"}</span>
               </a>
 
               <a
@@ -113,7 +126,7 @@ export function ContactSection() {
                 className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-md text-center"
               >
                 <MessageCircle className="w-4 h-4 fill-current" />
-                <span>{isMarathi ? "व्हॉट्सॲप" : "WhatsApp"}</span>
+                <span>{isMarathi ? "व्हॉट्सॲप" : isHindi ? "व्हाट्सएप" : "WhatsApp"}</span>
               </a>
             </div>
 
@@ -132,7 +145,7 @@ export function ContactSection() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs text-white hover:text-[#6EC6F0] font-semibold underline underline-offset-2"
               >
-                <span>{isMarathi ? "मोठ्या नकाशावर पहा" : "Open in Maps"}</span>
+                <span>{isMarathi ? "मोठ्या नकाशावर पहा" : isHindi ? "बड़े नक्शे पर देखें" : "Open in Maps"}</span>
                 <Navigation className="w-3.5 h-3.5" />
               </a>
             </div>

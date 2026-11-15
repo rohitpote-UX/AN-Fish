@@ -9,6 +9,7 @@ import { PLACEHOLDERS } from "@/data/placeholders";
 export function Hero() {
   const locale = useLocale();
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
 
   // 1. Changing Background Images (Cycling smoothly)
   const [bgImageIndex, setBgImageIndex] = useState(0);
@@ -30,12 +31,16 @@ export function Hero() {
     return () => clearInterval(timer);
   }, [backgroundImages.length]);
 
-  // 2. Typing & Erasing Effect for Tagline: "एकदा खाल की पुन्हा पुन्हा मागाल." <-> "मासे खावा, खुश रहा!"
+  // 2. Typing & Erasing Effect for Tagline
   const phrases = useMemo(() => {
-    return isMarathi
-      ? ["एकदा खाल की पुन्हा पुन्हा मागाल.", "मासे खावा, खुश रहा!"]
-      : ["Taste once, you'll ask for more.", "Eat fresh fish, stay happy!"];
-  }, [isMarathi]);
+    if (locale === "mr") {
+      return ["एकदा खाल की पुन्हा पुन्हा मागाल.", "मासे खावा, खुश रहा!"];
+    }
+    if (locale === "hi") {
+      return ["एक बार खाएंगे तो बार-बार मांगेंगे।", "मछली खाएं, खुश रहें!"];
+    }
+    return ["Taste once, you'll ask for more.", "Eat fresh fish, stay happy!"];
+  }, [locale]);
 
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [displayedText, setDisplayedText] = useState("");
@@ -45,7 +50,7 @@ export function Hero() {
     const currentPhrase = phrases[phraseIndex];
     const segmenter =
       typeof Intl !== "undefined" && Intl.Segmenter
-        ? new Intl.Segmenter(isMarathi ? "mr" : "en", { granularity: "grapheme" })
+        ? new Intl.Segmenter(locale === "mr" ? "mr" : locale === "hi" ? "hi" : "en", { granularity: "grapheme" })
         : null;
 
     const graphemes = segmenter
@@ -86,7 +91,7 @@ export function Hero() {
     }
 
     return () => clearTimeout(timeoutId);
-  }, [displayedText, isDeleting, phraseIndex, phrases, isMarathi]);
+  }, [displayedText, isDeleting, phraseIndex, phrases, locale]);
 
   const cleanPhone = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || PLACEHOLDERS.WHATSAPP_NUMBER).replace(
     /[^0-9]/g,
@@ -94,8 +99,10 @@ export function Hero() {
   );
 
   const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-    isMarathi
+    locale === "mr"
       ? "नमस्कार AN Fish World कराड, मला आजच्या ताजी आवकमधून ऑर्डर करायची आहे."
+      : locale === "hi"
+      ? "नमस्ते AN Fish World कराड, मुझे आज की ताजी आवक से ऑर्डर करना है।"
       : "Hello AN Fish World Karad, I would like to order from today's fresh catch."
   )}`;
 
@@ -108,15 +115,15 @@ export function Hero() {
   };
 
   const tickerItems = [
-    isMarathi ? "सिल्व्हर पापलेट (लाडकी आवक)" : "Silver Pomfret",
-    isMarathi ? "किंग सुरमई स्टेक्स" : "King Surmai Steaks",
-    isMarathi ? "रॉयल टायगर कोळंबी" : "Royal Tiger Prawns",
-    isMarathi ? "इंडियन सामन (रावस)" : "Indian Salmon (Rawas)",
-    isMarathi ? "ताजा चंदेरी बांगडा" : "Fresh Mackerel (Bangda)",
-    isMarathi ? "जिवंत चिंबोरी / खेकडे" : "Live Sea Mud Crabs",
-    isMarathi ? "कृष्णा-कोयना रोहू" : "Freshwater Rohu",
-    isMarathi ? "कोयना काठ कटला" : "Freshwater Catla",
-    isMarathi ? "जिताडा / आशियाई सीबास" : "Asian Seabass (Jitada)",
+    locale === "mr" ? "सिल्व्हर पापलेट (लाडकी आवक)" : locale === "hi" ? "सिल्वर पापलेट (चहेती आवक)" : "Silver Pomfret",
+    locale === "mr" ? "किंग सुरमई स्टेक्स" : locale === "hi" ? "किंग सुरमई स्टेक्स" : "King Surmai Steaks",
+    locale === "mr" ? "रॉयल टायगर कोळंबी" : locale === "hi" ? "रॉयल टाइगर प्रॉन्स" : "Royal Tiger Prawns",
+    locale === "mr" ? "इंडियन सामन (रावस)" : locale === "hi" ? "इंडियन सैल्मन (रावस)" : "Indian Salmon (Rawas)",
+    locale === "mr" ? "ताजा चंदेरी बांगडा" : locale === "hi" ? "ताजा बांगड़ा मछली" : "Fresh Mackerel (Bangda)",
+    locale === "mr" ? "जिवंत चिंबोरी / खेकडे" : locale === "hi" ? "जीवित केकड़ा" : "Live Sea Mud Crabs",
+    locale === "mr" ? "कृष्णा-कोयना रोहू" : locale === "hi" ? "कृष्णा-कोयना रोहू" : "Freshwater Rohu",
+    locale === "mr" ? "कोयना काठ कटला" : locale === "hi" ? "कोयना तट कतला" : "Freshwater Catla",
+    locale === "mr" ? "जिताडा / आशियाई सीबास" : locale === "hi" ? "जिताड़ा / सीबास" : "Asian Seabass (Jitada)",
   ];
 
   return (
@@ -187,20 +194,30 @@ export function Hero() {
           {/* Centered Name / Sub-eyebrow */}
           <div className="mt-5">
             <span className="block font-marathi-display text-sm sm:text-base font-bold tracking-wide text-[#6EC6F0] drop-shadow-sm">
-              {isMarathi
+              {locale === "mr"
                 ? "ए एन फिश वर्ल्ड · AN Fish World, Karad"
+                : locale === "hi"
+                ? "ए एन फिश वर्ल्ड · AN Fish World, कराड"
                 : "AN Fish World · Karad, Maharashtra"}
             </span>
           </div>
 
-          {/* Centered Bold Marathi Heading (100% Static) */}
+          {/* Centered Bold Heading (100% Static) */}
           <h1 className="mt-3">
             <span className="block font-marathi-display text-[clamp(2.2rem,6.8vw,4.5rem)] leading-[1.2] font-black text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.7)]">
-              {isMarathi ? "अस्सल दर्जेदार चवीची" : "Authentic Sea Freshness"}
+              {locale === "mr"
+                ? "अस्सल दर्जेदार चवीची"
+                : locale === "hi"
+                ? "असली व लाजवाब स्वाद की"
+                : "Authentic Sea Freshness"}
               
               {/* Static bold golden line */}
               <span className="mt-1 block text-[#FBBF24] drop-shadow-[0_4px_24px_rgba(251,191,36,0.35)]">
-                {isMarathi ? "कराडची लाडकी मासोळी" : "Karad's Beloved Seafood"}
+                {locale === "mr"
+                  ? "कराडची लाडकी मासोळी"
+                  : locale === "hi"
+                  ? "कराड की चहेती मछली"
+                  : "Karad's Beloved Seafood"}
               </span>
             </span>
           </h1>
@@ -208,8 +225,10 @@ export function Hero() {
           {/* Centered Bigger Tagline with Better Font & Dynamic Typing Effect (Strictly 1 line always) */}
           <p className="mx-auto mt-6 w-full max-w-5xl font-marathi-display text-[clamp(0.72rem,1.85vw,1.35rem)] font-semibold leading-relaxed text-white/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] whitespace-nowrap text-center">
             <span className="whitespace-nowrap">
-              {isMarathi
+              {locale === "mr"
                 ? "कराडची लाडकी मासोळी... समुद्राची खरी चव..! — "
+                : locale === "hi"
+                ? "कराड की चहेती मछली... समुद्र का असली स्वाद..! — "
                 : "Karad's beloved seafood... Pure oceanic taste..! — "}
             </span>
             <span className="inline-block whitespace-nowrap text-[#38BDF8] font-bold drop-shadow-[0_2px_16px_rgba(56,189,248,0.5)]">
@@ -233,7 +252,13 @@ export function Hero() {
               aria-label="Order fresh fish on WhatsApp"
             >
               <MessageCircle className="w-5 h-5 fill-current shrink-0" />
-              <span>{isMarathi ? "व्हॉट्सॲपवर ऑर्डर द्या" : "Order on WhatsApp"}</span>
+              <span>
+                {locale === "mr"
+                  ? "व्हॉट्सॲपवर ऑर्डर द्या"
+                  : locale === "hi"
+                  ? "व्हाट्सएप पर ऑर्डर करें"
+                  : "Order on WhatsApp"}
+              </span>
               <ArrowRight className="w-4 h-4 ml-0.5 transition-transform duration-300 group-hover:translate-x-1" />
             </a>
 
@@ -244,7 +269,13 @@ export function Hero() {
               className="relative inline-flex items-center justify-center gap-2 rounded-full font-bold tracking-wide transition-all duration-300 border-2 border-white/45 bg-black/40 hover:bg-white/20 text-white px-7 py-3.5 text-base sm:px-9 sm:py-4 backdrop-blur-sm active:scale-95 cursor-pointer font-marathi-display"
               aria-label="View Today's Fresh Fish Catch"
             >
-              <span>{isMarathi ? "आजची ताजी आवक पहा" : "View Today's Catch"}</span>
+              <span>
+                {locale === "mr"
+                  ? "आजची ताजी आवक पहा"
+                  : locale === "hi"
+                  ? "आज की ताजी आवक देखें"
+                  : "View Today's Catch"}
+              </span>
             </a>
 
           </div>
@@ -253,21 +284,33 @@ export function Hero() {
           <ul className="mt-10 flex flex-wrap items-center justify-center gap-y-2 gap-x-5 text-xs sm:text-sm font-semibold text-white/85">
             <li className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-[#FBBF24] shrink-0" />
-              <span>कराड · जि. सातारा</span>
+              <span>{locale === "en" ? "Karad · Satara Dist." : "कराड · जि. सातारा"}</span>
             </li>
 
             <li aria-hidden="true" className="hidden h-3.5 w-px bg-white/25 sm:block" />
 
             <li className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-[#FBBF24] shrink-0" />
-              <span>{isMarathi ? "ऑर्डरनंतर ३० मिनिटांत ताजी मासोळी घरपोच" : "Fresh delivery within 30-45 mins"}</span>
+              <span>
+                {locale === "mr"
+                  ? "ऑर्डरनंतर ३० मिनिटांत ताजी मासोळी घरपोच"
+                  : locale === "hi"
+                  ? "ऑर्डर के ३० मिनट में ताजी मछली घरपहुंच"
+                  : "Fresh delivery within 30-45 mins"}
+              </span>
             </li>
 
             <li aria-hidden="true" className="hidden h-3.5 w-px bg-white/25 sm:block" />
 
             <li className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>{isMarathi ? "१००% फॉर्मेलिन व केमिकलमुक्त" : "100% Formalin & Chemical Free"}</span>
+              <span>
+                {locale === "mr"
+                  ? "१००% फॉर्मेलिन व केमिकलमुक्त"
+                  : locale === "hi"
+                  ? "१००% फॉर्मेलिन व केमिकल मुक्त"
+                  : "100% Formalin & Chemical Free"}
+              </span>
             </li>
           </ul>
 

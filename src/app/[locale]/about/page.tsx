@@ -12,7 +12,7 @@ export default async function AboutRedirectPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!routing.locales.includes(locale as "mr" | "en")) notFound();
+  if (!routing.locales.includes(locale as any)) notFound();
 
   redirect({ href: "/our-story", locale });
 }

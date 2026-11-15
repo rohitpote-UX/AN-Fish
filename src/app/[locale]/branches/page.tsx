@@ -35,11 +35,12 @@ export default async function BranchesPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!routing.locales.includes(locale as "mr" | "en")) notFound();
+  if (!routing.locales.includes(locale as any)) notFound();
   setRequestLocale(locale);
 
   const t = await getTranslations("branchesPage");
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
 
   return (
     <div
@@ -63,11 +64,11 @@ export default async function BranchesPage({
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
           </span>
-          <span>{isMarathi ? "कराड व पाटण दालन नेटवर्क" : "FLAGSHIP RETAIL NETWORK • KARAD & PATAN"}</span>
+          <span>{isMarathi ? "कराड व पाटण दालन नेटवर्क" : isHindi ? "कराड व पाटण शाखा नेटवर्क" : "FLAGSHIP RETAIL NETWORK • KARAD & PATAN"}</span>
         </div>
         <h1
           className={`${
-            isMarathi ? "font-marathi-display" : "font-latin-display"
+            isMarathi || isHindi ? "font-marathi-display" : "font-latin-display"
           } text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[1.05]`}
         >
           {t("title")}
@@ -93,7 +94,7 @@ export default async function BranchesPage({
             </div>
             <div>
               <h3 className="text-lg font-bold text-white">
-                {isMarathi ? "कराड शहर व १५ किमी परिसर जलद घरपोच" : "Fast Doorstep Delivery Across Karad"}
+                {isMarathi ? "कराड शहर व १५ किमी परिसर जलद घरपोच" : isHindi ? "कराड शहर व १५ किमी क्षेत्र में त्वरित होम डिलीवरी" : "Fast Doorstep Delivery Across Karad"}
               </h3>
               <p className="text-xs sm:text-sm text-[#E9F7FF]/70">
                 {PLACEHOLDERS.DELIVERY_SLOTS}

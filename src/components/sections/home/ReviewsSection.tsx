@@ -55,6 +55,7 @@ const REVIEWS: Review[] = [
 export function ReviewsSection() {
   const locale = useLocale();
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
 
   return (
     <section
@@ -67,16 +68,24 @@ export function ReviewsSection() {
         <div className="text-center max-w-3xl mx-auto mb-14 lg:mb-18 space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF8FF] border border-[#0B9DD8]/30 text-xs font-bold text-[#0B9DD8] uppercase tracking-wider">
             <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-            <span>{isMarathi ? "कराडकरांचे प्रामाणिक मत" : "Karad Foodie Testimonials"}</span>
+            <span>
+              {isMarathi
+                ? "कराडकरांचे प्रामाणिक मत"
+                : isHindi
+                ? "कराडवासियों की सच्ची राय"
+                : "Karad Foodie Testimonials"}
+            </span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight font-marathi-display text-[#071A24]">
-            {isMarathi ? "आमचे ग्राहक काय म्हणतात?" : "What Our Customers Say"}
+            {isMarathi ? "आमचे ग्राहक काय म्हणतात?" : isHindi ? "हमारे ग्राहक क्या कहते हैं?" : "What Our Customers Say"}
           </h2>
 
           <p className="text-sm sm:text-base text-[#071A24]/75 font-marathi-body leading-relaxed">
             {isMarathi
               ? "कराड आणि परिसरातील शेकडो खवय्ये आणि कुटुंबांचा ए एन फिशवर अतूट विश्वास आहे."
+              : isHindi
+              ? "कराड और आसपास के सैकड़ों स्वादमर्मियों और परिवारों का ए एन फिश पर अटूट विश्वास है।"
               : "Trusted by hundreds of families and seafood enthusiasts across Karad, Satara."}
           </p>
 
@@ -87,7 +96,13 @@ export function ReviewsSection() {
                 <Star key={i} className="w-4 h-4 fill-amber-500 text-amber-500" />
               ))}
             </div>
-            <span>४.९ / ५.० रेटिंग • कराड ग्राहक समाधान</span>
+            <span>
+              {isMarathi
+                ? "४.९ / ५.० रेटिंग • कराड ग्राहक समाधान"
+                : isHindi
+                ? "४.९ / ५.० रेटिंग • कराड ग्राहक संतुष्टि"
+                : "4.9 / 5.0 Rating • Karad Customer Satisfaction"}
+            </span>
           </div>
         </div>
 
@@ -111,7 +126,7 @@ export function ReviewsSection() {
 
                 {/* Review Text */}
                 <p className="text-sm text-[#071A24]/80 font-marathi-body leading-relaxed italic">
-                  “{isMarathi ? review.reviewMr : review.reviewEn}”
+                  “{isMarathi || isHindi ? review.reviewMr : review.reviewEn}”
                 </p>
               </div>
 
@@ -120,20 +135,24 @@ export function ReviewsSection() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-sm font-bold font-marathi-display text-[#071A24]">
-                      {isMarathi ? review.nameMr : review.nameEn}
+                      {isMarathi || isHindi ? review.nameMr : review.nameEn}
                     </h3>
                     <p className="text-xs text-[#071A24]/60">
-                      {isMarathi ? review.locationMr : review.locationEn}
+                      {isMarathi || isHindi ? review.locationMr : review.locationEn}
                     </p>
                   </div>
                   <span className="inline-flex items-center gap-1 text-[0.68rem] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">
                     <CheckCircle2 className="w-3 h-3" />
-                    {isMarathi ? "सत्यापित ग्राहक" : "Verified Buyer"}
+                    <span>{isMarathi ? "सत्यापित ग्राहक" : isHindi ? "सत्यापित ग्राहक" : "Verified Buyer"}</span>
                   </span>
                 </div>
 
                 <div className="mt-2 text-[0.72rem] font-bold text-[#0A9AD9]">
-                  {isMarathi ? review.favoriteMr : review.favoriteEn}
+                  {isMarathi
+                    ? review.favoriteMr
+                    : isHindi
+                    ? review.favoriteMr.replace("आवडती मासोळी:", "पसंदीदा मछली:")
+                    : review.favoriteEn}
                 </div>
               </div>
             </div>

@@ -56,9 +56,10 @@ export async function generateMetadata({
   if (!branch) return {};
 
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
   return {
-    title: `${isMarathi ? branch.nameMr : branch.nameEn} | AN Fish World`,
-    description: isMarathi ? branch.taglineMr : branch.taglineEn,
+    title: `${isMarathi || isHindi ? branch.nameMr : branch.nameEn} | AN Fish World`,
+    description: isMarathi || isHindi ? branch.taglineMr : branch.taglineEn,
   };
 }
 
@@ -68,13 +69,14 @@ export default async function BranchDetailPage({
   params: Promise<{ locale: string; slug: string }>;
 }) {
   const { locale, slug } = await params;
-  if (!routing.locales.includes(locale as "mr" | "en")) notFound();
+  if (!routing.locales.includes(locale as any)) notFound();
   setRequestLocale(locale);
 
   const branch = BRANCHES_LIST.find((b) => b.slug === slug);
   if (!branch) notFound();
 
   const isMarathi = locale === "mr";
+  const isHindi = locale === "hi";
 
   // Comprehensive 10-Item Live Fish Stock for this Branch
   const stockItems = [
@@ -264,6 +266,8 @@ export default async function BranchDetailPage({
   const whatsappMessage = encodeURIComponent(
     isMarathi
       ? `नमस्कार AN Fish World (${branch.nameMr}), मला आजच्या ताजी आवकमधून ऑर्डर करायची आहे. कृपया उपलब्ध साठा सांगा.`
+      : isHindi
+      ? `नमस्ते AN Fish World (${branch.nameMr}), मुझे आज की ताज़ा आवक से ऑर्डर करना है। कृपया उपलब्ध स्टॉक बताएं।`
       : `Hello AN Fish World (${branch.nameEn}), I would like to place an order from today's fresh catch.`
   );
 
@@ -296,7 +300,7 @@ export default async function BranchDetailPage({
             className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#FBBF24] hover:text-white transition-colors bg-[#061D2B] px-4 py-2 rounded-full border border-white/10 shadow-md font-marathi-display"
           >
             <ArrowLeft className="w-4 h-4 text-[#FBBF24]" />
-            <span>{isMarathi ? "← महाराष्ट्राच्या ३डी नकाशावर परत जा" : "← Back to Maharashtra 3D Map"}</span>
+            <span>{isMarathi ? "← महाराष्ट्राच्या ३डी नकाशावर परत जा" : isHindi ? "← महाराष्ट्र के ३डी नक्शे पर वापस जाएं" : "← Back to Maharashtra 3D Map"}</span>
           </Link>
 
           <span className="text-xs text-white/60 font-mono-accent hidden sm:inline-block">
@@ -314,29 +318,29 @@ export default async function BranchDetailPage({
               <div className="flex flex-wrap items-center gap-2.5">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-[#FBBF24] text-[#071A24] shadow-md uppercase">
                   {branch.type === "hq"
-                    ? "👑 मुख्य केंद्र व दालन (Headquarter)"
+                    ? (isMarathi ? "👑 मुख्य केंद्र व दालन (Headquarter)" : isHindi ? "👑 मुख्य केंद्र व शाखा (Headquarter)" : "👑 Headquarter & Flagship")
                     : branch.type === "port"
-                    ? "⚓ सागरी बंदर थेट आवक केंद्र"
-                    : "📍 अधिकृत फ्रँचायझी दालन"}
+                    ? (isMarathi ? "⚓ सागरी बंदर थेट आवक केंद्र" : isHindi ? "⚓ समुद्री बंदरगाह सीधी आवक केंद्र" : "⚓ Sea Port Direct Intake")
+                    : (isMarathi ? "📍 अधिकृत फ्रँचायझी दालन" : isHindi ? "📍 अधिकृत फ्रेंचाइजी शाखा" : "📍 Authorized Franchise Outlet")}
                 </span>
 
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>{isMarathi ? "आज चालू आहे · १००% ताजी आवक" : "Open Today · 100% Fresh Catch"}</span>
+                  <span>{isMarathi ? "आज चालू आहे · १००% ताजी आवक" : isHindi ? "आज खुला है · १००% ताज़ा आवक" : "Open Today · 100% Fresh Catch"}</span>
                 </span>
 
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.7rem] font-bold bg-[#0A9AD9]/20 text-[#38BDF8] border border-[#0A9AD9]/30">
                   <Award className="w-3.5 h-3.5" />
-                  <span>{isMarathi ? "ISO व FSSAI प्रमाणित स्वच्छता" : "Certified Hygiene"}</span>
+                  <span>{isMarathi ? "ISO व FSSAI प्रमाणित स्वच्छता" : isHindi ? "ISO व FSSAI प्रमाणित स्वच्छता" : "Certified Hygiene"}</span>
                 </span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black font-marathi-display text-white tracking-tight">
-                {isMarathi ? branch.nameMr : branch.nameEn}
+                {isMarathi || isHindi ? branch.nameMr : branch.nameEn}
               </h1>
 
               <p className="text-sm sm:text-base text-[#6EC6F0] font-semibold font-marathi-body leading-relaxed">
-                {isMarathi ? branch.taglineMr : branch.taglineEn}
+                {isMarathi || isHindi ? branch.taglineMr : branch.taglineEn}
               </p>
 
               {/* Address & Timings Pill Grid */}
@@ -344,25 +348,25 @@ export default async function BranchDetailPage({
                 <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-[#061822]/90 border border-white/10">
                   <MapPin className="w-4 h-4 text-[#FBBF24] shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-white font-marathi-display block">पत्ता:</span>
-                    <span className="text-white/75">{isMarathi ? branch.addressMr : branch.addressEn}</span>
+                    <span className="font-bold text-white font-marathi-display block">{isMarathi ? "पत्ता:" : isHindi ? "पता:" : "Address:"}</span>
+                    <span className="text-white/75">{isMarathi || isHindi ? branch.addressMr : branch.addressEn}</span>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-[#061822]/90 border border-white/10">
                   <Clock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-white font-marathi-display block">दालनाची वेळ:</span>
-                    <span className="text-white/75">{isMarathi ? branch.hoursMr : branch.hoursEn}</span>
+                    <span className="font-bold text-white font-marathi-display block">{isMarathi ? "दालनाची वेळ:" : isHindi ? "शाखा समय:" : "Store Timings:"}</span>
+                    <span className="text-white/75">{isMarathi || isHindi ? branch.hoursMr : branch.hoursEn}</span>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-[#061822]/90 border border-white/10">
                   <Truck className="w-4 h-4 text-[#38BDF8] shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-white font-marathi-display block">डिलिव्हरी परिसर:</span>
+                    <span className="font-bold text-white font-marathi-display block">{isMarathi ? "डिलिव्हरी परिसर:" : isHindi ? "डिलीवरी क्षेत्र:" : "Delivery Radius:"}</span>
                     <span className="text-white/75">
-                      {isMarathi ? "१५ किमी परिसरात ३० मिनिटांत जलद घरपोच सेवा" : "Fast delivery within 15 km radius"}
+                      {isMarathi ? "१५ किमी परिसरात ३० मिनिटांत जलद घरपोच सेवा" : isHindi ? "१५ किमी क्षेत्र में ३० मिनट में त्वरित होम डिलीवरी" : "Fast delivery within 15 km radius"}
                     </span>
                   </div>
                 </div>
@@ -370,9 +374,9 @@ export default async function BranchDetailPage({
                 <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-[#061822]/90 border border-white/10">
                   <UserCheck className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-white font-marathi-display block">दालन संपर्क:</span>
+                    <span className="font-bold text-white font-marathi-display block">{isMarathi ? "दालन संपर्क:" : isHindi ? "शाखा संपर्क:" : "Store Contact:"}</span>
                     <span className="text-white/75 font-semibold">
-                      {branch.type === "hq" ? "आमिर नादाफ व मुख्य टीम" : "स्थानिक शाखा व्यवस्थापक व कटिंग मास्टर"}
+                      {branch.type === "hq" ? (isMarathi ? "आमिर नादाफ व मुख्य टीम" : isHindi ? "आमिर नादाफ व मुख्य टीम" : "Ameer Nadaf & Central Team") : (isMarathi ? "स्थानिक शाखा व्यवस्थापक व कटिंग मास्टर" : isHindi ? "स्थानीय शाखा प्रबंधक व कटिंग मास्टर" : "Branch Manager & Master Fishmonger")}
                     </span>
                   </div>
                 </div>
@@ -387,7 +391,7 @@ export default async function BranchDetailPage({
                   className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-gradient-to-r from-[#0A9AD9] via-[#0284C7] to-[#25D366] text-white font-black text-sm uppercase tracking-wide transition-all duration-300 shadow-[0_8px_24px_rgba(10,154,217,0.4)] hover:shadow-[0_12px_32px_rgba(37,211,102,0.6)] hover:-translate-y-0.5 cursor-pointer font-marathi-display"
                 >
                   <MessageCircle className="w-4 h-4 fill-current shrink-0" />
-                  <span>{isMarathi ? "व्हॉट्सॲपवर ऑर्डर द्या" : "Order on WhatsApp"}</span>
+                  <span>{isMarathi ? "व्हॉट्सॲपवर ऑर्डर द्या" : isHindi ? "व्हाट्सएप पर ऑर्डर करें" : "Order on WhatsApp"}</span>
                 </a>
 
                 <a
@@ -395,7 +399,7 @@ export default async function BranchDetailPage({
                   className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-white/20 bg-white/5 hover:bg-white/15 text-white font-bold text-sm transition-all cursor-pointer font-marathi-display"
                 >
                   <Phone className="w-4 h-4 text-[#25D366] shrink-0" />
-                  <span>{isMarathi ? `कॉल करा: ${branch.phone}` : `Call: ${branch.phone}`}</span>
+                  <span>{isMarathi ? `कॉल करा: ${branch.phone}` : isHindi ? `कॉल करें: ${branch.phone}` : `Call: ${branch.phone}`}</span>
                 </a>
 
                 <a
@@ -405,7 +409,7 @@ export default async function BranchDetailPage({
                   className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full border border-white/20 bg-white/5 hover:bg-white/15 text-white font-bold text-sm transition-all cursor-pointer font-marathi-display"
                 >
                   <ExternalLink className="w-4 h-4 text-[#38BDF8] shrink-0" />
-                  <span>{isMarathi ? "गुगल मॅप्सवर दिशा" : "Directions"}</span>
+                  <span>{isMarathi ? "गुगल मॅप्सवर दिशा" : isHindi ? "गूगल मैप पर दिशा" : "Directions"}</span>
                 </a>
               </div>
             </div>
@@ -414,15 +418,15 @@ export default async function BranchDetailPage({
             <div className="relative w-full lg:w-[380px] h-[260px] sm:h-[300px] rounded-3xl overflow-hidden border-2 border-white/15 shadow-2xl shrink-0">
               <Image
                 src={branch.image || "/media/gallery/karad-outlet-tour.webp"}
-                alt={isMarathi ? branch.nameMr : branch.nameEn}
+                alt={isMarathi || isHindi ? branch.nameMr : branch.nameEn}
                 fill
                 sizes="(max-width: 1024px) 100vw, 380px"
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
               <div className="absolute bottom-3 left-3 right-3 text-xs text-white/95 font-marathi-body bg-black/70 backdrop-blur-md p-3 rounded-2xl border border-white/15">
-                <span className="font-bold text-[#FBBF24] block">📍 खूण (Landmark):</span>
-                <span>{isMarathi ? branch.landmarkMr : branch.landmarkEn}</span>
+                <span className="font-bold text-[#FBBF24] block">{isMarathi ? "📍 खूण (Landmark):" : isHindi ? "📍 पहचान (Landmark):" : "📍 Landmark:"}</span>
+                <span>{isMarathi || isHindi ? branch.landmarkMr : branch.landmarkEn}</span>
               </div>
             </div>
 
@@ -433,10 +437,10 @@ export default async function BranchDetailPage({
         <div className="mb-14">
           <div className="text-center max-w-3xl mx-auto mb-8">
             <span className="text-xs font-bold text-[#FBBF24] tracking-wider uppercase">
-              {isMarathi ? "आमच्या दालनाची खासियत" : "Store Facilities & Standards"}
+              {isMarathi ? "आमच्या दालनाची खासियत" : isHindi ? "हमारी शाखा की खासियत" : "Store Facilities & Standards"}
             </span>
             <h2 className="text-2xl sm:text-3xl font-black font-marathi-display text-white mt-1">
-              {isMarathi ? "या दालनात ग्राहकांना मिळणाऱ्या खास सुविधा" : "Customer Services & Hygiene Guarantees"}
+              {isMarathi ? "या दालनात ग्राहकांना मिळणाऱ्या खास सुविधा" : isHindi ? "इस शाखा में ग्राहकों को मिलने वाली विशेष सुविधाएं" : "Customer Services & Hygiene Guarantees"}
             </h2>
           </div>
 
@@ -496,40 +500,56 @@ export default async function BranchDetailPage({
           <div className="flex items-center gap-2 mb-6">
             <Clock className="w-5 h-5 text-[#FBBF24]" />
             <h3 className="text-xl sm:text-2xl font-black font-marathi-display text-white">
-              {isMarathi ? "पहाटे ४:०० ते आपल्या ताटापर्यंत — ताजेपणाचा दैनंदिन प्रवास" : "The 4:00 AM Freshness Journey"}
+              {isMarathi ? "पहाटे ४:०० ते आपल्या ताटापर्यंत — ताजेपणाचा दैनंदिन प्रवास" : isHindi ? "सुबह ४:०० बजे से आपकी थाली तक — ताजगी का दैनिक सफर" : "The 4:00 AM Freshness Journey"}
             </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="p-4 rounded-2xl bg-[#071F2E] border border-white/10">
-              <span className="text-xs font-bold text-[#FBBF24] block">पायरी ०१ · पहाटे ४:००</span>
-              <h5 className="text-sm font-bold text-white font-marathi-display mt-1">थेट बंदरावर निवड</h5>
+              <span className="text-xs font-bold text-[#FBBF24] block">{isMarathi ? "पायरी ०१ · पहाटे ४:००" : isHindi ? "चरण ०१ · सुबह ४:००" : "Step 01 • 4:00 AM"}</span>
+              <h5 className="text-sm font-bold text-white font-marathi-display mt-1">{isMarathi ? "थेट बंदरावर निवड" : isHindi ? "सीधे बंदरगाह पर चयन" : "Portside Auction Selection"}</h5>
               <p className="text-xs text-white/70 mt-1 font-marathi-body">
-                रत्नागिरी मिरकरवाडा व मालवण जेटीवर पहिल्या लिलावातून ए-ग्रेड माशांची थेट निवड.
+                {isMarathi
+                  ? "रत्नागिरी मिरकरवाडा व मालवण जेटीवर पहिल्या लिलावातून ए-ग्रेड माशांची थेट निवड."
+                  : isHindi
+                  ? "रत्नागिरी मिरकरवाडा व मालवण जेटी पर पहले ऑक्शन से ए-ग्रेड मछली का सीधा चयन।"
+                  : "Direct selection of A-grade catch from the first dawn auctions at Mirkarwada and Malvan jetties."}
               </p>
             </div>
 
             <div className="p-4 rounded-2xl bg-[#071F2E] border border-white/10">
-              <span className="text-xs font-bold text-[#38BDF8] block">पायरी ०२ · पहाटे ५:३०</span>
-              <h5 className="text-sm font-bold text-white font-marathi-display mt-1">०°C आईस एक्सप्रेस प्रवास</h5>
+              <span className="text-xs font-bold text-[#38BDF8] block">{isMarathi ? "पायरी ०२ · पहाटे ५:३०" : isHindi ? "चरण ०२ · सुबह ५:३०" : "Step 02 • 5:30 AM"}</span>
+              <h5 className="text-sm font-bold text-white font-marathi-display mt-1">{isMarathi ? "०°C आईस एक्सप्रेस प्रवास" : isHindi ? "०°C चिल्ड एक्सप्रेस सफर" : "0°C Chilled Transit"}</h5>
               <p className="text-xs text-white/70 mt-1 font-marathi-body">
-                लिक्विड आईस स्लरी असलेल्या इन्सुलेटेड वाहनातून तातडीने या दालनाकडे प्रस्थान.
+                {isMarathi
+                  ? "लिक्विड आईस स्लरी असलेल्या इन्सुलेटेड वाहनातून तातडीने या दालनाकडे प्रस्थान."
+                  : isHindi
+                  ? "लिक्विड आइस स्लरी वाले इंसुलेटेड वाहन से तुरंत इस शाखा की ओर प्रस्थान।"
+                  : "Rapid transit in insulated fleet with liquid ice slurry keeping temperature strictly at 0°C."}
               </p>
             </div>
 
             <div className="p-4 rounded-2xl bg-[#071F2E] border border-white/10">
-              <span className="text-xs font-bold text-emerald-400 block">पायरी ०३ · सकाळी ६:००</span>
-              <h5 className="text-sm font-bold text-white font-marathi-display mt-1">आरओ पाण्याने स्वच्छता</h5>
+              <span className="text-xs font-bold text-emerald-400 block">{isMarathi ? "पायरी ०३ · सकाळी ६:००" : isHindi ? "चरण ०३ · सुबह ६:००" : "Step 03 • 6:00 AM"}</span>
+              <h5 className="text-sm font-bold text-white font-marathi-display mt-1">{isMarathi ? "आरओ पाण्याने स्वच्छता" : isHindi ? "आरओ पानी से सफाई" : "RO Pure Wash & Ice-Bed"}</h5>
               <p className="text-xs text-white/70 mt-1 font-marathi-body">
-                दालनात आगमन होताच पिण्याच्या शुद्ध पाण्याने धुलाई, ग्रेडिंग व आईस-बेडवर मांडणी.
+                {isMarathi
+                  ? "दालनात आगमन होताच पिण्याच्या शुद्ध पाण्याने धुलाई, ग्रेडिंग व आईस-बेडवर मांडणी."
+                  : isHindi
+                  ? "शाखा में आगमन होते ही शुद्ध आरओ पानी से धुलाई, ग्रेडिंग और आइस-बेड पर प्रदर्शन।"
+                  : "Arrival, RO water rinsing, strict grading, and display on food-grade crushed ice beds."}
               </p>
             </div>
 
             <div className="p-4 rounded-2xl bg-[#071F2E] border border-white/10">
-              <span className="text-xs font-bold text-purple-400 block">पायरी ०४ · सकाळी ७:०० पुढे</span>
-              <h5 className="text-sm font-bold text-white font-marathi-display mt-1">थेट विक्री व घरपोच</h5>
+              <span className="text-xs font-bold text-purple-400 block">{isMarathi ? "पायरी ०४ · सकाळी ७:०० पुढे" : isHindi ? "चरण ०४ · सुबह ७:०० से आगे" : "Step 04 • 7:00 AM Onward"}</span>
+              <h5 className="text-sm font-bold text-white font-marathi-display mt-1">{isMarathi ? "थेट विक्री व घरपोच" : isHindi ? "सीधी बिक्री व होम डिलीवरी" : "Retail Butchering & Delivery"}</h5>
               <p className="text-xs text-white/70 mt-1 font-marathi-body">
-                ग्राहकांना आवडीनुसार मोफत चोख कटिंग आणि ३० मिनिटांत घरपोच सुरक्षित डिलिव्हरी.
+                {isMarathi
+                  ? "ग्राहकांना आवडीनुसार मोफत चोख कटिंग आणि ३० मिनिटांत घरपोच सुरक्षित डिलिव्हरी."
+                  : isHindi
+                  ? "ग्राहकों को पसंद अनुसार मुफ्त चोख कटिंग और ३० मिनट में सुरक्षित होम डिलीवरी।"
+                  : "Precision custom butchering at zero extra cost and 30-minute delivery to doorsteps."}
               </p>
             </div>
           </div>
@@ -541,17 +561,17 @@ export default async function BranchDetailPage({
             <div>
               <span className="text-xs font-bold text-[#FBBF24] tracking-wider uppercase flex items-center gap-1.5">
                 <Fish className="w-4 h-4 text-[#FBBF24]" />
-                {isMarathi ? "थेट या दालनातील आजची ताजी मासोळी" : "Live In-Store Fresh Catch"}
+                {isMarathi ? "थेट या दालनातील आजची ताजी मासोळी" : isHindi ? "सीधे इस शाखा में आज की ताज़ा मछली" : "Live In-Store Fresh Catch"}
               </span>
               <h2 className="text-2xl sm:text-3xl font-black font-marathi-display text-white mt-1">
-                {isMarathi ? "आजचा उपलब्ध ताजी मासोळी साठा (Live Daily Rates)" : "Available Fish Stock Today"}
+                {isMarathi ? "आजचा उपलब्ध ताजी मासोळी साठा (Live Daily Rates)" : isHindi ? "आज का उपलब्ध ताज़ा मछली स्टॉक (Live Daily Rates)" : "Available Fish Stock Today"}
               </h2>
             </div>
 
             {/* Guarantee Pill */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#081F2C] border border-[#0A9AD9]/40 text-xs text-[#6EC6F0] font-bold">
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>{isMarathi ? "१००% शुद्ध आरओ पाण्याने स्वच्छता · मोफत कटिंग" : "RO Cleaned • Free Cuts"}</span>
+              <span>{isMarathi ? "१००% शुद्ध आरओ पाण्याने स्वच्छता · मोफत कटिंग" : isHindi ? "१००% शुद्ध आरओ पानी से सफाई · मुफ्त कटिंग" : "RO Cleaned • Free Cuts"}</span>
             </div>
           </div>
 
@@ -566,41 +586,41 @@ export default async function BranchDetailPage({
                 <div className="relative w-full h-44 rounded-2xl overflow-hidden bg-[#04121B] flex items-center justify-center p-3 mb-3">
                   <Image
                     src={fish.image}
-                    alt={isMarathi ? fish.nameMr : fish.nameEn}
+                    alt={isMarathi || isHindi ? fish.nameMr : fish.nameEn}
                     width={200}
                     height={140}
                     className="object-contain max-h-full max-w-full transition-transform duration-500 group-hover:scale-110 drop-shadow-lg"
                   />
                   <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[0.62rem] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                    🟢 {isMarathi ? "ताजी आवक" : "Fresh"}
+                    🟢 {isMarathi ? "ताजी आवक" : isHindi ? "ताज़ा आवक" : "Fresh"}
                   </span>
                   <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md text-[0.6rem] font-bold bg-black/75 text-[#FBBF24]">
-                    {isMarathi ? fish.badgeMr : fish.badgeEn}
+                    {isMarathi || isHindi ? fish.badgeMr : fish.badgeEn}
                   </span>
                 </div>
 
                 {/* Fish Info */}
                 <div className="space-y-2 mb-4">
                   <h3 className="text-lg font-bold font-marathi-display text-white group-hover:text-[#FBBF24] transition-colors leading-tight">
-                    {isMarathi ? fish.nameMr : fish.nameEn}
+                    {isMarathi || isHindi ? fish.nameMr : fish.nameEn}
                   </h3>
 
                   <p className="text-[0.72rem] text-white/70 line-clamp-2 leading-relaxed font-marathi-body">
-                    {isMarathi ? fish.descMr : fish.descEn}
+                    {isMarathi || isHindi ? fish.descMr : fish.descEn}
                   </p>
 
                   <div className="pt-2 border-t border-white/10 text-[0.68rem] text-[#6EC6F0]">
                     <span className="text-white/45 uppercase text-[0.6rem] font-bold block">
-                      {isMarathi ? "मोफत कटिंग पर्याय:" : "Free Cuts:"}
+                      {isMarathi ? "मोफत कटिंग पर्याय:" : isHindi ? "मुफ्त कटिंग विकल्प:" : "Free Cuts:"}
                     </span>
-                    <span className="font-semibold block truncate">{isMarathi ? fish.cutsMr : fish.cutsEn}</span>
+                    <span className="font-semibold block truncate">{isMarathi || isHindi ? fish.cutsMr : fish.cutsEn}</span>
                   </div>
 
                   <div className="text-[0.68rem] text-emerald-300">
                     <span className="text-white/45 uppercase text-[0.6rem] font-bold block">
-                      {isMarathi ? "कशासाठी सर्वोत्तम:" : "Best for:"}
+                      {isMarathi ? "कशासाठी सर्वोत्तम:" : isHindi ? "किसके लिए सर्वश्रेष्ठ:" : "Best for:"}
                     </span>
-                    <span className="font-medium block truncate">{isMarathi ? fish.bestCookingMr : fish.bestCookingEn}</span>
+                    <span className="font-medium block truncate">{isMarathi || isHindi ? fish.bestCookingMr : fish.bestCookingEn}</span>
                   </div>
                 </div>
 
@@ -608,7 +628,7 @@ export default async function BranchDetailPage({
                 <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
                   <div>
                     <span className="block text-[0.6rem] text-white/45 uppercase tracking-wider font-semibold">
-                      {isMarathi ? "दैनिक बाजार दर" : "Daily Rate"}
+                      {isMarathi ? "दैनिक बाजार दर" : isHindi ? "दैनिक बाज़ार दर" : "Daily Rate"}
                     </span>
                     <span className="text-sm font-black text-[#FBBF24] tabular-nums">
                       {fish.rate}
@@ -619,6 +639,8 @@ export default async function BranchDetailPage({
                     href={`https://wa.me/${branch.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
                       isMarathi
                         ? `नमस्कार AN Fish World (${branch.nameMr}), मला आजच्या ताजी आवकमधून "${fish.nameMr}" ऑर्डर करायची आहे.`
+                        : isHindi
+                        ? `नमस्ते AN Fish World (${branch.nameMr}), मुझे आज की ताज़ा आवक से "${fish.nameMr}" ऑर्डर करना है।`
                         : `Hello AN Fish World (${branch.nameEn}), I want to order "${fish.nameEn}".`
                     )}`}
                     target="_blank"
@@ -626,7 +648,7 @@ export default async function BranchDetailPage({
                     className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-[#0A9AD9] to-[#0284C7] hover:from-[#38BDF8] hover:to-[#0A9AD9] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md"
                   >
                     <MessageCircle className="w-3.5 h-3.5 fill-current" />
-                    <span>{isMarathi ? "मागवा" : "Order"}</span>
+                    <span>{isMarathi ? "मागवा" : isHindi ? "मंगवाएं" : "Order"}</span>
                   </a>
                 </div>
               </div>
@@ -640,14 +662,14 @@ export default async function BranchDetailPage({
             <div>
               <span className="text-xs font-bold text-[#FBBF24] tracking-wider uppercase flex items-center gap-1.5">
                 <Flame className="w-4 h-4 text-[#FBBF24]" />
-                {isMarathi ? "दालनात खरेदीसाठी उपलब्ध" : "Available In Store"}
+                {isMarathi ? "दालनात खरेदीसाठी उपलब्ध" : isHindi ? "शाखा में खरीद के लिए उपलब्ध" : "Available In Store"}
               </span>
               <h3 className="text-2xl sm:text-3xl font-black font-marathi-display text-white mt-1">
-                {isMarathi ? "ए एन फिश स्पेशल मसाले (घरगुती पारंपरिक चव)" : "AN Fish Handcrafted Special Masalas"}
+                {isMarathi ? "ए एन फिश स्पेशल मसाले (घरगुती पारंपरिक चव)" : isHindi ? "ए एन फिश स्पेशल मसाले (पारंपरिक घरेलू स्वाद)" : "AN Fish Handcrafted Special Masalas"}
               </h3>
             </div>
             <span className="px-3 py-1 rounded-full bg-amber-500/20 text-[#FBBF24] border border-amber-500/30 text-xs font-bold font-marathi-display">
-              {isMarathi ? "माशांसोबत घरपोच उपलब्ध" : "Order Along with Fish"}
+              {isMarathi ? "माशांसोबत घरपोच उपलब्ध" : isHindi ? "मछली के साथ घर पर उपलब्ध" : "Order Along with Fish"}
             </span>
           </div>
 
@@ -667,10 +689,10 @@ export default async function BranchDetailPage({
                     </span>
                   </div>
                   <h4 className="text-base font-bold font-marathi-display text-white">
-                    {isMarathi ? masala.nameMr : masala.nameEn}
+                    {isMarathi || isHindi ? masala.nameMr : masala.nameEn}
                   </h4>
                   <p className="text-xs text-white/75 font-marathi-body mt-2 leading-relaxed">
-                    {isMarathi ? masala.descMr : masala.descEn}
+                    {isMarathi || isHindi ? masala.descMr : masala.descEn}
                   </p>
                 </div>
 
@@ -679,6 +701,8 @@ export default async function BranchDetailPage({
                     href={`https://wa.me/${branch.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
                       isMarathi
                         ? `नमस्कार AN Fish World (${branch.nameMr}), मला माशांसोबत "${masala.nameMr}" (${masala.weight}) सुद्धा मागवायचा आहे.`
+                        : isHindi
+                        ? `नमस्ते AN Fish World (${branch.nameMr}), मुझे मछली के साथ "${masala.nameMr}" (${masala.weight}) भी चाहिए।`
                         : `Hello AN Fish World (${branch.nameEn}), please add "${masala.nameEn}" (${masala.weight}) to my fish order.`
                     )}`}
                     target="_blank"
@@ -686,7 +710,7 @@ export default async function BranchDetailPage({
                     className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-[#FBBF24] font-bold text-xs font-marathi-display transition-all"
                   >
                     <MessageCircle className="w-3.5 h-3.5" />
-                    <span>{isMarathi ? "मसाला ऑर्डर करा" : "Order Masala"}</span>
+                    <span>{isMarathi ? "मसाला ऑर्डर करा" : isHindi ? "मसाला ऑर्डर करें" : "Order Masala"}</span>
                   </a>
                 </div>
               </div>
@@ -699,14 +723,16 @@ export default async function BranchDetailPage({
           <div className="text-center max-w-3xl mx-auto mb-8">
             <span className="text-xs font-bold text-emerald-400 tracking-wider uppercase flex items-center justify-center gap-1.5">
               <Heart className="w-4 h-4 text-rose-400" />
-              {isMarathi ? "आरोग्य सल्ला व पोषण" : "Health & Nutrition"}
+              {isMarathi ? "आरोग्य सल्ला व पोषण" : isHindi ? "स्वास्थ्य सलाह व पोषण" : "Health & Nutrition"}
             </span>
             <h3 className="text-2xl sm:text-3xl font-black font-marathi-display text-white mt-1">
-              {isMarathi ? '"मासे खाण्याचे आरोग्यदायी फायदे"' : "Proven Health Benefits of Eating Fish"}
+              {isMarathi ? '"मासे खाण्याचे आरोग्यदायी फायदे"' : isHindi ? '"मछली खाने के स्वास्थ्यवर्धक फायदे"' : "Proven Health Benefits of Eating Fish"}
             </h3>
             <p className="text-xs sm:text-sm text-white/70 font-marathi-body mt-1">
               {isMarathi
                 ? "आमच्या कराड मुख्य केंद्रातील प्रत्यक्ष दर्शनी फलकावरील आरोग्याची ७ महत्त्वाची सूत्रे:"
+                : isHindi
+                ? "हमारे कराड मुख्य केंद्र के प्रत्यक्ष बोर्ड पर स्वास्थ्य के ७ महत्वपूर्ण सूत्र:"
                 : "Official nutritional guidance from AN Fish World store displays:"}
             </p>
           </div>
@@ -766,11 +792,13 @@ export default async function BranchDetailPage({
           <div className="flex items-center justify-between gap-4 mb-6">
             <div>
               <span className="text-xs font-bold text-[#FBBF24] uppercase">
-                {isMarathi ? "खवय्यांचे प्रेम" : "Customer Love"}
+                {isMarathi ? "खवय्यांचे प्रेम" : isHindi ? "ग्राहकों का प्यार" : "Customer Love"}
               </span>
               <h3 className="text-xl sm:text-2xl font-black font-marathi-display text-white mt-0.5">
                 {isMarathi
                   ? `या दालनाविषयी ग्राहकांचे मत (${branch.villageNameMr || branch.nameMr})`
+                  : isHindi
+                  ? `इस शाखा के बारे में ग्राहकों की राय (${branch.villageNameMr || branch.nameMr})`
                   : `Customer Reviews for ${branch.nameEn}`}
               </h3>
             </div>
@@ -832,17 +860,17 @@ export default async function BranchDetailPage({
           <div className="flex items-center justify-between gap-4 mb-6">
             <div>
               <h3 className="text-xl sm:text-2xl font-bold font-marathi-display text-white">
-                {isMarathi ? "महाराष्ट्रातील इतर अधिकृत दालने" : "Other Outlets Across Maharashtra"}
+                {isMarathi ? "महाराष्ट्रातील इतर अधिकृत दालने" : isHindi ? "महाराष्ट्र की अन्य अधिकृत शाखाएं" : "Other Outlets Across Maharashtra"}
               </h3>
               <p className="text-xs text-white/60 font-marathi-body">
-                {isMarathi ? "सर्व २५ दालनांमध्ये थेट पहाटेची आवक उपलब्ध आहे." : "Direct morning catch across all 25 outlets."}
+                {isMarathi ? "सर्व २५ दालनांमध्ये थेट पहाटेची आवक उपलब्ध आहे." : isHindi ? "सभी २५ शाखाओं में सीधी सुबह की आवक उपलब्ध है।" : "Direct morning catch across all 25 outlets."}
               </p>
             </div>
             <Link
               href={`/${locale}#franchise-map`}
               className="text-xs font-bold text-[#FBBF24] hover:underline font-marathi-display"
             >
-              {isMarathi ? "३डी नकाशावर सर्व २५ दालने पहा →" : "View All on 3D Map →"}
+              {isMarathi ? "३डी नकाशावर सर्व २५ दालने पहा →" : isHindi ? "३डी नक्शे पर सभी २५ शाखाएं देखें →" : "View All on 3D Map →"}
             </Link>
           </div>
 
@@ -854,13 +882,13 @@ export default async function BranchDetailPage({
                 className="p-4 rounded-2xl bg-[#081F2C] hover:bg-[#0C2A3C] border border-white/10 hover:border-[#38BDF8]/40 transition-all block group"
               >
                 <span className="text-[0.68rem] text-[#FBBF24] font-bold block mb-1">
-                  {other.type === "hq" ? "👑 मुख्य दालन" : other.type === "port" ? "⚓ बंदर केंद्र" : "📍 अधिकृत दालन"}
+                  {other.type === "hq" ? (isMarathi ? "👑 मुख्य दालन" : isHindi ? "👑 मुख्य शाखा" : "👑 Flagship") : other.type === "port" ? (isMarathi ? "⚓ बंदर केंद्र" : isHindi ? "⚓ बंदरगाह केंद्र" : "⚓ Port Intake") : (isMarathi ? "📍 अधिकृत दालन" : isHindi ? "📍 अधिकृत शाखा" : "📍 Store")}
                 </span>
                 <h4 className="text-sm font-bold text-white group-hover:text-[#38BDF8] transition-colors font-marathi-display">
-                  {isMarathi ? other.nameMr : other.nameEn}
+                  {isMarathi || isHindi ? other.nameMr : other.nameEn}
                 </h4>
                 <p className="text-xs text-white/60 truncate mt-1">
-                  {isMarathi ? other.addressMr : other.addressEn}
+                  {isMarathi || isHindi ? other.addressMr : other.addressEn}
                 </p>
               </Link>
             ))}

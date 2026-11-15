@@ -31,7 +31,7 @@ export default async function CleanAndCutPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!routing.locales.includes(locale as "mr" | "en")) notFound();
+  if (!routing.locales.includes(locale as any)) notFound();
   setRequestLocale(locale);
 
   return <FreshnessPageTemplate config={CLEAN_AND_CUT_CONFIG} />;
