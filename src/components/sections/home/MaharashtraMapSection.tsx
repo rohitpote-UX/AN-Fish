@@ -16,7 +16,7 @@ export function MaharashtraMapSection() {
     <section
       id="franchise-map"
       data-section="maharashtra-map"
-      className="relative py-12 sm:py-20 md:py-24 pb-28 sm:pb-24 bg-[#071423] text-white overflow-x-hidden selection:bg-[#0A9AD9] selection:text-white"
+      className="relative py-10 sm:py-12 md:py-14 pb-14 sm:pb-14 bg-[#071423] text-white overflow-x-hidden selection:bg-[#0A9AD9] selection:text-white"
     >
       {/* Background Ambient Ocean Glow & Subtle Light */}
       <div
@@ -31,7 +31,7 @@ export function MaharashtraMapSection() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* SECTION HEADER */}
-        <div className="text-center max-w-4xl mx-auto mb-8 sm:mb-14">
+        <div className="text-center max-w-4xl mx-auto mb-6 sm:mb-8">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0A9AD9]/15 border border-[#38BDF8]/30 text-xs sm:text-sm font-bold text-[#6EC6F0] mb-3 sm:mb-4 backdrop-blur-md shadow-[0_0_20px_rgba(10,154,217,0.25)]">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FBBF24] opacity-75" />
@@ -143,7 +143,7 @@ export function MaharashtraMapSection() {
         </div>
 
         {/* STREAMLINED STORE DIRECTORY (Header & View All 25 Stores Button in One Clean Line with Generous Whitespace) */}
-        <div className="mt-14 sm:mt-18 pt-8 sm:pt-10 border-t border-white/10">
+        <div className="mt-10 sm:mt-12 pt-8 sm:pt-10 border-t border-white/10">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 p-5 sm:p-7 rounded-2xl bg-gradient-to-r from-[#061A26]/90 via-[#0A2637]/80 to-[#061A26]/90 border border-white/10 shadow-xl backdrop-blur-md">
             <div className="space-y-1.5 max-w-2xl">
               <h3 className="text-lg sm:text-xl md:text-2xl font-black font-marathi-display text-white flex items-center gap-2.5">

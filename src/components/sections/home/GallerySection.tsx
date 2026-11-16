@@ -66,7 +66,7 @@ export function GallerySection() {
   return (
     <section
       id="gallery"
-      className="relative py-20 lg:py-28 bg-[#071A24] text-white overflow-hidden scroll-mt-20 border-b border-white/08"
+      className="relative py-12 lg:py-16 bg-[#071A24] text-white overflow-hidden scroll-mt-20 border-b border-white/08"
       aria-label="AN Fish Photo and Video Gallery"
     >
       {/* Background Ambience */}

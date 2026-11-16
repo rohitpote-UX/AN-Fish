@@ -67,7 +67,7 @@ export function AboutSection() {
   return (
     <section
       id="about"
-      className="relative scroll-mt-20 overflow-hidden bg-gradient-to-b from-white to-[#F3F8FB] py-20 text-[#071A24] lg:py-28"
+      className="relative scroll-mt-20 overflow-hidden bg-gradient-to-b from-white to-[#F3F8FB] py-12 text-[#071A24] lg:py-16"
       aria-label="About AN Fish World"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">

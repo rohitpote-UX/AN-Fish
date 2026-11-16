@@ -69,12 +69,12 @@ export function FaqSection() {
   return (
     <section
       id="faq"
-      className="relative py-20 lg:py-28 bg-[#FFFFFF] text-[#071A24] overflow-hidden scroll-mt-20 border-b border-[#071A24]/08"
+      className="relative py-12 lg:py-16 bg-[#FFFFFF] text-[#071A24] overflow-hidden scroll-mt-20 border-b border-[#071A24]/08"
       aria-label="Frequently Asked Questions"
     >
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-12">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
+        <div className="text-center max-w-2xl mx-auto mb-8 space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF8FF] border border-[#0B9DD8]/30 text-xs font-bold text-[#0B9DD8] uppercase tracking-wider">
             <HelpCircle className="w-3.5 h-3.5 text-[#0B9DD8]" />
             <span>{isMarathi ? "शंका व उत्तरे" : isHindi ? "सवाल और जवाब" : "Got Questions?"}</span>

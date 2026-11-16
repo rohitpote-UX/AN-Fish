@@ -19,7 +19,7 @@ export function FooterCtaBand() {
   return (
     <aside
       aria-label="Footer Call to Action"
-      className="relative w-full bg-[#0F1F10] text-white py-24 sm:py-32 px-4 sm:px-6 lg:px-12 overflow-hidden border-t border-white/10 z-10"
+      className="relative w-full bg-[#0F1F10] text-white py-14 sm:py-20 px-4 sm:px-6 lg:px-12 overflow-hidden border-t border-white/10 z-10"
     >
       {/* 1. Slow Blue Water-Caustics Loop in CSS/SVG */}
       <div className="absolute inset-0 pointer-events-none opacity-20 overflow-hidden" aria-hidden="true">

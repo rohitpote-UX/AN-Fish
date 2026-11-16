@@ -167,7 +167,7 @@ export function SignatureSection() {
   return (
     <section
       id="signature"
-      className="relative py-20 lg:py-28 bg-[#071A24] text-white overflow-hidden scroll-mt-20"
+      className="relative py-12 lg:py-16 bg-[#071A24] text-white overflow-hidden scroll-mt-20"
       aria-label="Signature Catch & Brand Story"
     >
       {/* 1. Subtle Luxury Textured Background (Identical theme & solid base color) */}
@@ -196,7 +196,7 @@ export function SignatureSection() {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 lg:mb-16 space-y-3">
+        <div className="text-center max-w-3xl mx-auto mb-8 lg:mb-10 space-y-3">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0A9AD9]/15 border border-[#0A9AD9]/35 text-xs font-semibold text-[#6EC6F0] uppercase tracking-wider shadow-sm">
             <Sparkles className="w-3.5 h-3.5 text-[#FBBF24]" />
             <span>
@@ -228,7 +228,7 @@ export function SignatureSection() {
         </div>
 
         {/* Brand Story Journey: restrained, corporate 4-step process */}
-        <div className="mb-14 lg:mb-20">
+        <div className="mb-10 lg:mb-12">
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#0A2232] p-7 sm:p-12">
             {/* Heading */}
             <motion.div
@@ -251,7 +251,7 @@ export function SignatureSection() {
             </motion.div>
 
             {/* Process */}
-            <div className="relative mt-12 lg:mt-14">
+            <div className="relative mt-10 lg:mt-12">
               {/* Desktop rail with a thin progress line that draws once */}
               <div aria-hidden="true" className="absolute left-6 right-6 top-6 hidden h-px bg-white/15 lg:block">
                 <motion.div
@@ -285,7 +285,7 @@ export function SignatureSection() {
                       )}
 
                       {/* Icon (sits on the rail) + step number */}
-                      <div className="relative z-10 flex shrink-0 items-center gap-4 lg:mb-6">
+                      <div className="relative z-10 flex shrink-0 items-center gap-4 lg:mb-5">
                         <span className="grid size-12 place-items-center rounded-xl border border-white/15 bg-[#0D2A3E] transition-colors duration-300 group-hover:border-[#38BDF8]/70">
                           <Icon className="size-5 text-[#7DD3FC]" />
                         </span>
@@ -320,7 +320,7 @@ export function SignatureSection() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-center sm:flex-row sm:text-left"
+              className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-center sm:flex-row sm:text-left"
             >
               <p className="font-marathi-body text-sm italic text-white/75">
                 {isMarathi
@@ -428,7 +428,7 @@ export function SignatureSection() {
         </ul>
 
         {/* View Entire Menu CTA */}
-        <div className="mt-14 text-center">
+        <div className="mt-10 text-center">
           <a
             href="#menu"
             className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full border border-[#0A9AD9]/40 bg-[#0A9AD9]/10 hover:bg-gradient-to-r hover:from-[#0A9AD9] hover:to-[#0284C7] text-white hover:text-white font-bold text-sm tracking-wide transition-all duration-300 shadow-[0_8px_24px_rgba(10,154,217,0.2)] hover:shadow-[0_12px_32px_rgba(10,154,217,0.4)] hover:-translate-y-0.5 active:scale-95 cursor-pointer font-marathi-display"

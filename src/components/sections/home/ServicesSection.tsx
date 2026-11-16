@@ -208,12 +208,12 @@ export function ServicesSection() {
   return (
     <section
       id="services"
-      className="relative py-20 lg:py-28 bg-[#FFFFFF] text-[#071A24] overflow-hidden scroll-mt-20 border-b border-[#071A24]/08"
+      className="relative py-12 lg:py-16 bg-[#FFFFFF] text-[#071A24] overflow-hidden scroll-mt-20 border-b border-[#071A24]/08"
       aria-label="Why Choose AN Fish World"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
         {/* ================= SECTION HEADER ================= */}
-        <div className="text-center max-w-3xl mx-auto mb-14 lg:mb-18 space-y-3">
+        <div className="text-center max-w-3xl mx-auto mb-8 lg:mb-10 space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF8FF] border border-[#0B9DD8]/30 text-xs font-bold text-[#0B9DD8] uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5 text-[#0B9DD8]" />
             <span>
@@ -239,7 +239,7 @@ export function ServicesSection() {
         </div>
 
         {/* ================= 4 CORE SERVICE CARDS ================= */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mb-16 lg:mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mb-10 lg:mb-12">
           {services.map((item, idx) => {
             const Icon = item.icon;
             return (
@@ -276,7 +276,7 @@ export function ServicesSection() {
         </div>
 
         {/* ================= FEATURE 1: AN SPICES (अस्सल गावरान मसाले) ================= */}
-        <div className="mb-16 lg:mb-20 rounded-3xl bg-gradient-to-br from-[#071A24] via-[#0B2533] to-[#071A24] text-white p-6 sm:p-10 lg:p-12 border border-[#0A9AD9]/30 shadow-2xl overflow-hidden relative">
+        <div className="mb-10 lg:mb-12 rounded-3xl bg-gradient-to-br from-[#071A24] via-[#0B2533] to-[#071A24] text-white p-6 sm:p-10 lg:p-12 border border-[#0A9AD9]/30 shadow-2xl overflow-hidden relative">
           {/* Subtle Ambient Glow */}
           <div
             className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-[#F59E0B]/10 blur-3xl pointer-events-none"
@@ -408,14 +408,14 @@ export function ServicesSection() {
         </div>
 
         {/* ================= FEATURE 2: BENEFITS OF EATING FISH (मासे खाण्याचे फायदे) ================= */}
-        <div className="relative mb-14 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0B2535] via-[#082030] to-[#061822] p-7 text-white shadow-[0_30px_70px_-30px_rgba(7,26,36,0.7)] sm:p-12">
+        <div className="relative mb-10 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0B2535] via-[#082030] to-[#061822] p-7 text-white shadow-[0_30px_70px_-30px_rgba(7,26,36,0.7)] sm:p-12">
           {/* soft light accents */}
           <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-24 size-80 rounded-full bg-[#0A9AD9]/20 blur-3xl" />
           <div aria-hidden="true" className="pointer-events-none absolute -bottom-32 -left-20 size-80 rounded-full bg-rose-500/10 blur-3xl" />
 
           <div className="relative">
             {/* Header */}
-            <motion.div {...benefitReveal()} className="mx-auto mb-12 max-w-3xl text-center">
+            <motion.div {...benefitReveal()} className="mx-auto mb-8 max-w-3xl text-center">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-[#7DD3FC] backdrop-blur">
                 <Heart className="size-3.5 fill-rose-400 text-rose-400" />
                 {isMarathi ? "आरोग्याची गावरान गुरुकिल्ली" : isHindi ? "उत्तम स्वास्थ्य की कुंजी" : "Pure Health from River & Sea"}

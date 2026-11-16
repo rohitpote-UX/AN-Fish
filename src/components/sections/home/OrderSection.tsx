@@ -63,7 +63,7 @@ export function OrderSection() {
   return (
     <section
       id="order"
-      className="relative py-20 lg:py-28 bg-[#071A24] text-white overflow-hidden scroll-mt-20"
+      className="relative py-12 lg:py-16 bg-[#071A24] text-white overflow-hidden scroll-mt-20"
       aria-label="Order Fresh Fish"
     >
       {/* Background Ambient Glow */}
@@ -74,7 +74,7 @@ export function OrderSection() {
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-12">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
+        <div className="text-center max-w-2xl mx-auto mb-8 space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0A9AD9]/15 border border-[#0A9AD9]/30 text-xs font-semibold text-[#6EC6F0] uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5 text-[#6EC6F0]" />
             <span>

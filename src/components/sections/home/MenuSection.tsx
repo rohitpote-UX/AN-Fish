@@ -84,12 +84,12 @@ export function MenuSection() {
   return (
     <section
       id="menu"
-      className="relative py-20 lg:py-28 bg-[#F8FAFC] text-[#071A24] overflow-hidden scroll-mt-20 border-b border-[#071A24]/08"
+      className="relative py-12 lg:py-16 bg-[#F8FAFC] text-[#071A24] overflow-hidden scroll-mt-20 border-b border-[#071A24]/08"
       aria-label="Fresh Fish Menu and Catalog"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-10 lg:mb-14 space-y-3">
+        <div className="text-center max-w-3xl mx-auto mb-8 lg:mb-10 space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF8FF] border border-[#0B9DD8]/30 text-xs font-bold text-[#0B9DD8] uppercase tracking-wider">
             <Utensils className="w-3.5 h-3.5 text-[#0B9DD8]" />
             <span>
@@ -115,7 +115,7 @@ export function MenuSection() {
         </div>
 
         {/* Filter Category Tabs (Hotel Atithi Karad Interface Style) */}
-        <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mb-12">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mb-8">
           {filterTabs.map((tab) => {
             const isActive = selectedFilter === tab.id;
             return (
@@ -236,7 +236,7 @@ export function MenuSection() {
         </div>
 
         {/* Custom Order Box / Direct Hotline */}
-        <div className="mt-14 p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-[#071A24] to-[#0D2634] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border border-white/10">
+        <div className="mt-10 p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-[#071A24] to-[#0D2634] text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl border border-white/10">
           <div className="space-y-2 text-center md:text-left">
             <h3 className="text-xl sm:text-2xl font-bold font-marathi-display text-white">
               {isMarathi

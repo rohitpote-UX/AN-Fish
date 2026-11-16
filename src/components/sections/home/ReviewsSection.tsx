@@ -60,12 +60,12 @@ export function ReviewsSection() {
   return (
     <section
       id="reviews"
-      className="relative py-20 lg:py-28 bg-[#FFFFFF] text-[#071A24] overflow-hidden scroll-mt-20 border-b border-[#071A24]/08"
+      className="relative py-12 lg:py-16 bg-[#FFFFFF] text-[#071A24] overflow-hidden scroll-mt-20 border-b border-[#071A24]/08"
       aria-label="Customer Reviews"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-14 lg:mb-18 space-y-3">
+        <div className="text-center max-w-3xl mx-auto mb-8 lg:mb-10 space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF8FF] border border-[#0B9DD8]/30 text-xs font-bold text-[#0B9DD8] uppercase tracking-wider">
             <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
             <span>
