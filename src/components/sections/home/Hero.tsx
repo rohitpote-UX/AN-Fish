@@ -1,97 +1,198 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useLocale } from "next-intl";
-import { MessageCircle, ArrowRight, MapPin, Clock, ShieldCheck, ChevronDown } from "lucide-react";
+import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
+import { MessageCircle, ArrowRight, MapPin, Clock, ShieldCheck, ChevronDown, Snowflake } from "lucide-react";
 import { PLACEHOLDERS } from "@/data/placeholders";
+
+type L = { mr: string; en: string; hi: string };
+
+/** Rotating showcase: real photos + real prices from PLACEHOLDERS only. */
+const SHOWCASE: { id: string; img: string; name: L; alt: L; price: string }[] = [
+  {
+    id: "pomfret",
+    img: "/media/hero/pomfret-large.webp",
+    name: { mr: "सिल्व्हर पापलेट", hi: "सिल्वर पापलेट", en: "Silver Pomfret" },
+    alt: { mr: "ताजा सिल्व्हर पापलेट", hi: "ताजा सिल्वर पापलेट", en: "Fresh Silver Pomfret on ice" },
+    price: PLACEHOLDERS.PRICES.PAPLET,
+  },
+  {
+    id: "surmai",
+    img: "/media/hero/surmai-large.webp",
+    name: { mr: "किंग सुरमई", hi: "किंग सुरमई", en: "King Surmai" },
+    alt: { mr: "ताजे किंग सुरमई स्टेक्स", hi: "ताजे किंग सुरमई स्टेक्स", en: "Fresh King Surmai steaks on ice" },
+    price: PLACEHOLDERS.PRICES.SURMAI,
+  },
+  {
+    id: "prawns",
+    img: "/media/hero/prawns-large.webp",
+    name: { mr: "रॉयल टायगर कोळंबी", hi: "रॉयल टाइगर प्रॉन्स", en: "Royal Tiger Prawns" },
+    alt: { mr: "ताजी टायगर कोळंबी", hi: "ताजे टाइगर प्रॉन्स", en: "Fresh Royal Tiger Prawns on ice" },
+    price: PLACEHOLDERS.PRICES.KOLAMBI_TIGER,
+  },
+  {
+    id: "rawas",
+    img: "/media/hero/rawas-large.webp",
+    name: { mr: "इंडियन सामन (रावस)", hi: "इंडियन सैल्मन (रावस)", en: "Indian Salmon (Rawas)" },
+    alt: { mr: "ताजे रावस स्टेक्स", hi: "ताजे रावस स्टेक्स", en: "Fresh Rawas (Indian Salmon) steaks on ice" },
+    price: PLACEHOLDERS.PRICES.RAWAS,
+  },
+];
+
+const ROTATE_MS = 4500;
+
+function HeroShowcase({ t, reduce }: { t: (v: L) => string; reduce: boolean }) {
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const item = SHOWCASE[index];
+
+  // Auto-rotate (off for reduced-motion users, paused on hover/focus)
+  useEffect(() => {
+    if (reduce || paused) return;
+    const id = setTimeout(() => setIndex((i) => (i + 1) % SHOWCASE.length), ROTATE_MS);
+    return () => clearTimeout(id);
+  }, [index, paused, reduce]);
+
+  // Subtle 3D tilt that follows the pointer (fine pointers only)
+  const rx = useSpring(useMotionValue(0), { stiffness: 140, damping: 16 });
+  const ry = useSpring(useMotionValue(0), { stiffness: 140, damping: 16 });
+  const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (reduce || e.pointerType !== "mouse" || !cardRef.current) return;
+    const r = cardRef.current.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    ry.set(px * 8);
+    rx.set(-py * 8);
+  };
+  const resetTilt = () => {
+    rx.set(0);
+    ry.set(0);
+    setPaused(false);
+  };
+
+  return (
+    <motion.div
+      {...(reduce
+        ? {}
+        : {
+            initial: { opacity: 0, scale: 0.94 },
+            animate: { opacity: 1, scale: 1 },
+            transition: { duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] as const },
+          })}
+      className="relative mx-auto w-full max-w-md [perspective:1200px] lg:max-w-none"
+      onPointerEnter={() => setPaused(true)}
+      onPointerLeave={resetTilt}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
+    >
+      <motion.div
+        ref={cardRef}
+        onPointerMove={onMove}
+        style={{ rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }}
+        className="relative"
+      >
+        <div className="relative aspect-square overflow-hidden rounded-[2rem] border border-white/30 bg-white shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)]">
+          <AnimatePresence initial={false}>
+            <motion.div
+              key={item.id}
+              className="absolute inset-0"
+              initial={reduce ? false : { opacity: 0, scale: 1.06 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <Image
+                src={item.img}
+                alt={t(item.alt)}
+                fill
+                priority={index === 0}
+                sizes="(min-width:1024px) 40vw, 90vw"
+                className="object-cover"
+              />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Soft navy fade behind the caption for legibility */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#071A24]/60 to-transparent"
+          />
+
+          {/* Caption: name + live price swap with the photo */}
+          <div
+            className="absolute inset-x-4 bottom-4 flex items-center justify-between gap-3 rounded-2xl border border-white/15 bg-[#071A24]/85 px-4 py-3 backdrop-blur-md"
+            style={{ transform: "translateZ(30px)" }}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={item.id}
+                className="flex min-w-0 flex-1 items-center justify-between gap-3"
+                initial={reduce ? false : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduce ? undefined : { opacity: 0, y: -8 }}
+                transition={{ duration: 0.3 }}
+                aria-live="polite"
+              >
+                <div className="min-w-0">
+                  <p className="truncate font-marathi-display text-sm font-bold text-white">{t(item.name)}</p>
+                  <p className="text-xs text-white/60">{t({ mr: "आजचा दर", hi: "आज का भाव", en: "Today's rate" })}</p>
+                </div>
+                <p className="shrink-0 font-marathi-display text-lg font-extrabold text-[#FBBF24]">{item.price}</p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Floating freshness chip */}
+        <motion.div
+          animate={reduce ? undefined : { y: [0, -8, 0] }}
+          transition={reduce ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          style={{ transform: "translateZ(60px)" }}
+          className="absolute -left-3 top-8 flex items-center gap-2.5 rounded-2xl border border-white/20 bg-white px-4 py-2.5 text-[#071A24] shadow-xl sm:-left-6"
+        >
+          <span className="grid size-8 place-items-center rounded-full bg-[#0A9AD9]/15 text-[#0A9AD9]">
+            <Snowflake className="size-4" aria-hidden="true" />
+          </span>
+          <span className="text-xs font-bold leading-tight">
+            {t({ mr: "ताजी आवक", hi: "ताजी आवक", en: "Fresh Arrival" })}
+            <span className="block font-medium text-[#071A24]/60">
+              {t({ mr: "०°C – २°C चिल्ड", hi: "०°C – २°C चिल्ड", en: "Chilled 0°C – 2°C" })}
+            </span>
+          </span>
+        </motion.div>
+      </motion.div>
+
+      {/* Pager dots */}
+      <div className="mt-5 flex items-center justify-center gap-2" role="tablist" aria-label="Featured fish">
+        {SHOWCASE.map((s, i) => (
+          <button
+            key={s.id}
+            type="button"
+            role="tab"
+            aria-selected={i === index}
+            aria-label={t(s.name)}
+            onClick={() => setIndex(i)}
+            className="group grid h-6 min-h-0 place-items-center px-1"
+          >
+            <span
+              className={`block h-1.5 rounded-full transition-all duration-300 ${
+                i === index ? "w-8 bg-[#FBBF24]" : "w-3 bg-white/35 group-hover:bg-white/60"
+              }`}
+            />
+          </button>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
 
 export function Hero() {
   const locale = useLocale();
-  const isMarathi = locale === "mr";
-  const isHindi = locale === "hi";
-
-  // 1. Changing Background Images (Cycling smoothly)
-  const [bgImageIndex, setBgImageIndex] = useState(0);
-
-  const backgroundImages = useMemo(
-    () => [
-      "/media/counter-landscape.jpg",
-      "/media/hero/hero-underwater-fish.jpg",
-      "/media/family-dinner.jpg",
-      "/media/cutting-hygiene.jpg",
-    ],
-    []
-  );
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setBgImageIndex((prev) => (prev + 1) % backgroundImages.length);
-    }, 7000);
-    return () => clearInterval(timer);
-  }, [backgroundImages.length]);
-
-  // 2. Typing & Erasing Effect for Tagline
-  const phrases = useMemo(() => {
-    if (locale === "mr") {
-      return ["एकदा खाल की पुन्हा पुन्हा मागाल.", "मासे खावा, खुश रहा!"];
-    }
-    if (locale === "hi") {
-      return ["एक बार खाएंगे तो बार-बार मांगेंगे।", "मछली खाएं, खुश रहें!"];
-    }
-    return ["Taste once, you'll ask for more.", "Eat fresh fish, stay happy!"];
-  }, [locale]);
-
-  const [phraseIndex, setPhraseIndex] = useState(0);
-  const [displayedText, setDisplayedText] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  useEffect(() => {
-    const currentPhrase = phrases[phraseIndex];
-    const segmenter =
-      typeof Intl !== "undefined" && Intl.Segmenter
-        ? new Intl.Segmenter(locale === "mr" ? "mr" : locale === "hi" ? "hi" : "en", { granularity: "grapheme" })
-        : null;
-
-    const graphemes = segmenter
-      ? Array.from(segmenter.segment(currentPhrase), (s) => s.segment)
-      : Array.from(currentPhrase);
-
-    const currentGraphemes = segmenter
-      ? Array.from(segmenter.segment(displayedText), (s) => s.segment)
-      : Array.from(displayedText);
-
-    let timeoutId: NodeJS.Timeout;
-
-    if (!isDeleting) {
-      // Typing phase: type letter by letter
-      if (currentGraphemes.length < graphemes.length) {
-        timeoutId = setTimeout(() => {
-          setDisplayedText(graphemes.slice(0, currentGraphemes.length + 1).join(""));
-        }, 120);
-      } else {
-        // Complete phrase typed: pause before erasing so the user can read it
-        timeoutId = setTimeout(() => {
-          setIsDeleting(true);
-        }, 2200);
-      }
-    } else {
-      // Erasing phase: erase letter by letter
-      if (currentGraphemes.length > 0) {
-        timeoutId = setTimeout(() => {
-          setDisplayedText(graphemes.slice(0, currentGraphemes.length - 1).join(""));
-        }, 60);
-      } else {
-        // Complete erase: brief pause then switch to next phrase
-        timeoutId = setTimeout(() => {
-          setIsDeleting(false);
-          setPhraseIndex((prev) => (prev + 1) % phrases.length);
-        }, 400);
-      }
-    }
-
-    return () => clearTimeout(timeoutId);
-  }, [displayedText, isDeleting, phraseIndex, phrases, locale]);
+  const reduce = useReducedMotion();
+  const t = (v: L) => (locale === "mr" ? v.mr : locale === "hi" ? v.hi : v.en);
 
   const cleanPhone = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || PLACEHOLDERS.WHATSAPP_NUMBER).replace(
     /[^0-9]/g,
@@ -99,31 +200,54 @@ export function Hero() {
   );
 
   const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-    locale === "mr"
-      ? "नमस्कार AN Fish World कराड, मला आजच्या ताजी आवकमधून ऑर्डर करायची आहे."
-      : locale === "hi"
-      ? "नमस्ते AN Fish World कराड, मुझे आज की ताजी आवक से ऑर्डर करना है।"
-      : "Hello AN Fish World Karad, I would like to order from today's fresh catch."
+    t({
+      mr: "नमस्कार AN Fish World कराड, मला आजच्या ताजी आवकमधून ऑर्डर करायची आहे.",
+      hi: "नमस्ते AN Fish World कराड, मुझे आज की ताजी आवक से ऑर्डर करना है।",
+      en: "Hello AN Fish World Karad, I would like to order from today's fresh catch.",
+    })
   )}`;
 
-  const scrollToMenu = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const scrollToCatch = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     const el = document.getElementById("signature") || document.getElementById("menu");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    el?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const tickerItems = [
-    locale === "mr" ? "सिल्व्हर पापलेट (लाडकी आवक)" : locale === "hi" ? "सिल्वर पापलेट (चहेती आवक)" : "Silver Pomfret",
-    locale === "mr" ? "किंग सुरमई स्टेक्स" : locale === "hi" ? "किंग सुरमई स्टेक्स" : "King Surmai Steaks",
-    locale === "mr" ? "रॉयल टायगर कोळंबी" : locale === "hi" ? "रॉयल टाइगर प्रॉन्स" : "Royal Tiger Prawns",
-    locale === "mr" ? "इंडियन सामन (रावस)" : locale === "hi" ? "इंडियन सैल्मन (रावस)" : "Indian Salmon (Rawas)",
-    locale === "mr" ? "ताजा चंदेरी बांगडा" : locale === "hi" ? "ताजा बांगड़ा मछली" : "Fresh Mackerel (Bangda)",
-    locale === "mr" ? "जिवंत चिंबोरी / खेकडे" : locale === "hi" ? "जीवित केकड़ा" : "Live Sea Mud Crabs",
-    locale === "mr" ? "कृष्णा-कोयना रोहू" : locale === "hi" ? "कृष्णा-कोयना रोहू" : "Freshwater Rohu",
-    locale === "mr" ? "कोयना काठ कटला" : locale === "hi" ? "कोयना तट कतला" : "Freshwater Catla",
-    locale === "mr" ? "जिताडा / आशियाई सीबास" : locale === "hi" ? "जिताड़ा / सीबास" : "Asian Seabass (Jitada)",
+  // Subtle staggered entrance (disabled for reduced-motion users)
+  const rise = (delay: number) =>
+    reduce
+      ? {}
+      : {
+          initial: { opacity: 0, y: 28 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] as const },
+        };
+
+  const trust = [
+    {
+      icon: ShieldCheck,
+      text: t({ mr: "१००% फॉर्मेलिन व केमिकलमुक्त", hi: "१००% फॉर्मेलिन व केमिकल मुक्त", en: "100% Formalin & Chemical Free" }),
+    },
+    {
+      icon: Clock,
+      text: t({ mr: "ऑर्डरनंतर ३० मिनिटांत घरपोच", hi: "ऑर्डर के ३० मिनट में घरपहुंच", en: "Home delivery in 30–45 mins" }),
+    },
+    {
+      icon: MapPin,
+      text: t({ mr: "कराड · जि. सातारा", hi: "कराड · जि. सातारा", en: "Karad · Satara Dist." }),
+    },
+  ];
+
+  const ribbon = [
+    t({ mr: "सिल्व्हर पापलेट", hi: "सिल्वर पापलेट", en: "Silver Pomfret" }),
+    t({ mr: "किंग सुरमई", hi: "किंग सुरमई", en: "King Surmai" }),
+    t({ mr: "रॉयल टायगर कोळंबी", hi: "रॉयल टाइगर प्रॉन्स", en: "Royal Tiger Prawns" }),
+    t({ mr: "इंडियन सामन (रावस)", hi: "इंडियन सैल्मन (रावस)", en: "Indian Salmon (Rawas)" }),
+    t({ mr: "चंदेरी बांगडा", hi: "बांगड़ा", en: "Fresh Mackerel (Bangda)" }),
+    t({ mr: "जिवंत चिंबोरी", hi: "जीवित केकड़ा", en: "Live Mud Crabs" }),
+    t({ mr: "कृष्णा-कोयना रोहू", hi: "कृष्णा-कोयना रोहू", en: "Freshwater Rohu" }),
+    t({ mr: "कोयना कटला", hi: "कोयना कतला", en: "Freshwater Catla" }),
+    t({ mr: "जिताडा / सीबास", hi: "जिताड़ा / सीबास", en: "Asian Seabass" }),
   ];
 
   return (
@@ -132,220 +256,150 @@ export function Hero() {
       aria-label="AN Fish World Hero"
       className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-[#071A24] text-white"
     >
-      {/* 1. Background Imagery with Smooth Changing Transition */}
-      <div className="absolute inset-0 -z-20 overflow-hidden pointer-events-none select-none">
-        {backgroundImages.map((src, idx) => (
-          <Image
-            key={src}
-            src={src}
-            alt="AN Fish World Fresh Seafood Display"
-            fill
-            priority={idx === 0}
-            className={`object-cover object-center transition-opacity duration-[1800ms] ease-in-out animate-slow-zoom ${
-              bgImageIndex === idx ? "opacity-100" : "opacity-0"
-            }`}
-          />
-        ))}
+      {/* Background: single optimised photo + layered navy gradients (no cycling, lighter on mobile) */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-20 select-none">
+        <Image
+          src="/media/counter-landscape.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
       </div>
-
-      {/* 2. Textured Overlays & Veils (Exact Hotel Atithi Match) */}
-      {/* Dark Oceanic Veil */}
-      <div aria-hidden="true" className="absolute inset-0 -z-10 veil-hero-ocean pointer-events-none" />
-
-      {/* Radial Vignette Center Veil */}
-      <div aria-hidden="true" className="absolute inset-0 -z-10 veil-hero-center pointer-events-none" />
-
-      {/* Golden & Cyan Textured Dot-Screen (Matches the Attached Screenshot) */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 dot-screen-hero opacity-60 mix-blend-screen"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(100deg,rgba(7,26,36,0.97)_0%,rgba(7,26,36,0.88)_42%,rgba(7,26,36,0.55)_100%)]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 dot-screen-cyan opacity-40"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_70%_at_82%_45%,rgba(10,154,217,0.28)_0%,transparent_70%)]"
       />
-
-      {/* Bottom Fade to Next Section */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-36 bg-gradient-to-t from-[#071A24] to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-[#071A24] to-transparent"
       />
 
-      {/* 3. Center Content Container (Logo -> Name -> Heading with Typing Effect -> Tagline -> 2 Buttons) */}
-      <div className="relative flex flex-1 items-center justify-center px-5 pb-20 pt-32 text-center lg:pt-36">
-        <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
-          
-          {/* Centered Circular Badge Logo */}
-          <div className="relative group">
-            <div className="mx-auto size-20 sm:size-[5.5rem] rounded-full shadow-[0_18px_44px_-14px_rgba(0,0,0,0.85)] ring-4 ring-[#0A9AD9]/40 bg-white p-1.5 transition-transform duration-300 hover:scale-105 flex items-center justify-center">
-              <Image
-                src="/brand/an-fish-logo-badge.webp"
-                alt="AN Fish World Official Badge"
-                width={88}
-                height={88}
-                priority
-                className="w-full h-full object-contain"
-              />
-            </div>
-            {/* Luminous Glow Ring */}
-            <div className="absolute inset-0 rounded-full bg-[#0A9AD9]/20 blur-md pointer-events-none" />
-          </div>
-
-          {/* Centered Name / Sub-eyebrow */}
-          <div className="mt-5">
-            <span className="block font-marathi-display text-sm sm:text-base font-bold tracking-wide text-[#6EC6F0] drop-shadow-sm">
-              {locale === "mr"
-                ? "ए एन फिश वर्ल्ड · AN Fish World, Karad"
-                : locale === "hi"
-                ? "ए एन फिश वर्ल्ड · AN Fish World, कराड"
-                : "AN Fish World · Karad, Maharashtra"}
-            </span>
-          </div>
-
-          {/* Centered Bold Heading (100% Static) */}
-          <h1 className="mt-3">
-            <span className="block font-marathi-display text-[clamp(2.2rem,6.8vw,4.5rem)] leading-[1.2] font-black text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.7)]">
-              {locale === "mr"
-                ? "अस्सल दर्जेदार चवीची"
-                : locale === "hi"
-                ? "असली व लाजवाब स्वाद की"
-                : "Authentic Sea Freshness"}
-              
-              {/* Static bold golden line */}
-              <span className="mt-1 block text-[#FBBF24] drop-shadow-[0_4px_24px_rgba(251,191,36,0.35)]">
-                {locale === "mr"
-                  ? "कराडची लाडकी मासोळी"
-                  : locale === "hi"
-                  ? "कराड की चहेती मछली"
-                  : "Karad's Beloved Seafood"}
-              </span>
-            </span>
-          </h1>
-
-          {/* Centered Bigger Tagline with Better Font & Dynamic Typing Effect (Strictly 1 line always) */}
-          <p className="mx-auto mt-6 w-full max-w-5xl font-marathi-display text-[clamp(0.72rem,1.85vw,1.35rem)] font-semibold leading-relaxed text-white/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] whitespace-nowrap text-center">
-            <span className="whitespace-nowrap">
-              {locale === "mr"
-                ? "कराडची लाडकी मासोळी... समुद्राची खरी चव..! — "
-                : locale === "hi"
-                ? "कराड की चहेती मछली... समुद्र का असली स्वाद..! — "
-                : "Karad's beloved seafood... Pure oceanic taste..! — "}
-            </span>
-            <span className="inline-block whitespace-nowrap text-[#38BDF8] font-bold drop-shadow-[0_2px_16px_rgba(56,189,248,0.5)]">
-              <span>{displayedText}</span>
-              <span
-                className="inline-block w-[3px] h-[0.85em] ml-1 bg-[#38BDF8] align-middle animate-pulse"
-                aria-hidden="true"
-              />
-            </span>
-          </p>
-
-          {/* The 2 Buttons: [व्हॉट्सॲपवर ऑर्डर द्या] & [आजची ताजी आवक पहा] */}
-          <div className="mt-8 sm:mt-10 flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center w-full sm:w-auto">
-            
-            {/* Button 1: [व्हॉट्सॲपवर ऑर्डर द्या] (Gradient with WhatsApp Icon & Arrow) */}
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative inline-flex items-center justify-center gap-2.5 rounded-full font-bold tracking-wide transition-all duration-300 shadow-[0_18px_40px_-14px_rgba(10,154,217,0.75)] hover:-translate-y-0.5 hover:shadow-[0_22px_46px_-14px_rgba(10,154,217,0.95)] px-7 py-3.5 text-base sm:px-9 sm:py-4 bg-gradient-to-r from-[#0A9AD9] via-[#0284C7] to-[#25D366] text-white active:scale-95 cursor-pointer font-marathi-display"
-              aria-label="Order fresh fish on WhatsApp"
+      {/* Main content */}
+      <div className="relative mx-auto flex w-full max-w-7xl flex-1 items-center px-5 pb-16 pt-36 sm:px-8 lg:px-12 lg:pt-40">
+        <div className="grid w-full items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
+          {/* LEFT: message */}
+          <div className="max-w-2xl">
+            <motion.div
+              {...rise(0.05)}
+              className="inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/10 py-1.5 pl-1.5 pr-4 backdrop-blur-md"
             >
-              <MessageCircle className="w-5 h-5 fill-current shrink-0" />
-              <span>
-                {locale === "mr"
-                  ? "व्हॉट्सॲपवर ऑर्डर द्या"
-                  : locale === "hi"
-                  ? "व्हाट्सएप पर ऑर्डर करें"
-                  : "Order on WhatsApp"}
+              <span className="grid size-8 place-items-center overflow-hidden rounded-full bg-white p-0.5">
+                <Image
+                  src="/brand/an-fish-logo-badge.webp"
+                  alt="AN Fish World"
+                  width={32}
+                  height={32}
+                  priority
+                  className="size-full object-contain"
+                />
               </span>
-              <ArrowRight className="w-4 h-4 ml-0.5 transition-transform duration-300 group-hover:translate-x-1" />
-            </a>
+              <span className="font-marathi-display text-xs font-bold uppercase tracking-[0.14em] text-[#6EC6F0] sm:text-[0.8rem]">
+                {t({
+                  mr: "ए एन फिश वर्ल्ड · कराड",
+                  hi: "ए एन फिश वर्ल्ड · कराड",
+                  en: "AN Fish World · Karad",
+                })}
+              </span>
+            </motion.div>
 
-            {/* Button 2: [आजची ताजी आवक पहा] (Frosted Glass Border Button) */}
-            <a
-              href="#signature"
-              onClick={scrollToMenu}
-              className="relative inline-flex items-center justify-center gap-2 rounded-full font-bold tracking-wide transition-all duration-300 border-2 border-white/45 bg-black/40 hover:bg-white/20 text-white px-7 py-3.5 text-base sm:px-9 sm:py-4 backdrop-blur-sm active:scale-95 cursor-pointer font-marathi-display"
-              aria-label="View Today's Fresh Fish Catch"
+            <motion.h1 {...rise(0.15)} className="mt-6 font-marathi-display font-black tracking-tight">
+              <span className="block text-[clamp(1.75rem,3.8vw,2.75rem)] font-bold leading-[1.25] text-white/90">
+                {t({ mr: "अस्सल दर्जेदार चवीची", hi: "असली व लाजवाब स्वाद की", en: "Authentic Sea Freshness," })}
+              </span>
+              <span className="mt-1 block bg-gradient-to-r from-[#FBBF24] via-[#FCD34D] to-[#FBBF24] bg-clip-text text-[clamp(2.5rem,5.6vw,4.25rem)] leading-[1.15] text-transparent">
+                {t({ mr: "कराडची लाडकी मासोळी", hi: "कराड की चहेती मछली", en: "Karad's Beloved Seafood" })}
+              </span>
+            </motion.h1>
+
+            <motion.p
+              {...rise(0.28)}
+              className="mt-6 max-w-xl font-marathi-body text-base leading-relaxed text-white/80 sm:text-lg"
             >
-              <span>
-                {locale === "mr"
-                  ? "आजची ताजी आवक पहा"
-                  : locale === "hi"
-                  ? "आज की ताजी आवक देखें"
-                  : "View Today's Catch"}
-              </span>
-            </a>
+              {t({
+                mr: "समुद्राची खरी चव, थेट रत्नागिरी व मालवणच्या बंदरातून तुमच्या ताटापर्यंत — मासे खावा, खुश रहा!",
+                hi: "समुद्र का असली स्वाद, सीधे रत्नागिरी और मालवण बंदरगाह से आपकी थाली तक — मछली खाएं, खुश रहें!",
+                en: "The true taste of the sea, from the Ratnagiri & Malvan harbours straight to your plate — eat fresh fish, stay happy!",
+              })}
+            </motion.p>
 
+            <motion.div {...rise(0.4)} className="mt-9 flex flex-col gap-3.5 sm:flex-row sm:items-center">
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Order fresh fish on WhatsApp"
+                className="group inline-flex items-center justify-center gap-2.5 rounded-full bg-[#0A9AD9] px-8 py-4 font-marathi-display text-base font-bold text-white shadow-[0_18px_40px_-14px_rgba(10,154,217,0.8)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#0B9DD8] hover:shadow-[0_22px_46px_-12px_rgba(10,154,217,0.95)] active:scale-95"
+              >
+                <MessageCircle className="size-5 shrink-0 fill-current" />
+                {t({ mr: "व्हॉट्सॲपवर ऑर्डर द्या", hi: "व्हाट्सएप पर ऑर्डर करें", en: "Order on WhatsApp" })}
+                <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </a>
+              <a
+                href="#signature"
+                onClick={scrollToCatch}
+                aria-label="View today's fresh fish catch"
+                className="inline-flex items-center justify-center rounded-full border border-white/35 bg-white/5 px-8 py-4 font-marathi-display text-base font-bold text-white backdrop-blur-sm transition-all duration-300 hover:border-white/70 hover:bg-white/15 active:scale-95"
+              >
+                {t({ mr: "आजची ताजी आवक पहा", hi: "आज की ताजी आवक देखें", en: "View Today's Catch" })}
+              </a>
+            </motion.div>
+
+            <motion.ul
+              {...rise(0.52)}
+              className="mt-10 grid gap-3 border-t border-white/10 pt-6 sm:grid-cols-3 sm:gap-4"
+            >
+              {trust.map(({ icon: Icon, text }) => (
+                <li key={text} className="flex items-center gap-3 text-sm font-semibold text-white/85">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#0A9AD9]/20 text-[#6EC6F0] ring-1 ring-[#0A9AD9]/30">
+                    <Icon className="size-4" aria-hidden="true" />
+                  </span>
+                  <span className="leading-snug">{text}</span>
+                </li>
+              ))}
+            </motion.ul>
           </div>
 
-          {/* Centered Bottom Quick Signals (Exact Reference Style) */}
-          <ul className="mt-10 flex flex-wrap items-center justify-center gap-y-2 gap-x-5 text-xs sm:text-sm font-semibold text-white/85">
-            <li className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#FBBF24] shrink-0" />
-              <span>{locale === "en" ? "Karad · Satara Dist." : "कराड · जि. सातारा"}</span>
-            </li>
-
-            <li aria-hidden="true" className="hidden h-3.5 w-px bg-white/25 sm:block" />
-
-            <li className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[#FBBF24] shrink-0" />
-              <span>
-                {locale === "mr"
-                  ? "ऑर्डरनंतर ३० मिनिटांत ताजी मासोळी घरपोच"
-                  : locale === "hi"
-                  ? "ऑर्डर के ३० मिनट में ताजी मछली घरपहुंच"
-                  : "Fresh delivery within 30-45 mins"}
-              </span>
-            </li>
-
-            <li aria-hidden="true" className="hidden h-3.5 w-px bg-white/25 sm:block" />
-
-            <li className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>
-                {locale === "mr"
-                  ? "१००% फॉर्मेलिन व केमिकलमुक्त"
-                  : locale === "hi"
-                  ? "१००% फॉर्मेलिन व केमिकल मुक्त"
-                  : "100% Formalin & Chemical Free"}
-              </span>
-            </li>
-          </ul>
-
+          {/* RIGHT: rotating product showcase */}
+          <HeroShowcase t={t} reduce={!!reduce} />
         </div>
 
-        {/* Bouncing Chevron Scroll Down Indicator */}
+        {/* Scroll indicator */}
         <a
           href="#signature"
-          onClick={scrollToMenu}
-          aria-label="Scroll to signature catch"
-          className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full p-2 text-white/70 hover:text-[#FBBF24] transition-colors hidden sm:block"
+          onClick={scrollToCatch}
+          aria-label="Scroll to today's catch"
+          className="absolute bottom-4 left-1/2 hidden -translate-x-1/2 rounded-full p-2 text-white/60 transition-colors hover:text-[#FBBF24] lg:block"
         >
-          <ChevronDown className="w-7 h-7 animate-bounce" />
+          <ChevronDown className={`size-7 ${reduce ? "" : "animate-bounce"}`} />
         </a>
       </div>
 
-      {/* 4. Marquee Catch Ribbon at Bottom of Hero (Matching Hotel Atithi Style) */}
-      <div className="relative z-10 border-t border-[#FBBF24]/30 bg-gradient-to-r from-[#0A9AD9] via-[#0284C7] to-[#0A9AD9] text-white shadow-lg overflow-hidden py-3">
-        <div className="marquee-track">
-          <ul className="flex shrink-0 items-center">
-            {tickerItems.map((item, idx) => (
-              <li key={idx} className="flex items-center font-marathi-display text-sm sm:text-base font-bold text-white tracking-wide">
-                <span>{item}</span>
-                <span className="mx-4 sm:mx-6 text-[0.65em] text-[#FBBF24]">◆</span>
-              </li>
-            ))}
-          </ul>
-          <ul className="flex shrink-0 items-center" aria-hidden="true">
-            {tickerItems.map((item, idx) => (
-              <li key={`dup-${idx}`} className="flex items-center font-marathi-display text-sm sm:text-base font-bold text-white tracking-wide">
-                <span>{item}</span>
-                <span className="mx-4 sm:mx-6 text-[0.65em] text-[#FBBF24]">◆</span>
-              </li>
-            ))}
-          </ul>
+      {/* Catch ribbon */}
+      <div className="relative z-10 overflow-hidden border-t border-white/10 bg-[#0A9AD9] py-3 text-white">
+        <div className={reduce ? "flex flex-wrap justify-center" : "marquee-track"}>
+          {(reduce ? [0] : [0, 1]).map((dup) => (
+            <ul
+              key={dup}
+              className="flex shrink-0 items-center"
+              aria-hidden={dup === 1 || reduce ? true : undefined}
+            >
+              {ribbon.map((item) => (
+                <li
+                  key={`${dup}-${item}`}
+                  className="flex items-center font-marathi-display text-sm font-bold tracking-wide sm:text-base"
+                >
+                  <span>{item}</span>
+                  <span className="mx-4 text-[0.65em] text-[#FBBF24] sm:mx-6">◆</span>
+                </li>
+              ))}
+            </ul>
+          ))}
         </div>
       </div>
     </section>
