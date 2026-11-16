@@ -75,7 +75,7 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
   };
 
   return (
-    <div className="rounded-3xl bg-gradient-to-b from-[#0B2535] via-[#091F2C] to-[#061824] border-2 border-[#FBBF24]/40 p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+    <div className="rounded-3xl bg-gradient-to-b from-[#0B2535] via-[#091F2C] to-[#061824] border border-white/10 p-6 sm:p-8 shadow-2xl">
       <div className="flex items-center justify-between gap-4 mb-6 pb-4 border-b border-white/10">
         <div>
           <span className="text-xs font-bold text-[#FBBF24] uppercase tracking-wider flex items-center gap-1.5">

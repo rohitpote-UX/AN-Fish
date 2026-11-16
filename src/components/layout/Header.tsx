@@ -44,6 +44,7 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const [activeId, setActiveId] = useState<string>("home");
   const mobileDrawerRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const langDropdownRef = useRef<HTMLDivElement>(null);
@@ -108,6 +109,23 @@ export function Header() {
     }
   };
 
+  // Scroll-spy: highlight the menu link of the section currently in view
+  useEffect(() => {
+    const ids = NAV_LINKS.map((l) => l.href.replace("#", ""));
+    const els = ids.map((id) => document.getElementById(id)).filter((e): e is HTMLElement => !!e);
+    if (!els.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setActiveId(e.target.id);
+        });
+      },
+      { rootMargin: "-35% 0px -60% 0px", threshold: 0 }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [pathname]);
+
   const phoneTel = PLACEHOLDERS.CONTACT_PHONE.replace(/[^0-9+]/g, "");
   const cleanPhone = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || PLACEHOLDERS.WHATSAPP_NUMBER).replace(
     /[^0-9]/g,
@@ -158,12 +176,13 @@ export function Header() {
 
       {/* 2. Main Sticky Navigation Bar (AN Fish Frosted Header) */}
       <div
-        className={`w-full transition-all duration-300 ${
+        className={`relative w-full transition-all duration-300 ${
           isScrolled
             ? "bg-white/95 backdrop-blur-md shadow-md py-2.5 border-b border-[#071A24]/10 text-[#071A24]"
             : "bg-white/90 backdrop-blur-sm py-3.5 border-b border-[#071A24]/05 text-[#071A24]"
         }`}
       >
+        <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#0A9AD9]/40 to-transparent" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-4">
           
           {/* Logo & Brand Emblem */}
@@ -187,24 +206,50 @@ export function Header() {
               <span className="text-sm sm:text-base font-extrabold tracking-tight block leading-tight font-latin-display text-[#071A24] group-hover:text-[#0A9AD9] transition-colors">
                 AN FISH WORLD
               </span>
-              <span className="text-[0.62rem] sm:text-[0.68rem] tracking-wider uppercase text-[#0A9AD9] font-bold block leading-none font-marathi-display">
+              <span className={`text-[0.68rem] sm:text-[0.74rem] text-[#0A9AD9] font-bold block leading-none font-marathi-display ${locale === "en" ? "tracking-wider uppercase" : ""}`}>
                 {locale === "mr" ? "कराडची लाडकी मासोळी" : locale === "hi" ? "कराड की चहेती मछली" : "Karad's Fresh Seafood"}
               </span>
             </div>
           </a>
 
           {/* Desktop Nav Links (Hotel Atithi Karad Style) */}
-          <nav className="hidden xl:flex items-center gap-1 lg:gap-2">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
-                className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-[#071A24]/80 hover:text-[#0A9AD9] hover:bg-[#EBF8FF] transition-colors font-marathi-display"
-              >
-                {locale === "mr" ? link.labelMr : locale === "hi" ? link.labelHi : link.labelEn}
-              </a>
-            ))}
+          <nav aria-label="Primary" className="hidden xl:flex items-center gap-0.5">
+            {NAV_LINKS.map((link) => {
+              const id = link.href.replace("#", "");
+              // scroll-spy only applies on the home page (sections exist there)
+              const active = pathname === "/" && activeId === id;
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  aria-current={active ? "location" : undefined}
+                  className={`relative whitespace-nowrap rounded-full px-3 py-2 font-marathi-display text-[0.92rem] font-semibold leading-none transition-colors duration-200 ${
+                    active ? "text-[#0A9AD9]" : "text-[#071A24]/85 hover:text-[#0A9AD9]"
+                  }`}
+                >
+                  {active && (
+                    <motion.span
+                      layoutId="nav-active-pill"
+                      aria-hidden="true"
+                      className="absolute inset-0 -z-10 rounded-full bg-[#0A9AD9]/10 ring-1 ring-[#0A9AD9]/20"
+                      transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                    />
+                  )}
+                  <span className="relative">
+                    {locale === "mr" ? link.labelMr : locale === "hi" ? link.labelHi : link.labelEn}
+                  </span>
+                  {active && (
+                    <motion.span
+                      layoutId="nav-active-dot"
+                      aria-hidden="true"
+                      className="absolute -bottom-1 left-1/2 size-1 -translate-x-1/2 rounded-full bg-[#FBBF24]"
+                      transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                    />
+                  )}
+                </a>
+              );
+            })}
           </nav>
 
           {/* Right Action: Single Language Dropdown + Order Button + Hamburger */}
@@ -273,7 +318,7 @@ export function Header() {
             <a
               href="#order"
               onClick={(e) => handleNavClick(e, "#order")}
-              className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#0A9AD9] hover:bg-[#071A24] text-white font-extrabold text-xs uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-cyan-500/25 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-[#0A9AD9] hover:bg-[#071A24] text-white font-bold text-[0.85rem] shadow-[0_10px_24px_-10px_rgba(10,154,217,0.8)] hover:-translate-y-0.5 transition-all duration-300 shadow-md hover:shadow-cyan-500/25 cursor-pointer"
             >
               <MessageCircle className="w-3.5 h-3.5 fill-current" />
               <span>
@@ -354,7 +399,7 @@ export function Header() {
                       key={link.href}
                       href={link.href}
                       onClick={(e) => handleNavClick(e, link.href)}
-                      className="block px-4 py-2.5 rounded-xl text-sm font-bold font-marathi-display text-white/85 hover:text-[#6EC6F0] hover:bg-white/5 transition-colors"
+                      className="block px-4 py-3 rounded-xl text-base font-semibold font-marathi-display text-white/90 hover:text-[#6EC6F0] hover:bg-white/5 transition-colors"
                     >
                       {locale === "mr" ? link.labelMr : locale === "hi" ? link.labelHi : link.labelEn}
                     </a>
