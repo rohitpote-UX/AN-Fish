@@ -15,7 +15,6 @@ import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvide
 import { Preloader } from "@/components/layout/Preloader";
 import { Header } from "@/components/layout/Header";
 import { FishCursor } from "@/components/layout/FishCursor";
-import { DepthMeter } from "@/components/layout/DepthMeter";
 import { StickyActions } from "@/components/layout/StickyActions";
 import { BasketDrawer } from "@/components/basket/BasketDrawer";
 import { FooterCtaBand } from "@/components/layout/FooterCtaBand";
@@ -107,9 +106,6 @@ export default async function LocaleLayout({
 
         {/* Custom Studio Fish Cursor (Fine pointer only, auto-disables on touch) */}
         <FishCursor />
-
-        {/* Ocean Depth Vertical Telemetry Meter (Desktop only) */}
-        <DepthMeter />
 
         {/* Accessibility: Skip to main content landmark */}
         <a

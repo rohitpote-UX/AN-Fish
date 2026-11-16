@@ -1,15 +1,27 @@
 "use client";
 
 import React from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useLocale } from "next-intl";
-import { ShieldCheck, ThermometerSnowflake, Droplets, HeartHandshake, Phone, Store, Award } from "lucide-react";
+import { ShieldCheck, ThermometerSnowflake, Droplets, HeartHandshake, Phone, Store, Quote } from "lucide-react";
 import { PLACEHOLDERS } from "@/data/placeholders";
 
 export function AboutSection() {
   const locale = useLocale();
   const isMarathi = locale === "mr";
   const isHindi = locale === "hi";
+  const reduce = useReducedMotion();
+  const t = (mr: string, en: string, hi: string) => (isMarathi ? mr : isHindi ? hi : en);
+  const reveal = (delay = 0) =>
+    reduce
+      ? {}
+      : {
+          initial: { opacity: 0, y: 28 },
+          whileInView: { opacity: 1, y: 0 },
+          viewport: { once: true, margin: "-80px" },
+          transition: { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] as const },
+        };
 
   const phoneTel = PLACEHOLDERS.CONTACT_PHONE.replace(/[^0-9+]/g, "");
 
@@ -55,173 +67,149 @@ export function AboutSection() {
   return (
     <section
       id="about"
-      className="relative py-20 lg:py-28 bg-[#FFFFFF] text-[#071A24] overflow-hidden scroll-mt-20 border-b border-[#071A24]/08"
+      className="relative scroll-mt-20 overflow-hidden bg-gradient-to-b from-white to-[#F3F8FB] py-20 text-[#071A24] lg:py-28"
       aria-label="About AN Fish World"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-14 lg:mb-18 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF8FF] border border-[#0B9DD8]/30 text-xs font-bold text-[#0B9DD8] uppercase tracking-wider">
-            <Award className="w-3.5 h-3.5 text-[#0B9DD8]" />
-            <span>
-              {isMarathi
-                ? "कराडची लाडकी मासोळी परंपरा"
-                : isHindi
-                ? "कराड की चहेती मछली परंपरा"
-                : "Our Heritage & Freshness Pledge"}
-            </span>
-          </div>
-
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight font-marathi-display text-[#071A24]">
-            {isMarathi ? "आमच्याबद्दल" : isHindi ? "हमारे बारे में" : "About AN Fish World"}
-          </h2>
-
-          <p className="text-sm sm:text-base text-[#071A24]/75 font-marathi-body leading-relaxed">
-            {isMarathi
-              ? "केवळ व्यवसाय नाही, तर कराडकरांच्या ताटात अस्सल आणि दर्जेदार सागरी मासोळी पोहोचवण्याचा आमचा ध्यास."
-              : isHindi
-              ? "केवल व्यापार नहीं, बल्कि कराडवासियों की थाली में असली और उच्च गुणवत्ता वाली समुद्री मछली पहुंचाने का हमारा संकल्प।"
-              : "Not just a fish store, but a dedication to bringing genuine coastal catch directly to the homes of Karad."}
-          </p>
-        </div>
-
-        {/* Two Column Layout: Founder Story & Visual Card */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
-          
-          {/* Left Column: Founder Photo & Badge */}
-          <div className="lg:col-span-5 relative flex justify-center">
-            <div className="relative w-full max-w-md">
-              {/* Outer Cyan Ring */}
-              <div className="absolute -inset-3 rounded-3xl bg-gradient-to-tr from-[#0A9AD9]/20 to-[#6EC6F0]/20 blur-lg" />
-              
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-[#0A9AD9]/30 bg-white">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
+        <div className="grid items-start gap-16 lg:grid-cols-12 lg:gap-14">
+          {/* LEFT: founder */}
+          <motion.div {...reveal()} className="lg:sticky lg:top-28 lg:col-span-5">
+            <div className="relative mx-auto max-w-md pb-10">
+              {/* offset frame */}
+              <div aria-hidden="true" className="absolute -bottom-0 -left-4 top-6 w-[92%] rounded-[1.75rem] border-2 border-[#0A9AD9]/25" />
+              <div className="relative overflow-hidden rounded-[1.75rem] bg-[#E8EEF1] shadow-[0_30px_60px_-28px_rgba(7,26,36,0.45)]">
                 <Image
                   src="/media/founder-owner.jpg"
-                  alt={isMarathi || isHindi ? "अमीर नदाफ — संस्थापक, ए एन फिश वर्ल्ड" : "Ameer Nadaf — Founder, AN Fish World"}
+                  alt={t("अमीर नदाफ — संस्थापक, ए एन फिश वर्ल्ड", "Ameer Nadaf — Founder, AN Fish World", "अमीर नदाफ — संस्थापक, ए एन फिश वर्ल्ड")}
                   width={520}
-                  height={580}
-                  className="w-full h-auto object-cover object-top"
+                  height={640}
+                  sizes="(max-width: 1024px) 90vw, 440px"
+                  className="aspect-[4/4.6] w-full object-cover object-top"
                 />
+              </div>
 
-                {/* Founder Info Overlay Card */}
-                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-[#071A24] via-[#071A24]/90 to-transparent p-6 text-white">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#0A9AD9] flex items-center justify-center font-bold text-white shadow-md shrink-0">
-                      AN
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold font-marathi-display leading-tight text-white">
-                        {PLACEHOLDERS.FOUNDER_NAME}
-                      </h3>
-                      <p className="text-xs text-[#6EC6F0] font-medium">
-                        {isMarathi
-                          ? PLACEHOLDERS.FOUNDER_ROLE_MR
-                          : isHindi
-                          ? "संस्थापक एवं संचालक"
-                          : PLACEHOLDERS.FOUNDER_ROLE_EN}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="mt-2 text-xs text-white/80 italic font-marathi-body">
-                    {isMarathi
-                      ? "“कराडकरांना समुद्रासारखाच ताजा आणि विषमुक्त मासा मिळावा, हाच आमचा प्रामाणिक संकल्प आहे.”"
-                      : isHindi
-                      ? "“कराडवासियों को समुद्र के किनारे जैसी ही ताजी और विषमुक्त मछली मिले, यही हमारा सच्चा संकल्प है।”"
-                      : "“Our single promise: Karad families must eat fish as fresh as if they were on the seashore itself.”"}
+              {/* name card (does not cover the portrait) */}
+              <div className="relative z-10 -mt-8 ml-6 mr-2 flex items-center gap-3.5 rounded-2xl border border-[#071A24]/8 bg-white p-4 shadow-[0_18px_40px_-18px_rgba(7,26,36,0.35)] sm:ml-8">
+                <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#071A24] text-sm font-bold text-white">AN</span>
+                <div className="min-w-0">
+                  <p className="font-marathi-display text-base font-bold leading-tight text-[#071A24]">{PLACEHOLDERS.FOUNDER_NAME}</p>
+                  <p className="mt-0.5 text-xs font-medium text-[#0A9AD9]">
+                    {isMarathi ? PLACEHOLDERS.FOUNDER_ROLE_MR : isHindi ? "संस्थापक एवं संचालक" : PLACEHOLDERS.FOUNDER_ROLE_EN}
                   </p>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Right Column: The Story & Value Pillars */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="space-y-4 text-sm sm:text-base text-[#071A24]/80 font-marathi-body leading-relaxed">
-              <p>
-                {isMarathi ? (
-                  <>
-                    कराडमध्ये अनेक वर्षे ताजी मासोळी मिळणे हे एक आव्हान होते. लांबच्या बाजारातून येणारे मासे कित्येक दिवस बर्फात पडून राहत असत आणि त्यावर फॉर्मेलिनसारखी घातक रसायने लावली जात असत. यामुळे माशाची मूळ गोड चव तर नाहीशी व्हायचीच, पण आरोग्यालाही धोका निर्माण व्हायचा.
-                  </>
-                ) : isHindi ? (
-                  <>
-                    कराड में कई वर्षों से ताजी मछली मिलना एक चुनौती था। दूर के बाजारों से आने वाली मछलियां कई दिनों तक बर्फ में पड़ी रहती थीं और उन पर फॉर्मेलिन जैसे हानिकारक रसायन लगाए जाते थे। इससे मछली का असली स्वाद तो खत्म होता ही था, साथ ही स्वास्थ्य के लिए भी गंभीर खतरा बन जाता था।
-                  </>
-                ) : (
-                  <>
-                    For years, finding genuinely fresh fish in Karad was a challenge. Fish brought from distant markets sat on ice for days, often treated with harmful chemical preservatives like formalin. Not only did this ruin the natural taste, but it also posed health risks.
-                  </>
+            <figure className="mx-auto mt-6 max-w-md">
+              <Quote className="mb-2 size-6 text-[#0A9AD9]/50" aria-hidden="true" />
+              <blockquote className="font-marathi-body text-[0.95rem] italic leading-relaxed text-[#071A24]/80">
+                {t(
+                  "“कराडकरांना समुद्रासारखाच ताजा आणि विषमुक्त मासा मिळावा, हाच आमचा प्रामाणिक संकल्प आहे.”",
+                  "“Our single promise: Karad families must eat fish as fresh as if they were on the seashore itself.”",
+                  "“कराडवासियों को समुद्र के किनारे जैसी ही ताजी और विषमुक्त मछली मिले, यही हमारा सच्चा संकल्प है।”"
+                )}
+              </blockquote>
+            </figure>
+          </motion.div>
+
+          {/* RIGHT: story */}
+          <div className="lg:col-span-7">
+            <motion.div {...reveal()}>
+              <p className={`flex items-center gap-3 text-xs font-bold uppercase ${isMarathi || isHindi ? "tracking-normal" : "tracking-[0.2em]"} text-[#0A9AD9]`}>
+                <span className="h-px w-8 bg-[#0A9AD9]" />
+                {t("कराडची लाडकी मासोळी परंपरा", "Our Heritage & Freshness Pledge", "कराड की चहेती मछली परंपरा")}
+              </p>
+              <h2 className="mt-4 font-marathi-display text-[clamp(2.2rem,4.6vw,3.6rem)] font-extrabold leading-[1.1] tracking-tight text-[#071A24]">
+                {t("आमच्याबद्दल", "About AN Fish World", "हमारे बारे में")}
+              </h2>
+              <p className="mt-5 max-w-2xl font-marathi-body text-lg leading-relaxed text-[#071A24]/70">
+                {t(
+                  "केवळ व्यवसाय नाही, तर कराडकरांच्या ताटात अस्सल आणि दर्जेदार सागरी मासोळी पोहोचवण्याचा आमचा ध्यास.",
+                  "Not just a fish store, but a dedication to bringing genuine coastal catch directly to the homes of Karad.",
+                  "केवल व्यापार नहीं, बल्कि कराडवासियों की थाली में असली और उच्च गुणवत्ता वाली समुद्री मछली पहुंचाने का हमारा संकल्प।"
                 )}
               </p>
+            </motion.div>
 
-              <p>
-                {isMarathi ? (
-                  <>
-                    यावर उपाय म्हणून <strong>ए एन फिश वर्ल्ड (AN Fish World)</strong> ची सुरुवात झाली. आम्ही दररोज पहाटे ४:०० वाजता रत्नागिरी आणि मालवणच्या बंदरात प्रत्यक्ष लिलावात स्वतः उभे राहून उत्कृष्ट प्रतीची मासोळी निवडतो. ती थेट ०°C लिक्विड आईस स्लरीमध्ये वाहून कराडमध्ये आणली जाते आणि आरओ पाण्याने स्वच्छ करून, तुमच्या आवडीनुसार कापून ग्राहकांना दिली जाते.
-                  </>
-                ) : isHindi ? (
-                  <>
-                    इसके समाधान के रूप में <strong>ए एन फिश वर्ल्ड (AN Fish World)</strong> की शुरुआत हुई। हम हर सुबह ४:०० बजे रत्नागिरी और मालवण के बंदरगाहों पर स्वयं नीलामी में खड़े होकर बेहतरीन गुणवत्ता की मछली चुनते हैं। वह सीधे ०°C लिक्विड आइस स्लरी में कराड लाई जाती है और आरओ पानी से धोकर, आपकी पसंद अनुसार काटकर दी जाती है।
-                  </>
-                ) : (
-                  <>
-                    To solve this, <strong>AN Fish World</strong> was founded by Ameer Nadaf. Every single morning at 4:00 AM, our team stands directly at coastal harbour auctions in Ratnagiri and Malvan, selecting the finest catch. Transported at 0°C liquid ice slurry, washed with pure RO water, and custom-sliced to perfection.
-                  </>
-                )}
-              </p>
+            {/* challenge → answer */}
+            <div className="mt-10 space-y-7">
+              <motion.div {...reveal(0.05)} className="border-l-2 border-[#071A24]/15 pl-6">
+                <p className={`mb-2 text-[0.7rem] font-bold uppercase ${isMarathi || isHindi ? "tracking-normal text-xs" : "tracking-[0.18em]"} text-[#071A24]/50`}>
+                  {t("आव्हान", "The Challenge", "चुनौती")}
+                </p>
+                <p className="font-marathi-body text-[0.97rem] leading-[1.85] text-[#071A24]/80">
+                  {isMarathi
+                    ? "कराडमध्ये अनेक वर्षे ताजी मासोळी मिळणे हे एक आव्हान होते. लांबच्या बाजारातून येणारे मासे कित्येक दिवस बर्फात पडून राहत असत आणि त्यावर फॉर्मेलिनसारखी घातक रसायने लावली जात असत. यामुळे माशाची मूळ गोड चव तर नाहीशी व्हायचीच, पण आरोग्यालाही धोका निर्माण व्हायचा."
+                    : isHindi
+                    ? "कराड में कई वर्षों से ताजी मछली मिलना एक चुनौती था। दूर के बाजारों से आने वाली मछलियां कई दिनों तक बर्फ में पड़ी रहती थीं और उन पर फॉर्मेलिन जैसे हानिकारक रसायन लगाए जाते थे। इससे मछली का असली स्वाद तो खत्म होता ही था, साथ ही स्वास्थ्य के लिए भी गंभीर खतरा बन जाता था।"
+                    : "For years, finding genuinely fresh fish in Karad was a challenge. Fish brought from distant markets sat on ice for days, often treated with harmful chemical preservatives like formalin. Not only did this ruin the natural taste, but it also posed health risks."}
+                </p>
+              </motion.div>
+
+              <motion.div {...reveal(0.1)} className="border-l-2 border-[#0A9AD9] pl-6">
+                <p className={`mb-2 text-[0.7rem] font-bold uppercase ${isMarathi || isHindi ? "tracking-normal text-xs" : "tracking-[0.18em]"} text-[#0A9AD9]`}>
+                  {t("आमचा उपाय", "Our Answer", "हमारा समाधान")}
+                </p>
+                <p className="font-marathi-body text-[0.97rem] leading-[1.85] text-[#071A24]/80">
+                  {isMarathi ? (
+                    <>
+                      यावर उपाय म्हणून <strong className="text-[#071A24]">ए एन फिश वर्ल्ड (AN Fish World)</strong> ची सुरुवात झाली. आम्ही दररोज पहाटे ४:०० वाजता रत्नागिरी आणि मालवणच्या बंदरात प्रत्यक्ष लिलावात स्वतः उभे राहून उत्कृष्ट प्रतीची मासोळी निवडतो. ती थेट ०°C लिक्विड आईस स्लरीमध्ये वाहून कराडमध्ये आणली जाते आणि आरओ पाण्याने स्वच्छ करून, तुमच्या आवडीनुसार कापून ग्राहकांना दिली जाते.
+                    </>
+                  ) : isHindi ? (
+                    <>
+                      इसके समाधान के रूप में <strong className="text-[#071A24]">ए एन फिश वर्ल्ड (AN Fish World)</strong> की शुरुआत हुई। हम हर सुबह ४:०० बजे रत्नागिरी और मालवण के बंदरगाहों पर स्वयं नीलामी में खड़े होकर बेहतरीन गुणवत्ता की मछली चुनते हैं। वह सीधे ०°C लिक्विड आइस स्लरी में कराड लाई जाती है और आरओ पानी से धोकर, आपकी पसंद अनुसार काटकर दी जाती है।
+                    </>
+                  ) : (
+                    <>
+                      To solve this, <strong className="text-[#071A24]">AN Fish World</strong> was founded by Ameer Nadaf. Every single morning at 4:00 AM, our team stands directly at coastal harbour auctions in Ratnagiri and Malvan, selecting the finest catch. Transported at 0°C liquid ice slurry, washed with pure RO water, and custom-sliced to perfection.
+                    </>
+                  )}
+                </p>
+              </motion.div>
             </div>
 
-            {/* 4 Pillars Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3">
+            {/* trust grid: one divided panel */}
+            <motion.ul
+              {...reveal(0.1)}
+              className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-[#071A24]/10 bg-[#071A24]/10 sm:grid-cols-2"
+            >
               {pillars.map((item, idx) => {
                 const Icon = item.icon;
                 return (
-                  <div
-                    key={idx}
-                    className="p-4 rounded-xl bg-[#F8FAFC] border border-[#071A24]/10 hover:border-[#0A9AD9] transition-colors flex items-start gap-3.5 shadow-xs"
-                  >
-                    <div className="p-2 rounded-lg bg-[#0A9AD9]/10 text-[#0A9AD9] shrink-0 mt-0.5">
-                      <Icon className="w-5 h-5" />
-                    </div>
+                  <li key={idx} className="group flex items-start gap-4 bg-white p-5 transition-colors duration-300 hover:bg-[#F3F8FB]">
+                    <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-[#0A9AD9]/10 text-[#0A9AD9] transition-colors duration-300 group-hover:bg-[#0A9AD9] group-hover:text-white">
+                      <Icon className="size-5" />
+                    </span>
                     <div>
-                      <h4 className="text-sm font-bold text-[#071A24] font-marathi-display">
+                      <h4 className="font-marathi-display text-[0.95rem] font-bold leading-snug text-[#071A24]">
                         {isMarathi ? item.titleMr : isHindi ? item.titleHi : item.titleEn}
                       </h4>
-                      <p className="text-xs text-[#071A24]/70 mt-1 leading-snug">
+                      <p className="mt-1 font-marathi-body text-[0.8rem] leading-relaxed text-[#071A24]/65">
                         {isMarathi ? item.descMr : isHindi ? item.descHi : item.descEn}
                       </p>
                     </div>
-                  </div>
+                  </li>
                 );
               })}
-            </div>
+            </motion.ul>
 
-            {/* Action Buttons */}
-            <div className="pt-4 flex flex-wrap items-center gap-4">
+            {/* actions */}
+            <motion.div {...reveal(0.1)} className="mt-9 flex flex-wrap items-center gap-3">
               <a
                 href="#contact"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0A9AD9] hover:bg-[#071A24] text-white font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-lg"
+                className="inline-flex items-center gap-2.5 rounded-full bg-[#071A24] px-7 py-3.5 text-sm font-bold text-white shadow-[0_14px_30px_-14px_rgba(7,26,36,0.7)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#0A9AD9]"
               >
-                <Store className="w-4 h-4" />
-                <span>
-                  {isMarathi
-                    ? "आमच्या दालनाला भेट द्या"
-                    : isHindi
-                    ? "हमारे स्टोर पर पधारें"
-                    : "Visit Our Karad Outlet"}
-                </span>
+                <Store className="size-4" />
+                {t("आमच्या दालनाला भेट द्या", "Visit Our Karad Outlet", "हमारे स्टोर पर पधारें")}
               </a>
-
               <a
                 href={`tel:${phoneTel}`}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#071A24]/20 hover:border-[#0A9AD9] text-[#071A24] hover:text-[#0A9AD9] font-bold text-xs uppercase tracking-wider transition-all duration-300"
+                className="inline-flex items-center gap-2.5 rounded-full border border-[#071A24]/20 px-7 py-3.5 text-sm font-bold text-[#071A24] transition-all duration-300 hover:border-[#0A9AD9] hover:text-[#0A9AD9]"
               >
-                <Phone className="w-4 h-4 text-[#0A9AD9]" />
-                <span>
-                  {isMarathi ? "थेट फोनवर बोला" : isHindi ? "सीधे कॉल करें" : "Call Outlet Directly"}
-                </span>
+                <Phone className="size-4 text-[#0A9AD9]" />
+                {t("थेट फोनवर बोला", "Call Outlet Directly", "सीधे कॉल करें")}
               </a>
-            </div>
-
+            </motion.div>
           </div>
         </div>
       </div>

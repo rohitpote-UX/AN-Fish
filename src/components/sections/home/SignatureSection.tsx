@@ -3,18 +3,16 @@
 import React from "react";
 import Image from "next/image";
 import { useLocale } from "next-intl";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Sparkles,
   MessageCircle,
   ArrowRight,
-  ShieldCheck,
   Waves,
   Anchor,
   Clock,
   Snowflake,
   Scissors,
-  Award,
-  HeartHandshake,
 } from "lucide-react";
 import { PLACEHOLDERS } from "@/data/placeholders";
 
@@ -97,80 +95,12 @@ const SIGNATURE_FISHES: SignatureFish[] = [
   },
 ];
 
-/**
- * Architectural Stepped Arch Frame Component
- * Perfectly outlines the arched showcase window with concentric mouldings,
- * shoulder impost steps, and stepped base plinth from user reference image.
- */
-function ArchPortalFrame({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 200 240"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={`pointer-events-none absolute inset-0 w-full h-full transition-all duration-500 ${className}`}
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="archGoldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FBBF24" stopOpacity="0.9" />
-          <stop offset="40%" stopColor="#38BDF8" stopOpacity="0.95" />
-          <stop offset="75%" stopColor="#0A9AD9" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="#FBBF24" stopOpacity="0.8" />
-        </linearGradient>
-        <linearGradient id="archCyanMoulding" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.85" />
-          <stop offset="100%" stopColor="#0A9AD9" stopOpacity="0.45" />
-        </linearGradient>
-      </defs>
-
-      {/* Layer 1: Outer Stepped Arch with Shoulder Impost Transitions */}
-      <path
-        d="M 12 232 L 12 96 L 22 96 L 22 84 A 78 78 0 0 1 178 84 L 178 96 L 188 96 L 188 232 Z"
-        stroke="url(#archGoldGradient)"
-        strokeWidth="2.2"
-        strokeLinejoin="round"
-      />
-
-      {/* Layer 2: Concentric Middle Arch */}
-      <path
-        d="M 22 224 L 22 84 A 78 78 0 0 1 178 84 L 178 224"
-        stroke="url(#archCyanMoulding)"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-
-      {/* Layer 3: Concentric Intermediate Arch Moulding */}
-      <path
-        d="M 30 216 L 30 84 A 70 70 0 0 1 170 84 L 170 216"
-        stroke="url(#archCyanMoulding)"
-        strokeWidth="1.3"
-        strokeLinejoin="round"
-        strokeOpacity="0.8"
-      />
-
-      {/* Layer 4: Innermost Window Portal Frame */}
-      <path
-        d="M 38 208 L 38 84 A 62 62 0 0 1 162 84 L 162 208 Z"
-        stroke="url(#archGoldGradient)"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
-
-      {/* Stepped Base Plinth Moldings */}
-      <line x1="12" y1="232" x2="188" y2="232" stroke="url(#archGoldGradient)" strokeWidth="2.2" />
-      <line x1="22" y1="224" x2="178" y2="224" stroke="url(#archCyanMoulding)" strokeWidth="1.6" />
-      <line x1="30" y1="216" x2="170" y2="216" stroke="url(#archCyanMoulding)" strokeWidth="1.3" strokeOpacity="0.8" />
-      <line x1="38" y1="208" x2="162" y2="208" stroke="url(#archGoldGradient)" strokeWidth="1.8" />
-    </svg>
-  );
-}
 
 export function SignatureSection() {
   const locale = useLocale();
   const isMarathi = locale === "mr";
   const isHindi = locale === "hi";
+  const reduce = useReducedMotion();
 
   const cleanPhone = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || PLACEHOLDERS.WHATSAPP_NUMBER).replace(
     /[^0-9]/g,
@@ -297,202 +227,205 @@ export function SignatureSection() {
           </div>
         </div>
 
-        {/* Brand Story Journey: The 4-Step Freshness Chain */}
+        {/* Brand Story Journey: restrained, corporate 4-step process */}
         <div className="mb-14 lg:mb-20">
-          <div className="rounded-3xl bg-[#092230]/80 border border-white/10 p-6 sm:p-8 backdrop-blur-md shadow-2xl relative overflow-hidden">
-            {/* Subtle Texture Inside Story Box */}
-            <div
-              className="absolute inset-0 opacity-20 pointer-events-none"
-              style={{
-                backgroundImage: `radial-gradient(rgba(56, 189, 248, 0.4) 1px, transparent 1px)`,
-                backgroundSize: "18px 18px",
-              }}
-              aria-hidden="true"
-            />
+          <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#0A2232] p-7 sm:p-12">
+            {/* Heading */}
+            <motion.div
+              initial={reduce ? false : { opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="mx-auto max-w-3xl text-center"
+            >
+              <span className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[#FBBF24]">
+                {isMarathi ? "ए एन फिश वर्ल्ड ब्रँड कथा" : isHindi ? "ए एन फिश वर्ल्ड ब्रांड कथा" : "AN Fish World Brand Story"}
+              </span>
+              <h3 className="mt-3 font-marathi-display text-2xl font-bold leading-snug text-white sm:text-3xl">
+                {isMarathi
+                  ? "सागरापासून कराडकरांच्या ताटापर्यंतचा अस्सल प्रवास"
+                  : isHindi
+                  ? "समुद्र से कराडवासियों की थाली तक का असली सफर"
+                  : "The Authentic Journey from Sea Harbor to Your Plate"}
+              </h3>
+            </motion.div>
 
-            <div className="relative z-10">
-              {/* Brand Narrative Banner */}
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-white/10">
-                <div>
-                  <span className="text-xs font-bold text-[#FBBF24] tracking-widest uppercase flex items-center gap-1.5">
-                    <Award className="w-4 h-4 text-[#FBBF24]" />
-                    {isMarathi ? "ए एन फिश वर्ल्ड ब्रँड कथा" : isHindi ? "ए एन फिश वर्ल्ड ब्रांड कथा" : "AN Fish World Brand Story"}
-                  </span>
-                  <h3 className="mt-1 text-xl sm:text-2xl font-bold font-marathi-display text-white">
-                    {isMarathi
-                      ? "सागरापासून कराडकरांच्या ताटापर्यंतचा अस्सल प्रवास"
-                      : isHindi
-                      ? "समुद्र से कराडवासियों की थाली तक का असली सफर"
-                      : "The Authentic Journey from Sea Harbor to Your Plate"}
-                  </h3>
-                </div>
-
-                {/* Trust Metrics Pill */}
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#071A24] border border-[#0A9AD9]/40 text-xs text-[#6EC6F0] font-semibold">
-                  <HeartHandshake className="w-4 h-4 text-[#FBBF24] shrink-0" />
-                  <span>
-                    {isMarathi
-                      ? "१५०+ हॉटेल्सचे विश्वासू पुरवठादार · १५,०००+ समाधानी कुटुंबे"
-                      : isHindi
-                      ? "१५०+ होटलों के विश्वसनीय सप्लायर · १५,०००+ संतुष्ट परिवार"
-                      : "Trusted by 150+ Top Hotels & 15,000+ Families"}
-                  </span>
-                </div>
+            {/* Process */}
+            <div className="relative mt-12 lg:mt-14">
+              {/* Desktop rail with a thin progress line that draws once */}
+              <div aria-hidden="true" className="absolute left-6 right-6 top-6 hidden h-px bg-white/15 lg:block">
+                <motion.div
+                  className="h-full origin-left bg-[#38BDF8]"
+                  initial={reduce ? false : { scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  viewport={{ once: true, margin: "-120px" }}
+                  transition={{ duration: 1.8, ease: "easeInOut" }}
+                />
               </div>
 
-              {/* 4 Steps Timeline Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-6">
-                {storySteps.map((item) => {
+              <ol className="grid gap-10 lg:grid-cols-4 lg:gap-8">
+                {storySteps.map((item, i) => {
                   const Icon = item.icon;
+                  const last = i === storySteps.length - 1;
                   return (
-                    <div
+                    <motion.li
                       key={item.step}
-                      className="group/step relative bg-[#061822]/70 hover:bg-[#0A2738]/90 border border-white/5 hover:border-[#38BDF8]/40 rounded-2xl p-4 sm:p-5 transition-all duration-300"
+                      initial={reduce ? false : { opacity: 0, y: 24 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-60px" }}
+                      transition={{ duration: 0.6, delay: i * 0.14, ease: [0.22, 1, 0.36, 1] }}
+                      className="group relative flex gap-5 lg:block"
                     >
-                      <div className="flex items-center justify-between gap-2 mb-3">
-                        <span className="text-[0.7rem] font-black text-[#FBBF24] tracking-wider uppercase bg-[#FBBF24]/10 border border-[#FBBF24]/30 px-2.5 py-0.5 rounded-full">
+                      {/* Mobile vertical rail */}
+                      {!last && (
+                        <span
+                          aria-hidden="true"
+                          className="absolute left-6 top-14 -bottom-10 w-px -translate-x-1/2 bg-white/15 lg:hidden"
+                        />
+                      )}
+
+                      {/* Icon (sits on the rail) + step number */}
+                      <div className="relative z-10 flex shrink-0 items-center gap-4 lg:mb-6">
+                        <span className="grid size-12 place-items-center rounded-xl border border-white/15 bg-[#0D2A3E] transition-colors duration-300 group-hover:border-[#38BDF8]/70">
+                          <Icon className="size-5 text-[#7DD3FC]" />
+                        </span>
+                        <span className="hidden font-mono text-xs font-semibold tracking-[0.2em] text-white/35 lg:inline">
                           {item.step}
                         </span>
-                        <span className="text-xs font-bold text-[#6EC6F0] flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5 text-[#38BDF8]" />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <p className="mb-2 flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-wider text-[#FBBF24]">
+                          <span className="font-mono text-white/35 lg:hidden">{item.step}</span>
+                          <span className="lg:hidden text-white/20">/</span>
+                          <Clock className="size-3.5" />
                           {item.time}
-                        </span>
+                        </p>
+                        <h4 className="font-marathi-display text-lg font-semibold leading-snug text-white">
+                          {isMarathi ? item.titleMr : isHindi ? item.titleHi : item.titleEn}
+                        </h4>
+                        <p className="mt-2 font-marathi-body text-[0.85rem] leading-relaxed text-white/65">
+                          {isMarathi ? item.descMr : isHindi ? item.descHi : item.descEn}
+                        </p>
                       </div>
-
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0A9AD9]/25 to-transparent border border-[#0A9AD9]/40 flex items-center justify-center mb-3 group-hover/step:scale-110 transition-transform duration-300">
-                        <Icon className="w-5 h-5 text-[#38BDF8]" />
-                      </div>
-
-                      <h4 className="text-base font-bold text-white font-marathi-display mb-1.5 group-hover/step:text-[#FBBF24] transition-colors">
-                        {isMarathi ? item.titleMr : isHindi ? item.titleHi : item.titleEn}
-                      </h4>
-
-                      <p className="text-xs text-white/70 leading-relaxed font-marathi-body">
-                        {isMarathi ? item.descMr : isHindi ? item.descHi : item.descEn}
-                      </p>
-                    </div>
+                    </motion.li>
                   );
                 })}
-              </div>
-
-              {/* Village-Perspective Emotional Quote */}
-              <div className="mt-6 pt-5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-                <p className="text-xs sm:text-sm text-white/85 italic font-marathi-body">
-                  {isMarathi
-                    ? "“केवळ मासे विकणे हा आमचा व्यवसाय नाही; कोकणच्या बंदराचा अस्सल टवटवीत ताजेपणा प्रत्येक कराडकरांच्या घरात पोहोचवणे हीच आमची ओळख आहे.”"
-                    : isHindi
-                    ? "“केवल मछली बेचना हमारा व्यापार नहीं है; कोंकण के बंदरगाह की असली ताजगी प्रत्येक कराडवासी के घर तक पहुंचाना ही हमारी पहचान है।”"
-                    : "“Selling fish isn't merely our business; delivering pure coastal oceanic freshness to every home in Karad is our heritage.”"}
-                </p>
-                <span className="text-[0.72rem] font-bold text-[#FBBF24] whitespace-nowrap bg-[#FBBF24]/10 px-3 py-1 rounded-full border border-[#FBBF24]/20">
-                  {isMarathi ? "— ए एन फिश वर्ल्ड, कराड" : isHindi ? "— ए एन फिश वर्ल्ड, कराड" : "— AN Fish World, Karad"}
-                </span>
-              </div>
+              </ol>
             </div>
+
+            {/* Quote */}
+            <motion.div
+              initial={reduce ? false : { opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-center sm:flex-row sm:text-left"
+            >
+              <p className="font-marathi-body text-sm italic text-white/75">
+                {isMarathi
+                  ? "“केवळ मासे विकणे हा आमचा व्यवसाय नाही; कोकणच्या बंदराचा अस्सल टवटवीत ताजेपणा प्रत्येक कराडकरांच्या घरात पोहोचवणे हीच आमची ओळख आहे.”"
+                  : isHindi
+                  ? "“केवल मछली बेचना हमारा व्यापार नहीं है; कोंकण के बंदरगाह की असली ताजगी प्रत्येक कराडवासी के घर तक पहुंचाना ही हमारी पहचान है।”"
+                  : "“Selling fish isn't merely our business; delivering pure coastal oceanic freshness to every home in Karad is our heritage.”"}
+              </p>
+              <span className="whitespace-nowrap text-xs font-semibold text-[#FBBF24]">
+                {isMarathi || isHindi ? "— ए एन फिश वर्ल्ड, कराड" : "— AN Fish World, Karad"}
+              </span>
+            </motion.div>
           </div>
         </div>
 
-        {/* 4 Signature Fish Cards with Enhanced Style & Large Arched Window Images */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-          {SIGNATURE_FISHES.map((fish) => (
-            <div
-              key={fish.id}
-              className="group relative bg-gradient-to-b from-[#0C2A3C] via-[#092230] to-[#071924] border border-white/10 hover:border-[#38BDF8]/70 rounded-[28px] p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-[0_20px_50px_rgba(10,154,217,0.32)] hover:-translate-y-2 overflow-hidden backdrop-blur-md"
-            >
-              {/* Subtle Ambient Hover Glow */}
-              <div
-                className="absolute inset-0 bg-gradient-to-b from-[#38BDF8]/15 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                aria-hidden="true"
-              />
-
-              {/* Top Section: Large Arched Showcase Portal */}
-              <div className="relative z-10 w-full mb-4">
-                {/* Arched Showcase Container with 280px Height and Full Width */}
-                <div className="relative w-full h-64 sm:h-72 rounded-t-[44px] sm:rounded-t-[54px] rounded-b-2xl overflow-hidden shadow-2xl bg-[#031119] group/arch">
-                  {/* The Large Fish Photo Filling the Arched Window */}
+        {/* 4 Signature Fish Cards: clean photo, non-overlapping badges, cut chips, price + order row */}
+        <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-7">
+          {SIGNATURE_FISHES.map((fish, i) => {
+            const name = isMarathi || isHindi ? fish.nameMr : fish.nameEn;
+            const cuts = (isMarathi || isHindi ? fish.cutsMr : fish.cutsEn)
+              .split("•")
+              .map((c) => c.trim())
+              .filter(Boolean);
+            return (
+              <li
+                key={fish.id}
+                className="group relative flex flex-col overflow-hidden rounded-[26px] border border-white/10 bg-gradient-to-b from-[#0C2A3C] to-[#071924] transition-all duration-300 hover:-translate-y-1.5 hover:border-[#38BDF8]/60 hover:shadow-[0_24px_50px_-18px_rgba(10,154,217,0.5)]"
+              >
+                {/* Photo: full-bleed, pure-white product shots blend into a white stage */}
+                <div className="relative aspect-[4/3.4] w-full overflow-hidden bg-white">
                   <Image
-                    src={fish.image}
-                    alt={isMarathi || isHindi ? fish.nameMr : fish.nameEn}
+                    src={fish.image.replace("-free.webp", "-large.webp")}
+                    alt={name}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    priority
-                    className="object-cover object-center w-full h-full transition-transform duration-700 ease-out group-hover:scale-115 group-hover:-translate-y-1.5"
+                    priority={i < 2}
+                    className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
                   />
-
-                  {/* Bottom Vignette for Smooth Transition into Card Body */}
-                  <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0C2A3C] via-[#0C2A3C]/60 to-transparent pointer-events-none" />
-
-                  {/* Stepped Architectural Arch Frame Vector Overlaid Around Window */}
-                  <ArchPortalFrame className="z-10 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] group-hover:drop-shadow-[0_0_16px_rgba(56,189,248,0.7)]" />
-
-                  {/* Arched Crown Keystone Tag */}
-                  <div className="absolute top-2.5 inset-x-0 z-20 flex items-center justify-center pointer-events-none">
-                    <span className="px-3.5 py-1 rounded-full text-[0.7rem] font-bold bg-[#071A24]/90 text-[#FBBF24] border border-[#FBBF24]/40 shadow-lg backdrop-blur-md">
-                      {isMarathi || isHindi ? fish.marathiTag : fish.englishTag}
-                    </span>
-                  </div>
-
-                  {/* Freshness Badge Floating on Top Right */}
-                  <div className="absolute top-3 right-3 z-20">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.65rem] font-bold bg-[#071A24]/85 text-emerald-400 border border-emerald-500/30 backdrop-blur-md shadow-md">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      {isMarathi ? "१००% ताजे" : isHindi ? "१००% ताजा" : "100% Fresh"}
-                    </span>
-                  </div>
+                  {/* soft fade into the dark card body */}
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#0C2A3C]/70 to-transparent"
+                  />
+                  {/* Badges: one on each side, never overlapping */}
+                  <span className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)] truncate rounded-full border border-[#FBBF24]/50 bg-[#071A24]/90 px-3 py-1 text-[0.7rem] font-bold text-[#FBBF24] shadow-lg backdrop-blur-md">
+                    {isMarathi || isHindi ? fish.marathiTag : fish.englishTag}
+                  </span>
+                  <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-[#071A24]/90 px-2.5 py-1 text-[0.65rem] font-bold text-emerald-300 backdrop-blur-md">
+                    <span className="size-1.5 animate-pulse rounded-full bg-emerald-400" />
+                    {isMarathi ? "१००% ताजे" : isHindi ? "१००% ताजा" : "100% Fresh"}
+                  </span>
                 </div>
-              </div>
 
-              {/* Middle Section: Fish Title & Description */}
-              <div className="relative z-10 space-y-2">
-                <div className="flex items-baseline justify-between gap-2">
-                  <h3 className="text-xl sm:text-2xl font-black font-marathi-display text-white group-hover:text-[#FBBF24] transition-colors leading-tight">
-                    {isMarathi || isHindi ? fish.nameMr : fish.nameEn}
+                {/* Body */}
+                <div className="flex flex-1 flex-col gap-3 p-5">
+                  <h3 className="font-marathi-display text-xl font-black leading-tight text-white transition-colors group-hover:text-[#FBBF24] sm:text-[1.4rem]">
+                    {name}
                   </h3>
-                </div>
 
-                <p className="text-xs text-white/75 line-clamp-2 leading-relaxed font-marathi-body">
-                  {isMarathi || isHindi ? fish.tasteMr : fish.tasteEn}
-                </p>
+                  <p className="line-clamp-2 min-h-[2.6rem] font-marathi-body text-[0.82rem] leading-relaxed text-white/75">
+                    {isMarathi || isHindi ? fish.tasteMr : fish.tasteEn}
+                  </p>
 
-                {/* Free Custom Cuts Pill */}
-                <div className="pt-2.5 border-t border-white/10 flex items-center gap-2">
-                  <Scissors className="w-3.5 h-3.5 text-[#FBBF24] shrink-0" />
-                  <div className="text-[0.72rem] text-white/80 truncate">
-                    <span className="text-white/45 uppercase text-[0.65rem] font-bold mr-1.5">
-                      {isMarathi ? "मोफत कटिंग:" : isHindi ? "मुफ्त कटिंग:" : "Free Cuts:"}
-                    </span>
-                    <span className="text-[#38BDF8] font-semibold">
-                      {isMarathi || isHindi ? fish.cutsMr : fish.cutsEn}
-                    </span>
+                  {/* Cuts as chips */}
+                  <div className="mt-auto">
+                    <p className="mb-2 flex items-center gap-1.5 text-[0.65rem] font-bold uppercase tracking-wider text-white/45">
+                      <Scissors className="size-3.5 text-[#FBBF24]" />
+                      {isMarathi ? "मोफत कटिंग" : isHindi ? "मुफ्त कटिंग" : "Free Cuts"}
+                    </p>
+                    <ul className="flex flex-wrap gap-1.5">
+                      {cuts.map((c) => (
+                        <li
+                          key={c}
+                          className="rounded-full border border-[#38BDF8]/25 bg-[#38BDF8]/10 px-2.5 py-1 font-marathi-body text-[0.7rem] font-medium leading-none text-[#9BDCF7]"
+                        >
+                          {c}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Price + order */}
+                  <div className="mt-2 flex items-end justify-between gap-3 border-t border-white/10 pt-4">
+                    <div>
+                      <span className="block text-[0.65rem] font-semibold uppercase tracking-wider text-white/45">
+                        {isMarathi ? "दैनिक बाजार दर" : isHindi ? "दैनिक बाज़ार भाव" : "Daily Rate"}
+                      </span>
+                      <span className="text-xl font-black tabular-nums tracking-tight text-[#FBBF24]">{fish.rate}</span>
+                    </div>
+                    <a
+                      href={getOrderLink(fish)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Order ${fish.nameEn} on WhatsApp`}
+                      className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#25D366] px-4 py-2.5 font-marathi-display text-sm font-bold text-[#052E16] shadow-[0_8px_20px_-8px_rgba(37,211,102,0.6)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 active:scale-95"
+                    >
+                      <MessageCircle className="size-4 shrink-0 fill-current" />
+                      <span>{isMarathi ? "मागवा" : isHindi ? "ऑर्डर करें" : "Order"}</span>
+                    </a>
                   </div>
                 </div>
-              </div>
-
-              {/* Bottom Action Footer: Daily Rate & WhatsApp CTA */}
-              <div className="relative z-10 mt-5 pt-4 border-t border-white/10 flex items-center justify-between gap-3">
-                <div>
-                  <span className="block text-[0.65rem] text-white/45 uppercase tracking-wider font-semibold">
-                    {isMarathi ? "दैनिक बाजार दर" : isHindi ? "दैनिक बाज़ार भाव" : "Daily Rate"}
-                  </span>
-                  <span className="text-lg sm:text-xl font-black text-[#FBBF24] tracking-tight tabular-nums drop-shadow-[0_2px_8px_rgba(251,191,36,0.3)]">
-                    {fish.rate}
-                  </span>
-                </div>
-
-                <a
-                  href={getOrderLink(fish)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#0A9AD9] via-[#0284C7] to-[#25D366] hover:from-[#38BDF8] hover:to-[#25D366] text-white font-bold text-xs uppercase tracking-wide transition-all duration-300 shadow-[0_4px_16px_rgba(10,154,217,0.35)] hover:shadow-[0_6px_22px_rgba(37,211,102,0.5)] hover:-translate-y-0.5 active:scale-95 cursor-pointer font-marathi-display"
-                  aria-label={`Order ${fish.nameEn} on WhatsApp`}
-                >
-                  <MessageCircle className="w-3.5 h-3.5 fill-current shrink-0" />
-                  <span>{isMarathi ? "मागवा" : isHindi ? "ऑर्डर करें" : "Order"}</span>
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
+              </li>
+            );
+          })}
+        </ul>
 
         {/* View Entire Menu CTA */}
         <div className="mt-14 text-center">

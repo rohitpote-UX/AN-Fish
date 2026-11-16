@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { useLocale } from "next-intl";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Anchor,
   ShieldCheck,
@@ -19,16 +20,26 @@ import {
   PhoneCall,
   Shield,
   UtensilsCrossed,
-  Layers,
   ZoomIn,
-  X,
 } from "lucide-react";
 import { PLACEHOLDERS } from "@/data/placeholders";
+
+const BENEFIT_ACCENTS = ["#34D399", "#FB7185", "#FBBF24", "#A78BFA", "#38BDF8", "#FB923C"];
 
 export function ServicesSection() {
   const locale = useLocale();
   const isMarathi = locale === "mr";
   const isHindi = locale === "hi";
+  const reduceMotion = useReducedMotion();
+  const benefitReveal = (delay = 0) =>
+    reduceMotion
+      ? {}
+      : {
+          initial: { opacity: 0, y: 28 },
+          whileInView: { opacity: 1, y: 0 },
+          viewport: { once: true, margin: "-60px" },
+          transition: { duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] as const },
+        };
   const [activeImageModal, setActiveImageModal] = useState<string | null>(null);
 
   const cleanPhone = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || PLACEHOLDERS.WHATSAPP_NUMBER).replace(
@@ -397,97 +408,68 @@ export function ServicesSection() {
         </div>
 
         {/* ================= FEATURE 2: BENEFITS OF EATING FISH (मासे खाण्याचे फायदे) ================= */}
-        <div className="mb-14 rounded-3xl bg-[#F8FAFC] border border-[#071A24]/10 p-6 sm:p-10 lg:p-12 shadow-sm">
-          {/* Section Sub-Header */}
-          <div className="text-center max-w-3xl mx-auto mb-10 space-y-2">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EBF8FF] border border-[#0A9AD9]/30 text-xs font-bold text-[#0A9AD9] uppercase tracking-wider">
-              <Heart className="size-3.5 text-rose-500 fill-rose-500" />
-              <span>
-                {isMarathi
-                  ? "आरोग्याची गावरान गुरुकिल्ली"
-                  : isHindi
-                  ? "उत्तम स्वास्थ्य की कुंजी"
-                  : "Pure Health from River & Sea"}
+        <div className="relative mb-14 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0B2535] via-[#082030] to-[#061822] p-7 text-white shadow-[0_30px_70px_-30px_rgba(7,26,36,0.7)] sm:p-12">
+          {/* soft light accents */}
+          <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-24 size-80 rounded-full bg-[#0A9AD9]/20 blur-3xl" />
+          <div aria-hidden="true" className="pointer-events-none absolute -bottom-32 -left-20 size-80 rounded-full bg-rose-500/10 blur-3xl" />
+
+          <div className="relative">
+            {/* Header */}
+            <motion.div {...benefitReveal()} className="mx-auto mb-12 max-w-3xl text-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-[#7DD3FC] backdrop-blur">
+                <Heart className="size-3.5 fill-rose-400 text-rose-400" />
+                {isMarathi ? "आरोग्याची गावरान गुरुकिल्ली" : isHindi ? "उत्तम स्वास्थ्य की कुंजी" : "Pure Health from River & Sea"}
               </span>
-            </div>
+              <h3 className="mt-5 font-marathi-display text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl">
+                {isMarathi ? "मासे खाण्याचे अनमोल फायदे" : isHindi ? "मछली खाने के अनमोल फायदे" : "Proven Health Benefits of Eating Fresh Fish"}
+              </h3>
+              <p className="mx-auto mt-4 max-w-2xl font-marathi-body text-[0.95rem] leading-relaxed text-white/70">
+                {isMarathi
+                  ? "गावरान ताकद, निरोगी हृदय आणि तीक्ष्ण नजर — ताज्या माशांचे आरोग्यदायी फायदे."
+                  : isHindi
+                  ? "प्राकृतिक शक्ति, स्वस्थ हृदय और तीक्ष्ण नजर — ताजी मछली खाने के स्वास्थ्य लाभ।"
+                  : "Natural strength, a healthy heart and sharp eyesight — the health benefits of eating fresh fish."}
+              </p>
+            </motion.div>
 
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-marathi-display text-[#071A24]">
-              {isMarathi
-                ? "मासे खाण्याचे अनमोल फायदे"
-                : isHindi
-                ? "मछली खाने के अनमोल फायदे"
-                : "Proven Health Benefits of Eating Fresh Fish"}
-            </h3>
-
-            <p className="text-sm text-[#071A24]/75 font-marathi-body">
-              {isMarathi
-                ? "गावरान ताकद, निरोगी हृदय आणि तीक्ष्ण नजर — आमच्या कराड दालनातील अधिकृत फलकावर सांगितलेले १० आरोग्यदायी फायदे."
-                : isHindi
-                ? "प्राकृतिक शक्ति, स्वस्थ हृदय और तीक्ष्ण नजर — हमारे कराड स्टोर के आधिकारिक फलक पर बताए गए १० स्वास्थ्य लाभ।"
-                : "Authentic nutritional guidance displayed directly on the AN Fish World Karad store guidance board."}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Left: 6 Clean Benefit Cards */}
-            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* 6 benefit cards */}
+            <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {fishBenefits.map((b, idx) => {
                 const Icon = b.icon;
+                const accent = BENEFIT_ACCENTS[idx % BENEFIT_ACCENTS.length];
                 return (
-                  <div
+                  <motion.li
                     key={idx}
-                    className="p-4 rounded-2xl bg-white border border-[#071A24]/08 hover:border-[#0A9AD9] hover:shadow-md transition-all duration-300 flex items-start gap-3.5 group"
+                    {...benefitReveal(idx * 0.08)}
+                    className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-white/25 hover:bg-white/[0.07]"
                   >
-                    <div className="size-10 rounded-xl bg-[#EBF8FF] text-[#0A9AD9] flex items-center justify-center shrink-0 group-hover:bg-[#0A9AD9] group-hover:text-white transition-colors duration-200">
-                      <Icon className="size-5" />
+                    {/* accent glow on hover */}
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute -right-10 -top-10 size-32 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-40"
+                      style={{ background: accent }}
+                    />
+                    <div className="relative flex items-center justify-between">
+                      <span
+                        className="grid size-12 place-items-center rounded-xl"
+                        style={{ background: `${accent}22`, color: accent, boxShadow: `inset 0 0 0 1px ${accent}40` }}
+                      >
+                        <Icon className="size-6" />
+                      </span>
+                      <span className="font-mono text-xs font-semibold tracking-widest text-white/25">
+                        {String(idx + 1).padStart(2, "0")}
+                      </span>
                     </div>
-                    <div>
-                      <h4 className="text-sm font-bold font-marathi-display text-[#071A24] group-hover:text-[#0A9AD9] transition-colors">
-                        {isMarathi || isHindi ? b.titleMr : b.titleEn}
-                      </h4>
-                      <p className="mt-1 text-xs text-[#071A24]/70 font-marathi-body leading-relaxed">
-                        {isMarathi || isHindi ? b.descMr : b.descEn}
-                      </p>
-                    </div>
-                  </div>
+                    <h4 className="relative mt-5 font-marathi-display text-lg font-bold leading-snug text-white">
+                      {isMarathi || isHindi ? b.titleMr : b.titleEn}
+                    </h4>
+                    <p className="relative mt-2 font-marathi-body text-[0.85rem] leading-relaxed text-white/65">
+                      {isMarathi || isHindi ? b.descMr : b.descEn}
+                    </p>
+                  </motion.li>
                 );
               })}
-            </div>
-
-            {/* Right: Real Store Board Photo (Straight & Enhanced) */}
-            <div className="lg:col-span-5 flex flex-col items-center">
-              <div
-                onClick={() => setActiveImageModal("/media/fish-benefits-board.jpg")}
-                className="group relative w-full max-w-md lg:max-w-none rounded-2xl overflow-hidden border-2 border-[#071A24]/10 hover:border-[#0A9AD9] shadow-xl cursor-pointer bg-slate-900 transition-all duration-300 hover:scale-[1.02]"
-              >
-                <div className="relative aspect-16/10 w-full">
-                  <Image
-                    src="/media/fish-benefits-board.webp"
-                    alt="AN Fish World Benefits of Eating Fish Board"
-                    width={800}
-                    height={500}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#071A24]/90 via-transparent to-transparent" />
-                  <div className="absolute bottom-3 inset-x-3 flex items-center justify-between text-xs font-bold">
-                    <span className="px-3 py-1 rounded-full bg-[#0A9AD9] text-white font-extrabold shadow-md">
-                      {isMarathi ? "अधिकृत माहिती फलक" : isHindi ? "आधिकारिक सूचना बोर्ड" : "In-Store Wall Guide"}
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-white bg-black/60 px-2.5 py-1 rounded-full backdrop-blur-xs">
-                      <ZoomIn className="size-3.5" />
-                      {isMarathi ? "मोठे करा" : isHindi ? "बड़ा करें" : "Zoom"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <p className="text-[0.72rem] text-[#071A24]/60 font-marathi-body mt-2 text-center">
-                {isMarathi
-                  ? "कराड मुख्य दालनात लावलेला अधिकृत 'मासे खाण्याचे फायदे' फलक"
-                  : isHindi
-                  ? "कराड मुख्य स्टोर पर लगा हुआ आधिकारिक 'मछली खाने के फायदे' बोर्ड"
-                  : "Official 'Benefits of Eating Fish' board at Karad store"}
-              </p>
-            </div>
+            </ul>
           </div>
         </div>
 
