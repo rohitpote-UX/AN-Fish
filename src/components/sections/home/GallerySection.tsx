@@ -124,7 +124,7 @@ export function GallerySection() {
                   {isMarathi
                     ? OFFICIAL_PROFILE_INFO.instagramFollowersMr
                     : isHindi
-                    ? "४,०००+ फॉलोअर्स"
+                    ? OFFICIAL_PROFILE_INFO.instagramFollowersMr
                     : `${OFFICIAL_PROFILE_INFO.instagramFollowers} Followers`}
                 </span>
               </div>

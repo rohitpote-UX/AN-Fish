@@ -65,10 +65,14 @@ export function StickyActions() {
 
         {/* Desktop Text Details */}
         <span className="relative hidden leading-tight sm:block text-left">
-          <span className="block text-[0.62rem] font-bold uppercase tracking-[0.16em] text-white/90 font-marathi-display">
+          <span
+            className={`block text-[0.8rem] font-semibold text-white/90 font-marathi-display ${
+              isMarathi || isHindi ? "" : "uppercase tracking-[0.12em] text-[0.68rem]"
+            }`}
+          >
             {isMarathi ? "कॉल करा" : isHindi ? "कॉल करें" : "Call Now"}
           </span>
-          <span className="block text-sm font-extrabold tabular-nums text-white">
+          <span className="block text-[1.05rem] font-bold tracking-wide text-white">
             {PLACEHOLDERS.CONTACT_PHONE}
           </span>
         </span>
