@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useLocale } from "next-intl";
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
-import { MessageCircle, ArrowRight, MapPin, Clock, ShieldCheck, ChevronDown, Snowflake } from "lucide-react";
+import { MessageCircle, ArrowRight, MapPin, Clock, ShieldCheck, ChevronDown, Snowflake, Heart } from "lucide-react";
 import { PLACEHOLDERS } from "@/data/placeholders";
 
 type L = { mr: string; en: string; hi: string };
@@ -42,6 +42,47 @@ const SHOWCASE: { id: string; img: string; name: L; alt: L; price: string }[] = 
 ];
 
 const ROTATE_MS = 4500;
+
+const HEADLINE_MS = 3200;
+
+/**
+ * Big gold headline that alternates between phrases: "कराडची लाडकी मासोळी" ⇄ "मासे खावा, खुश रहा!".
+ * An invisible stack of all phrases reserves the tallest height so nothing below jumps.
+ * Static (first phrase only) for reduced-motion users.
+ */
+function RotatingHeadline({ phrases, reduce }: { phrases: string[]; reduce: boolean }) {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (reduce) return;
+    const id = setInterval(() => setI((n) => (n + 1) % phrases.length), HEADLINE_MS);
+    return () => clearInterval(id);
+  }, [reduce, phrases.length]);
+
+  const gold =
+    "bg-gradient-to-r from-[#FBBF24] via-[#FCD34D] to-[#FBBF24] bg-clip-text text-[clamp(2.2rem,4.8vw,3.9rem)] font-black leading-[1.2] tracking-tight text-transparent";
+  const idx = i % phrases.length;
+  return (
+    <span className="grid [&>*]:col-start-1 [&>*]:row-start-1">
+      {phrases.map((p) => (
+        <span key={p} aria-hidden="true" className={`invisible ${gold}`}>
+          {p}
+        </span>
+      ))}
+      <AnimatePresence initial={false} mode="wait">
+        <motion.span
+          key={phrases[idx]}
+          className={gold}
+          initial={reduce ? false : { opacity: 0, y: 22 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduce ? undefined : { opacity: 0, y: -16 }}
+          transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {phrases[idx]}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+}
 
 function HeroShowcase({ t, reduce }: { t: (v: L) => string; reduce: boolean }) {
   const [index, setIndex] = useState(0);
@@ -308,23 +349,39 @@ export function Hero() {
               </span>
             </motion.div>
 
-            <motion.h1 {...rise(0.15)} className="mt-6 font-marathi-display font-black tracking-tight">
-              <span className="block text-[clamp(1.75rem,3.8vw,2.75rem)] font-bold leading-[1.25] text-white/90">
-                {t({ mr: "अस्सल दर्जेदार चवीची", hi: "असली व लाजवाब स्वाद की", en: "Authentic Sea Freshness," })}
-              </span>
-              <span className="mt-1 block bg-gradient-to-r from-[#FBBF24] via-[#FCD34D] to-[#FBBF24] bg-clip-text text-[clamp(2.5rem,5.6vw,4.25rem)] leading-[1.15] text-transparent">
-                {t({ mr: "कराडची लाडकी मासोळी", hi: "कराड की चहेती मछली", en: "Karad's Beloved Seafood" })}
-              </span>
+            <motion.h1 {...rise(0.15)} className="mt-6 font-marathi-display">
+              <RotatingHeadline
+                reduce={!!reduce}
+                phrases={[
+                  t({ mr: "कराडची लाडकी मासोळी", hi: "कराड की चहेती मछली", en: "Karad's Beloved Seafood" }),
+                  t({ mr: "मासे खावा, खुश रहा!", hi: "मछली खाएं, खुश रहें!", en: "Eat Fresh Fish, Stay Happy!" }),
+                ]}
+              />
             </motion.h1>
+
+            {/* Small, warm brand line: love from customers */}
+            <motion.p
+              {...rise(0.22)}
+              className="mt-4 inline-flex items-center gap-2 font-marathi-display text-xs font-semibold tracking-wide text-white/80 sm:text-sm"
+            >
+              <Heart className="size-3.5 shrink-0 fill-[#FB7185] text-[#FB7185]" aria-hidden="true" />
+              <span>
+                {t({
+                  mr: "आमच्या लाडक्या ग्राहकांची लाडकी फिश कंपनी",
+                  hi: "हमारे चहेते ग्राहकों की चहेती फिश कंपनी",
+                  en: "The most loved seafood store for our beloved patrons",
+                })}
+              </span>
+            </motion.p>
 
             <motion.p
               {...rise(0.28)}
               className="mt-6 max-w-xl font-marathi-body text-base leading-relaxed text-white/80 sm:text-lg"
             >
               {t({
-                mr: "समुद्राची खरी चव, थेट रत्नागिरी व मालवणच्या बंदरातून तुमच्या ताटापर्यंत — मासे खावा, खुश रहा!",
-                hi: "समुद्र का असली स्वाद, सीधे रत्नागिरी और मालवण बंदरगाह से आपकी थाली तक — मछली खाएं, खुश रहें!",
-                en: "The true taste of the sea, from the Ratnagiri & Malvan harbours straight to your plate — eat fresh fish, stay happy!",
+                mr: "समुद्राची खरी चव, थेट रत्नागिरी व मालवणच्या बंदरातून तुमच्या ताटापर्यंत.",
+                hi: "समुद्र का असली स्वाद, सीधे रत्नागिरी और मालवण बंदरगाह से आपकी थाली तक।",
+                en: "The true taste of the sea, from the Ratnagiri & Malvan harbours straight to your plate.",
               })}
             </motion.p>
 
