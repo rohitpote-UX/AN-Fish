@@ -52,13 +52,17 @@ function Card({ title, sub, children, className = "" }: { title: string; sub?: s
   );
 }
 
-export async function HeadDashboard({ sp }: { sp: Record<string, string | undefined> }) {
+/**
+ * Executive dashboard. Head office / Abnexa see every branch; a branch admin gets the same screen
+ * locked to their own branch (`fixedBranchId`), served from `basePath`.
+ */
+export async function HeadDashboard({ sp, fixedBranchId, basePath = "/" }: { sp: Record<string, string | undefined>; fixedBranchId?: number; basePath?: string }) {
   const range = parseRange(sp, "7d");
-  const branchId = /^\d+$/.test(sp.branch ?? "") ? Number(sp.branch) : null;
+  const branchId = fixedBranchId ?? (/^\d+$/.test(sp.branch ?? "") ? Number(sp.branch) : null);
   const [d, [branches], hrefs] = await Promise.all([
     getDashboard(range, branchId),
     db().query<RowDataPacket[]>("SELECT id, name FROM branches WHERE is_active=1 ORDER BY id"),
-    Promise.all(["/", "/reports", "/orders", "/wastage", "/branches"].map((p) => adminHref(p))),
+    Promise.all([basePath, "/reports", "/orders", "/wastage", "/branches"].map((p) => adminHref(p))),
   ]);
   const [home, reports, orders, wastage, branchesHref] = hrefs;
   const ordersHref = orders;
@@ -90,18 +94,20 @@ export async function HeadDashboard({ sp }: { sp: Record<string, string | undefi
         <div className="flex flex-wrap items-center gap-2">
           {PRESETS.map((p) => <Link key={p.id} href={q({ range: p.id, from: null, to: null })} className={chip(range.preset === p.id)}>{p.label}</Link>)}
           <form action={home} className="ml-auto flex flex-wrap items-center gap-2">
-            {branchId && <input type="hidden" name="branch" value={branchId} />}
+            {branchId && !fixedBranchId && <input type="hidden" name="branch" value={branchId} />}
             <input type="date" name="from" defaultValue={range.from} className="h-10 rounded-lg border border-[#172B3A]/15 px-3 text-sm font-semibold" />
             <span className="text-[#7A8794]">ते</span>
             <input type="date" name="to" defaultValue={range.to} max={todayIST()} className="h-10 rounded-lg border border-[#172B3A]/15 px-3 text-sm font-semibold" />
             <button className="h-10 rounded-lg bg-[#071D2B] px-4 text-sm font-bold text-white">पहा</button>
           </form>
         </div>
-        <div className="flex flex-wrap items-center gap-2 border-t border-[#172B3A]/8 pt-3">
-          <span className="mr-1 text-xs font-bold text-[#7A8794]">शाखा:</span>
-          <Link href={q({ branch: null })} className={chip(!branchId)}>सर्व शाखा</Link>
-          {branches.map((b) => <Link key={b.id} href={q({ branch: String(b.id) })} className={chip(branchId === b.id)}>{short(String(b.name))}</Link>)}
-        </div>
+        {!fixedBranchId && (
+          <div className="flex flex-wrap items-center gap-2 border-t border-[#172B3A]/8 pt-3">
+            <span className="mr-1 text-xs font-bold text-[#7A8794]">शाखा:</span>
+            <Link href={q({ branch: null })} className={chip(!branchId)}>सर्व शाखा</Link>
+            {branches.map((b) => <Link key={b.id} href={q({ branch: String(b.id) })} className={chip(branchId === b.id)}>{short(String(b.name))}</Link>)}
+          </div>
+        )}
       </section>
 
       {missing.length > 0 && (
@@ -134,14 +140,21 @@ export async function HeadDashboard({ sp }: { sp: Record<string, string | undefi
         </Card>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-3">
         {!branchId && (
           <Card title="शाखानुसार विक्री" sub="कोणती शाखा पुढे आहे">
             {d.byBranch.some((b) => b.value > 0) ? <HBars items={d.byBranch} format={fmtInr} /> : <p className="py-6 text-center text-sm text-[#7A8794]">या कालावधीत विक्रीची नोंद नाही.</p>}
           </Card>
         )}
-        <Card title="सर्वाधिक विकला जाणारा मासा" sub="किलोनुसार" className={branchId ? "lg:col-span-2" : ""}>
+        <Card title="सर्वाधिक विकला जाणारा मासा" sub="किलोनुसार">
           {d.topFish.length ? <HBars items={d.topFish} format={fmtKg} color="#3B82C4" /> : <p className="py-6 text-center text-sm text-[#7A8794]">या कालावधीत विक्रीची नोंद नाही.</p>}
+        </Card>
+        <Card title="रोख / UPI विभागणी" sub="काउंटर बिलांवरून, आपोआप">
+          {d.payments.cash + d.payments.upi + d.payments.other > 0 ? (
+            <div className="space-y-4">
+              <Donut items={[{ label: "रोख", value: Math.round(d.payments.cash), color: "#16A36A" }, { label: "UPI", value: Math.round(d.payments.upi), color: "#3B82C4" }, { label: "इतर", value: Math.round(d.payments.other), color: "#E9A23B" }].filter((x) => x.value > 0)} format={fmtInr} />
+            </div>
+          ) : <p className="py-6 text-center text-sm text-[#7A8794]">या कालावधीत काउंटर बिल नाही.</p>}
         </Card>
       </div>
 
@@ -193,13 +206,14 @@ export async function BranchStrip({ branchId }: { branchId: number }) {
   const [orders, reports, wastage] = await Promise.all([adminHref("/orders"), adminHref("/reports"), adminHref("/wastage")]);
   const items = [
     { href: `${reports}?type=daywise&range=today`, label: "आजची विक्री", value: fmtInr(d.cur.sales), tone: "#0EA5A0", Icon: IndianRupee },
-    { href: `${reports}?type=stockday&range=today`, label: "विक्री (kg)", value: fmtKg(d.cur.soldKg), tone: "#3B82C4", Icon: Scale },
+    { href: `${reports}?type=daywise&range=today`, label: "रोख", value: fmtInr(d.payments.cash), tone: "#16A36A", Icon: IndianRupee },
+    { href: `${reports}?type=daywise&range=today`, label: "UPI / इतर", value: fmtInr(d.payments.upi + d.payments.other), tone: "#3B82C4", Icon: IndianRupee },
     { href: orders, label: "नवीन ऑर्डर्स", value: String(d.cur.pending), tone: "#E9A23B", Icon: ClipboardList },
     { href: wastage, label: "वाया गेले", value: fmtKg(d.cur.wastageKg), tone: "#DC5252", Icon: Trash2 },
     { href: `${reports}?type=stockday&range=today`, label: "उपलब्ध स्टॉक", value: fmtKg(d.availableKgToday), tone: "#16A36A", Icon: PackageCheck },
   ];
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
       {items.map((i) => (
         <Link key={i.label} href={i.href} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-[#172B3A]/8 transition hover:ring-[#0EA5A0]/50">
           <div className="flex items-center justify-between"><p className="text-xs font-bold text-[#7A8794]">{i.label}</p><i.Icon className="size-4" style={{ color: i.tone }} /></div>

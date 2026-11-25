@@ -22,7 +22,7 @@ export default async function BranchDetail({ params }: { params: Promise<{ id: s
   const b = rows[0];
   if (!b) notFound();
   const [cr] = await db().query<RowDataPacket[]>("SELECT id, login_id, is_active FROM users WHERE branch_id=? AND role='counter' ORDER BY id", [id]);
-  const { day, rows: stock } = await loadStock(id);
+  const { day, rows: stock, usesBills } = await loadStock(id);
 
   let billing: React.ReactNode = null;
   if (session.role === "abnexa") {
@@ -58,7 +58,7 @@ export default async function BranchDetail({ params }: { params: Promise<{ id: s
       </div>
       {billing}
       <CounterPanel branchId={id} counters={cr.map((c) => ({ id: c.id, login: c.login_id, active: !!c.is_active }))} />
-      <StockEditor branchId={id} rows={stock} day={day} />
+      <StockEditor branchId={id} rows={stock} day={day} usesBills={usesBills} />
     </div>
   );
 }

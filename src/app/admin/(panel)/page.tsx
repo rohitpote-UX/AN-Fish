@@ -14,7 +14,7 @@ export default async function AdminHome({ searchParams }: { searchParams: Promis
   // Branch admin: straight to their own stock screen.
   if (s.role === "branch_admin" && s.branchId) {
     const [b] = await db().query<RowDataPacket[]>("SELECT name, address FROM branches WHERE id=?", [s.branchId]);
-    const { day, rows } = await loadStock(s.branchId);
+    const { day, rows, usesBills } = await loadStock(s.branchId);
     return (
       <div className="space-y-6">
         <div>
@@ -22,7 +22,7 @@ export default async function AdminHome({ searchParams }: { searchParams: Promis
           <p className="text-sm text-[#071C2C]/60">{b[0]?.address}</p>
         </div>
         <BranchStrip branchId={s.branchId} />
-        <StockEditor branchId={s.branchId} rows={rows} day={day} />
+        <StockEditor branchId={s.branchId} rows={rows} day={day} usesBills={usesBills} />
       </div>
     );
   }

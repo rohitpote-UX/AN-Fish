@@ -6,7 +6,7 @@ import { Delete, Loader2, Pencil, Search, ShoppingCart, Trash2, X } from "lucide
 import type { BillData, PosFish } from "@/lib/pos";
 import { createBillAction } from "./actions";
 import { ReceiptDialog } from "./ReceiptDialog";
-import { usePrintPrefs } from "./usePrintPrefs";
+import type { BranchSettings } from "@/lib/branchSettings";
 
 type Line = { key: number; fishId: number; qty: number; cut: string };
 const CUTS = ["अख्खा स्वच्छ", "तवा फ्राय कट", "कालवण कट", "बोनलेस फिलेट"];
@@ -15,7 +15,7 @@ const CAT: Record<string, string> = { sea: "सागरी", river: "नदी�
 const inr = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 const fmtQty = (q: number) => `${q.toFixed(3).replace(/\.?0+$/, "")} kg`;
 
-export function PosTerminal({ fish }: { fish: PosFish[] }) {
+export function PosTerminal({ fish, settings }: { fish: PosFish[]; settings: BranchSettings }) {
   const [cart, setCart] = useState<Line[]>([]);
   const [search, setSearch] = useState("");
   const [cat, setCat] = useState("all");
@@ -28,7 +28,6 @@ export function PosTerminal({ fish }: { fish: PosFish[] }) {
   const [cartOpen, setCartOpen] = useState(false);
   const [receipt, setReceipt] = useState<BillData | null>(null);
   const [pending, start] = useTransition();
-  const prefs = usePrintPrefs();
 
   const byId = useMemo(() => new Map(fish.map((f) => [f.id, f])), [fish]);
   const cats = useMemo(() => [...new Set(fish.map((f) => f.category).filter(Boolean))] as string[], [fish]);
@@ -70,7 +69,7 @@ export function PosTerminal({ fish }: { fish: PosFish[] }) {
       if (!r.ok) { setError(r.error); return; }
       setReceipt(r.bill);
       setCart([]); setDiscount(""); setCustName(""); setCustPhone(""); setMode("cash"); setCartOpen(false);
-      if (prefs.auto) setTimeout(() => window.print(), 400);
+      if (settings.autoPrint) setTimeout(() => window.print(), 400);
     });
   };
 
@@ -127,9 +126,6 @@ export function PosTerminal({ fish }: { fish: PosFish[] }) {
           </div>
         </details>
         {error && <p role="alert" className="rounded-lg bg-[#DC5252]/10 px-3 py-2 text-sm font-bold text-[#DC5252]">{error}</p>}
-        <label className="flex items-center gap-2 text-xs font-semibold text-[#7A8794]">
-          <input type="checkbox" checked={prefs.auto} onChange={(e) => prefs.setAuto(e.target.checked)} className="size-4 accent-[#0EA5A0]" /> बिल बनताच आपोआप प्रिंट डायलॉग उघडा
-        </label>
         <button onClick={checkout} disabled={cart.length === 0 || pending} className="flex h-16 w-full items-center justify-center gap-2 rounded-2xl bg-[#16A36A] text-xl font-extrabold text-white shadow-lg hover:brightness-110 disabled:opacity-50">
           {pending && <Loader2 className="size-6 animate-spin" />} बिल बनवा · {inr(total)}
         </button>
@@ -234,7 +230,7 @@ export function PosTerminal({ fish }: { fish: PosFish[] }) {
         </div>
       )}
 
-      {receipt && <ReceiptDialog bill={receipt} onClose={() => setReceipt(null)} primary={{ label: "नवीन बिल", onClick: () => setReceipt(null) }} />}
+      {receipt && <ReceiptDialog bill={receipt} settings={settings} onClose={() => setReceipt(null)} primary={{ label: "नवीन बिल", onClick: () => setReceipt(null) }} />}
     </div>
   );
 }

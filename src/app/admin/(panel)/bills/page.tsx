@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { adminHref, requireAnySession, todayIST } from "@/lib/adminAuth";
 import { loadBills } from "@/lib/pos";
+import { DEFAULT_SETTINGS, getBranchSettings, type BranchSettings } from "@/lib/branchSettings";
 import { fmtInr } from "@/lib/dateRange";
 import { BillsList } from "./BillsList";
 import { AutoRefresh } from "../AutoRefresh";
@@ -18,6 +19,8 @@ export default async function BillsPage({ searchParams }: { searchParams: Promis
   const branchFilter = isHead && /^\d+$/.test(sp.branch ?? "") ? Number(sp.branch) : null;
   const branchId = isHead ? branchFilter : s.branchId ?? 0;
   const bills = await loadBills(branchId, day);
+  const settings: Record<number, BranchSettings> = { 0: DEFAULT_SETTINGS };
+  for (const id of new Set(bills.map((b) => b.branchId))) settings[id] = await getBranchSettings(id);
 
   const live = bills.filter((b) => !b.isVoid);
   const sum = (m?: string) => live.filter((b) => !m || b.mode === m).reduce((a, b) => a + b.total, 0);
@@ -57,7 +60,7 @@ export default async function BillsPage({ searchParams }: { searchParams: Promis
         {stat("UPI / इतर", fmtInr(sum("upi") + sum("other")))}
       </div>
       </div>
-      <BillsList bills={bills} canVoid={!isCounter} showBranch={isHead && !branchFilter} />
+      <BillsList bills={bills} settings={settings} canVoid={!isCounter} showBranch={isHead && !branchFilter} />
     </div>
   );
 }

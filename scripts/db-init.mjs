@@ -199,6 +199,19 @@ CREATE TABLE IF NOT EXISTS bill_items (
 ALTER TABLE stock_movements MODIFY kind ENUM('opening','arrival','wastage','wastage_removed','closing','price','sale','sale_void') NOT NULL;
 `);
 
+await conn.query(`
+CREATE TABLE IF NOT EXISTS branch_settings (
+  branch_id INT PRIMARY KEY,
+  paper_mm TINYINT NOT NULL DEFAULT 80,          -- thermal paper width: 58 or 80
+  auto_print TINYINT(1) NOT NULL DEFAULT 0,      -- open the print dialog as soon as a bill is made
+  header_extra VARCHAR(120) NULL,                -- extra line under the address (e.g. licence / GST number, entered by the owner)
+  footer_text VARCHAR(120) NOT NULL DEFAULT 'धन्यवाद! पुन्हा भेट द्या.',
+  updated_by INT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (branch_id) REFERENCES branches(id)
+) ENGINE=InnoDB;
+`);
+
 // Fish list: read from the website's own catalogue so names stay identical.
 const species = readFileSync("src/data/species.ts", "utf8");
 const fishRe = /slug:\s*"([^"]+)",\s*nameMr:\s*"([^"]+)",\s*nameEn:\s*"([^"]+)",\s*category:\s*"([^"]+)"/g;

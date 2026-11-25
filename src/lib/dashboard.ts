@@ -43,6 +43,11 @@ export async function getDashboard(range: Range, branchId: number | null) {
     `SELECT f.name_mr AS fish, SUM(${SOLD}) AS sold ${BASE} WHERE sd.day BETWEEN ? AND ?${bw} GROUP BY f.id HAVING sold>0 ORDER BY sold DESC LIMIT 6`, [range.from, range.to, ...ba]);
   const [statusRows] = await db().query<RowDataPacket[]>(
     `SELECT o.status, COUNT(*) AS c FROM orders o WHERE ${OD} BETWEEN ? AND ?${branchId ? " AND o.branch_id=?" : ""} GROUP BY o.status`, [range.from, range.to, ...ba]);
+  const [payRows] = await db().query<RowDataPacket[]>(
+    `SELECT payment_mode AS m, COALESCE(SUM(total),0) AS amt, COUNT(*) AS c FROM bills WHERE is_void=0 AND bill_day BETWEEN ? AND ?${branchId ? " AND branch_id=?" : ""} GROUP BY payment_mode`,
+    [range.from, range.to, ...ba]);
+  const payments = { cash: 0, upi: 0, other: 0 } as Record<string, number>;
+  for (const x of payRows) payments[x.m as string] = n(x.amt);
   const [recent] = await db().query<RowDataPacket[]>(
     `SELECT o.id, o.customer_name, o.total, o.status, o.created_at, b.name AS branch FROM orders o JOIN branches b ON b.id=o.branch_id
      ${branchId ? "WHERE o.branch_id=?" : ""} ORDER BY o.id DESC LIMIT 6`, ba);
@@ -63,7 +68,7 @@ export async function getDashboard(range: Range, branchId: number | null) {
     branchesToday = rows.map((x) => ({ id: x.id, name: short(String(x.name)), entered: n(x.entered), available: n(x.available), ordersToday: n(x.orders_today), newOrders: n(x.new_orders) }));
   }
   return {
-    range, cur, prev, trend,
+    range, cur, prev, trend, payments: payments as { cash: number; upi: number; other: number },
     byBranch: byBranchRows.map((x) => ({ label: short(String(x.name)), value: n(x.sales) })),
     topFish: topFishRows.map((x) => ({ label: String(x.fish), value: n(x.sold) })),
     statuses: Object.fromEntries(statusRows.map((x) => [x.status as string, n(x.c)])) as Record<string, number>,

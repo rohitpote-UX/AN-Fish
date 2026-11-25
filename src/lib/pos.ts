@@ -11,7 +11,7 @@ export type PosFish = {
 
 export type BillItem = { name: string; qty: number; rate: number; amount: number; cut: string | null };
 export type BillData = {
-  id: number; billNo: number; day: string; time: string;
+  id: number; branchId: number; billNo: number; day: string; time: string;
   branchName: string; branchAddress: string | null; branchPhone: string | null;
   items: BillItem[]; subtotal: number; discount: number; total: number;
   mode: "cash" | "upi" | "other"; customerName: string | null; customerPhone: string | null;
@@ -54,7 +54,7 @@ export async function loadBills(branchId: number | null, day: string): Promise<B
     [bills.map((b) => b.id)],
   );
   return bills.map((b) => ({
-    id: Number(b.id), billNo: b.bill_no, day: String(b.bill_day instanceof Date ? b.bill_day.toISOString().slice(0, 10) : b.bill_day).slice(0, 10),
+    id: Number(b.id), branchId: Number(b.branch_id), billNo: b.bill_no, day: String(b.bill_day instanceof Date ? b.bill_day.toISOString().slice(0, 10) : b.bill_day).slice(0, 10),
     time: new Date(b.created_at).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: false }),
     branchName: shortBranch(String(b.branch_name)), branchAddress: b.branch_address, branchPhone: b.branch_phone,
     items: items.filter((i) => Number(i.bill_id) === Number(b.id)).map((i) => ({ name: i.fish_name, qty: Number(i.qty_kg), rate: Number(i.price_per_kg), amount: Number(i.amount), cut: i.cut })),

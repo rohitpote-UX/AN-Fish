@@ -52,13 +52,19 @@ export async function runReport(id: string, r: Range, branchId: number | null): 
       `SELECT DATE(CONVERT_TZ(created_at, @@session.time_zone, '+05:30')) AS d, COUNT(*) AS n FROM orders
        WHERE DATE(CONVERT_TZ(created_at, @@session.time_zone, '+05:30')) BETWEEN ? AND ?${branchId ? " AND branch_id=?" : ""} GROUP BY d`, args());
     const om = new Map(orders.map((o) => [dayStr(o.d), num(o.n)]));
-    const out = rows.map((x) => ({ day: dayStr(x.day), opening: num(x.opening), added: num(x.added), wastage: num(x.wastage), sold: num(x.sold), sales: num(x.sales), closing: num(x.closing), orders: om.get(dayStr(x.day)) ?? 0 }));
-    const t = out.reduce((a, x) => ({ opening: a.opening + x.opening, added: a.added + x.added, wastage: a.wastage + x.wastage, sold: a.sold + x.sold, sales: a.sales + x.sales, orders: a.orders + x.orders }), { opening: 0, added: 0, wastage: 0, sold: 0, sales: 0, orders: 0 });
+    // Cash / UPI / other split comes straight from the (non-cancelled) counter bills.
+    const pays = await q(
+      `SELECT bill_day AS d, SUM(CASE WHEN payment_mode='cash' THEN total ELSE 0 END) AS cash, SUM(CASE WHEN payment_mode='upi' THEN total ELSE 0 END) AS upi,
+         SUM(CASE WHEN payment_mode='other' THEN total ELSE 0 END) AS other FROM bills
+       WHERE is_void=0 AND bill_day BETWEEN ? AND ?${branchId ? " AND branch_id=?" : ""} GROUP BY bill_day`, args());
+    const pm = new Map(pays.map((x) => [dayStr(x.d), x]));
+    const out = rows.map((x) => ({ day: dayStr(x.day), opening: num(x.opening), added: num(x.added), wastage: num(x.wastage), sold: num(x.sold), sales: num(x.sales), cash: num(pm.get(dayStr(x.day))?.cash), upi: num(pm.get(dayStr(x.day))?.upi), other: num(pm.get(dayStr(x.day))?.other), closing: num(x.closing), orders: om.get(dayStr(x.day)) ?? 0 }));
+    const t = out.reduce((a, x) => ({ opening: a.opening + x.opening, added: a.added + x.added, wastage: a.wastage + x.wastage, sold: a.sold + x.sold, sales: a.sales + x.sales, cash: a.cash + x.cash, upi: a.upi + x.upi, other: a.other + x.other, orders: a.orders + x.orders }), { opening: 0, added: 0, wastage: 0, sold: 0, sales: 0, cash: 0, upi: 0, other: 0, orders: 0 });
     return {
       id, title: "दिवसवार विक्री",
-      columns: [{ key: "day", label: "तारीख", kind: "date" }, { key: "opening", label: "सुरुवात (kg)", kind: "kg" }, { key: "added", label: "नवीन आवक (kg)", kind: "kg" }, { key: "wastage", label: "वाया गेले (kg)", kind: "kg" }, { key: "sold", label: "विक्री (kg)", kind: "kg" }, { key: "sales", label: "विक्री रक्कम", kind: "inr" }, { key: "closing", label: "क्लोजिंग (kg)", kind: "kg" }, { key: "orders", label: "ऑर्डर्स", kind: "int" }],
+      columns: [{ key: "day", label: "तारीख", kind: "date" }, { key: "opening", label: "सुरुवात (kg)", kind: "kg" }, { key: "added", label: "नवीन आवक (kg)", kind: "kg" }, { key: "wastage", label: "वाया गेले (kg)", kind: "kg" }, { key: "sold", label: "विक्री (kg)", kind: "kg" }, { key: "sales", label: "विक्री रक्कम", kind: "inr" }, { key: "cash", label: "रोख", kind: "inr" }, { key: "upi", label: "UPI", kind: "inr" }, { key: "other", label: "इतर", kind: "inr" }, { key: "closing", label: "क्लोजिंग (kg)", kind: "kg" }, { key: "orders", label: "ऑर्डर्स", kind: "int" }],
       rows: out, totals: { day: "एकूण", ...t },
-      summary: [{ label: "एकूण विक्री", value: fmtInr(t.sales) }, { label: "विक्री (kg)", value: fmtKg(t.sold) }, { label: "नवीन आवक", value: fmtKg(t.added) }, { label: "वाया गेले", value: fmtKg(t.wastage) }, { label: "ऑर्डर्स", value: String(t.orders) }],
+      summary: [{ label: "एकूण विक्री", value: fmtInr(t.sales) }, { label: "विक्री (kg)", value: fmtKg(t.sold) }, { label: "नवीन आवक", value: fmtKg(t.added) }, { label: "वाया गेले", value: fmtKg(t.wastage) }, { label: "ऑर्डर्स", value: String(t.orders) }, { label: "रोख", value: fmtInr(t.cash) }, { label: "UPI", value: fmtInr(t.upi) }],
     };
   }
 
@@ -85,13 +91,17 @@ export async function runReport(id: string, r: Range, branchId: number | null): 
       `SELECT branch_id, COUNT(*) AS n, SUM(status='completed') AS done FROM orders
        WHERE DATE(CONVERT_TZ(created_at, @@session.time_zone, '+05:30')) BETWEEN ? AND ? GROUP BY branch_id`, [r.from, r.to]);
     const om = new Map(ords.map((o) => [o.branch_id as number, o]));
-    const out = rows.map((x) => ({ branch: shortBranch(String(x.name)), added: num(x.added), wastage: num(x.wastage), sold: num(x.sold), sales: num(x.sales), orders: num(om.get(x.id)?.n), done: num(om.get(x.id)?.done) }));
-    const t = out.reduce((a, x) => ({ added: a.added + x.added, wastage: a.wastage + x.wastage, sold: a.sold + x.sold, sales: a.sales + x.sales, orders: a.orders + x.orders, done: a.done + x.done }), { added: 0, wastage: 0, sold: 0, sales: 0, orders: 0, done: 0 });
+    const pays = await q(
+      `SELECT branch_id, SUM(CASE WHEN payment_mode='cash' THEN total ELSE 0 END) AS cash, SUM(CASE WHEN payment_mode='upi' THEN total ELSE 0 END) AS upi,
+         SUM(CASE WHEN payment_mode='other' THEN total ELSE 0 END) AS other FROM bills WHERE is_void=0 AND bill_day BETWEEN ? AND ? GROUP BY branch_id`, [r.from, r.to]);
+    const pm = new Map(pays.map((x) => [x.branch_id as number, x]));
+    const out = rows.map((x) => ({ branch: shortBranch(String(x.name)), added: num(x.added), wastage: num(x.wastage), sold: num(x.sold), sales: num(x.sales), cash: num(pm.get(x.id)?.cash), upi: num(pm.get(x.id)?.upi), other: num(pm.get(x.id)?.other), orders: num(om.get(x.id)?.n), done: num(om.get(x.id)?.done) }));
+    const t = out.reduce((a, x) => ({ added: a.added + x.added, wastage: a.wastage + x.wastage, sold: a.sold + x.sold, sales: a.sales + x.sales, cash: a.cash + x.cash, upi: a.upi + x.upi, other: a.other + x.other, orders: a.orders + x.orders, done: a.done + x.done }), { added: 0, wastage: 0, sold: 0, sales: 0, cash: 0, upi: 0, other: 0, orders: 0, done: 0 });
     return {
       id, title: "शाखानुसार तुलना",
-      columns: [{ key: "branch", label: "शाखा", kind: "text" }, { key: "added", label: "नवीन आवक (kg)", kind: "kg" }, { key: "wastage", label: "वाया गेले (kg)", kind: "kg" }, { key: "sold", label: "विक्री (kg)", kind: "kg" }, { key: "sales", label: "विक्री रक्कम", kind: "inr" }, { key: "orders", label: "ऑर्डर्स", kind: "int" }, { key: "done", label: "पूर्ण ऑर्डर्स", kind: "int" }],
+      columns: [{ key: "branch", label: "शाखा", kind: "text" }, { key: "added", label: "नवीन आवक (kg)", kind: "kg" }, { key: "wastage", label: "वाया गेले (kg)", kind: "kg" }, { key: "sold", label: "विक्री (kg)", kind: "kg" }, { key: "sales", label: "विक्री रक्कम", kind: "inr" }, { key: "cash", label: "रोख", kind: "inr" }, { key: "upi", label: "UPI", kind: "inr" }, { key: "other", label: "इतर", kind: "inr" }, { key: "orders", label: "ऑर्डर्स", kind: "int" }, { key: "done", label: "पूर्ण ऑर्डर्स", kind: "int" }],
       rows: out, totals: { branch: "एकूण", ...t },
-      summary: [{ label: "एकूण विक्री", value: fmtInr(t.sales) }, { label: "शाखा", value: String(out.length) }, { label: "सर्वोत्तम शाखा", value: out[0] && out[0].sales > 0 ? out[0].branch : "—" }],
+      summary: [{ label: "एकूण विक्री", value: fmtInr(t.sales) }, { label: "शाखा", value: String(out.length) }, { label: "रोख", value: fmtInr(t.cash) }, { label: "UPI", value: fmtInr(t.upi) }, { label: "सर्वोत्तम शाखा", value: out[0] && out[0].sales > 0 ? out[0].branch : "—" }],
     };
   }
 

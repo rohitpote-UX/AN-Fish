@@ -4,12 +4,13 @@ import { useState, useTransition } from "react";
 import { Printer, Ban } from "lucide-react";
 import type { BillData } from "@/lib/pos";
 import { ReceiptDialog } from "../pos/ReceiptDialog";
+import type { BranchSettings } from "@/lib/branchSettings";
 import { voidBillAction } from "../pos/actions";
 
 const MODE: Record<string, string> = { cash: "रोख", upi: "UPI", other: "इतर" };
 const inr = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
-export function BillsList({ bills, canVoid, showBranch }: { bills: BillData[]; canVoid: boolean; showBranch: boolean }) {
+export function BillsList({ bills, settings, canVoid, showBranch }: { bills: BillData[]; settings: Record<number, BranchSettings>; canVoid: boolean; showBranch: boolean }) {
   const [open, setOpen] = useState<BillData | null>(null);
   const [pending, start] = useTransition();
   const [err, setErr] = useState("");
@@ -51,7 +52,7 @@ export function BillsList({ bills, canVoid, showBranch }: { bills: BillData[]; c
           </li>
         ))}
       </ul>
-      {open && <ReceiptDialog bill={open} onClose={() => setOpen(null)} />}
+      {open && <ReceiptDialog bill={open} settings={settings[open.branchId] ?? settings[0]} onClose={() => setOpen(null)} />}
     </>
   );
 }

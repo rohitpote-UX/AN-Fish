@@ -4,7 +4,7 @@ const MODE: Record<string, string> = { cash: "रोख", upi: "UPI", other: "�
 const inr = (n: number) => n.toLocaleString("en-IN");
 
 /** Thermal-printer receipt (58 mm or 80 mm). Pure black on white, no colours, no images. */
-export function Receipt({ bill, widthMm }: { bill: BillData; widthMm: 58 | 80 }) {
+export function Receipt({ bill, widthMm, headerExtra, footer }: { bill: BillData; widthMm: 58 | 80; headerExtra?: string; footer?: string }) {
   const small = widthMm === 58;
   const rule = <div style={{ borderTop: "1px dashed #000", margin: "5px 0" }} />;
   return (
@@ -16,6 +16,7 @@ export function Receipt({ bill, widthMm }: { bill: BillData; widthMm: 58 | 80 })
         <div style={{ fontWeight: 700 }}>{bill.branchName}</div>
         {bill.branchAddress && <div style={{ fontSize: small ? 9.5 : 11 }}>{bill.branchAddress}</div>}
         {bill.branchPhone && <div style={{ fontSize: small ? 10 : 12 }}>फोन: +{bill.branchPhone}</div>}
+        {headerExtra && <div style={{ fontSize: small ? 9.5 : 11, fontWeight: 700 }}>{headerExtra}</div>}
       </div>
       {rule}
       <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
@@ -48,7 +49,7 @@ export function Receipt({ bill, widthMm }: { bill: BillData; widthMm: 58 | 80 })
       <div style={{ marginTop: 2 }}>पेमेंट: {MODE[bill.mode]}</div>
       {(bill.customerName || bill.customerPhone) && <div>ग्राहक: {bill.customerName ?? ""} {bill.customerPhone ?? ""}</div>}
       {rule}
-      <div style={{ textAlign: "center", fontWeight: 700 }}>धन्यवाद! पुन्हा भेट द्या.</div>
+      <div style={{ textAlign: "center", fontWeight: 700 }}>{footer ?? "धन्यवाद! पुन्हा भेट द्या."}</div>
       <div style={{ textAlign: "center", fontSize: small ? 9 : 10.5 }}>ताजी मासोळी · कराडची लाडकी</div>
     </div>
   );

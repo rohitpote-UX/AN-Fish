@@ -6,18 +6,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ChevronRight, ClipboardList, KeyRound, LayoutDashboard, LogOut, Menu, PanelLeftClose, PanelLeftOpen,
-  PackageCheck, BarChart3, Receipt, ShoppingCart, Store, Trash2, History, X, type LucideIcon,
+  PackageCheck, BarChart3, Receipt, Settings, ShoppingCart, Store, Trash2, History, X, type LucideIcon,
 } from "lucide-react";
 
 const ICONS: Record<string, LucideIcon> = {
-  dashboard: LayoutDashboard, branches: Store, stock: PackageCheck, orders: ClipboardList, accounts: KeyRound, wastage: Trash2, ledger: History, reports: BarChart3, pos: ShoppingCart, bills: Receipt, summary: PackageCheck,
+  dashboard: LayoutDashboard, branches: Store, stock: PackageCheck, orders: ClipboardList, accounts: KeyRound, wastage: Trash2, ledger: History, reports: BarChart3, pos: ShoppingCart, bills: Receipt, summary: PackageCheck, settings: Settings,
 };
 
 export type NavItem = { href: string; label: string; icon: keyof typeof ICONS; badge?: number; match: string };
 export type NavGroup = { title: string; items: NavItem[] };
 
 const CRUMBS: Record<string, string> = {
-  "stock-summary": "शिल्लक स्टॉक",
+  dashboard: "डॅशबोर्ड", "stock-summary": "शिल्लक स्टॉक", settings: "बिलिंग सेटिंग्ज",
   orders: "ऑर्डर्स", pos: "बिलिंग", bills: "बिले", reports: "रिपोर्ट्स", wastage: "वाया गेलेला माल", ledger: "स्टॉक नोंदवही", branches: "शाखा", new: "नवीन शाखा", accounts: "खाती", login: "लॉगिन",
 };
 

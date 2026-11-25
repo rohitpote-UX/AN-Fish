@@ -46,8 +46,9 @@ export function HBars({ items, format, color = "#0EA5A0" }: { items: { label: st
   );
 }
 
-export function Donut({ items }: { items: { label: string; value: number; color: string }[] }) {
+export function Donut({ items, format = String }: { items: { label: string; value: number; color: string }[]; format?: (n: number) => string }) {
   const total = items.reduce((a, i) => a + i.value, 0);
+  const centre = format(total);
   const R = 48, C = 2 * Math.PI * R;
   let off = 0;
   return (
@@ -56,15 +57,15 @@ export function Donut({ items }: { items: { label: string; value: number; color:
         <circle cx="60" cy="60" r={R} fill="none" stroke="#172B3A" strokeOpacity=".08" strokeWidth="14" />
         {total > 0 && items.filter((i) => i.value > 0).map((i) => {
           const len = (i.value / total) * C;
-          const el = <circle key={i.label} cx="60" cy="60" r={R} fill="none" stroke={i.color} strokeWidth="14" strokeDasharray={`${len} ${C - len}`} strokeDashoffset={-off}><title>{`${i.label}: ${i.value}`}</title></circle>;
+          const el = <circle key={i.label} cx="60" cy="60" r={R} fill="none" stroke={i.color} strokeWidth="14" strokeDasharray={`${len} ${C - len}`} strokeDashoffset={-off}><title>{`${i.label}: ${format(i.value)}`}</title></circle>;
           off += len;
           return el;
         })}
-        <text x="60" y="64" textAnchor="middle" className="rotate-90" style={{ transformOrigin: "60px 60px" }} fontSize="20" fontWeight="800" fill="#172B3A">{total}</text>
+        <text x="60" y="64" textAnchor="middle" className="rotate-90" style={{ transformOrigin: "60px 60px" }} fontSize={centre.length > 6 ? 13 : centre.length > 4 ? 16 : 20} fontWeight="800" fill="#172B3A">{centre}</text>
       </svg>
       <ul className="space-y-1.5 text-sm">
         {items.map((i) => (
-          <li key={i.label} className="flex items-center gap-2"><span className="size-3 rounded-full" style={{ background: i.color }} /><span className="font-semibold">{i.label}</span><b className="ml-auto pl-4 tabular-nums">{i.value}</b></li>
+          <li key={i.label} className="flex items-center gap-2"><span className="size-3 rounded-full" style={{ background: i.color }} /><span className="font-semibold">{i.label}</span><b className="ml-auto pl-4 tabular-nums">{format(i.value)}</b></li>
         ))}
       </ul>
     </div>
