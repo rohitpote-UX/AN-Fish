@@ -7,6 +7,7 @@ import { adminHref, requireSuper, todayIST } from "@/lib/adminAuth";
 import { monthIST, monthsSince } from "@/lib/billing";
 import { BillingPanel, type Payment } from "./BillingPanel";
 import { CounterPanel } from "./CounterPanel";
+import { EditBranchPanel } from "./EditBranchPanel";
 import { loadStock } from "@/lib/stock";
 import { StockEditor } from "../../StockEditor";
 import { BranchControls } from "./ResetPassword";
@@ -54,6 +55,7 @@ export default async function BranchDetail({ params }: { params: Promise<{ id: s
           </span>
         </div>
         <p className="mt-4 text-sm">लॉगिन आयडी: <b>{b.login_id}</b></p>
+        <EditBranchPanel branchId={id} b={{ name: String(b.name), address: b.address ?? "", whatsapp: String(b.whatsapp ?? ""), openTime: b.open_time ?? "", lat: b.lat === null ? "" : String(b.lat), lng: b.lng === null ? "" : String(b.lng) }} />
         <div className="mt-4 border-t border-[#071C2C]/8 pt-4"><BranchControls branchId={id} active={!!b.is_active} canToggle={session.role === "abnexa"} /></div>
       </div>
       {billing}

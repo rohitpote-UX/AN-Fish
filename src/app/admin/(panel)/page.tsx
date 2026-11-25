@@ -7,6 +7,7 @@ import { loadStock } from "@/lib/stock";
 import { monthIST, monthsSince } from "@/lib/billing";
 import { StockEditor } from "./StockEditor";
 import { HeadDashboard, BranchStrip } from "./Dashboard";
+import { LowStockAlert } from "./LowStockAlert";
 
 export default async function AdminHome({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const s = await requireSession();
@@ -21,6 +22,7 @@ export default async function AdminHome({ searchParams }: { searchParams: Promis
           <h1 className="text-2xl font-extrabold">{b[0]?.name}</h1>
           <p className="text-sm text-[#071C2C]/60">{b[0]?.address}</p>
         </div>
+        <LowStockAlert branchId={s.branchId} />
         <BranchStrip branchId={s.branchId} />
         <StockEditor branchId={s.branchId} rows={rows} day={day} usesBills={usesBills} />
       </div>

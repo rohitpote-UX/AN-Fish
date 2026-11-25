@@ -3,6 +3,8 @@ import type { RowDataPacket } from "mysql2";
 import { db } from "@/lib/db";
 import { fmtInr, fmtKg, type Range } from "@/lib/dateRange";
 import { REASONS } from "@/app/admin/(panel)/wastage/reasons";
+import { EXPENSE_CATEGORIES, PAY_MODES } from "@/app/admin/(panel)/expenses/categories";
+import { loadCustomers } from "@/lib/customers";
 import { EXPECTED_LEFT, SALES, SALES_JOINS, SOLD } from "@/lib/salesSql";
 
 export type Kind = "text" | "int" | "kg" | "inr" | "date";
@@ -25,6 +27,11 @@ export const REPORT_LIST: { id: string; title: string; desc: string; headOnly?: 
   { id: "branchwise", title: "शाखानुसार तुलना", desc: "सर्व शाखांची विक्री, वाया गेलेला माल आणि ऑर्डर्स", headOnly: true },
   { id: "bills", title: "काउंटर बिले", desc: "काउंटरवर बनवलेली बिले: रोख / UPI, सूट, रद्द बिले" },
   { id: "orders", title: "ऑर्डर्स", desc: "ग्राहकांच्या ऑर्डर्सची यादी आणि स्थिती" },
+  { id: "purchases", title: "खरेदी", desc: "पुरवठादारानुसार खरेदी, दिलेले आणि बाकी" },
+  { id: "cashclosing", title: "रोख क्लोजिंग", desc: "दिवसअखेर रोख: असायला हवी, मोजलेली, तफावत" },
+  { id: "staffpay", title: "पगार / उचल", desc: "कर्मचारीनुसार दिलेला पगार, उचल आणि तारखा" },
+  { id: "expenses", title: "खर्च", desc: "प्रकारानुसार आणि शाखेनुसार खर्च" },
+  { id: "customers", title: "ग्राहक", desc: "ग्राहकांची यादी आणि एकूण खरेदी (कालावधी लागू नाही)" },
   { id: "wastage", title: "वाया गेलेला माल", desc: "कारणानुसार वाया गेलेल्या मालाची यादी" },
 ];
 
@@ -171,6 +178,83 @@ export async function runReport(id: string, r: Range, branchId: number | null): 
       columns: [{ key: "id", label: "ऑर्डर #", kind: "int" }, { key: "date", label: "वेळ", kind: "text" }, { key: "branch", label: "शाखा", kind: "text" }, { key: "customer", label: "ग्राहक", kind: "text" }, { key: "phone", label: "मोबाईल", kind: "text" }, { key: "items", label: "माल", kind: "text" }, { key: "total", label: "अंदाजे रक्कम", kind: "inr" }, { key: "status", label: "स्थिती", kind: "text" }],
       rows: out, totals: { id: "एकूण", total: out.reduce((a, x) => a + x.total, 0) },
       summary: [{ label: "एकूण ऑर्डर्स", value: String(out.length) }, { label: "पूर्ण", value: String(done.length) }, { label: "रद्द", value: String(rows.filter((x) => x.status === "cancelled").length) }, { label: "पूर्ण ऑर्डर्सची रक्कम", value: fmtInr(done.reduce((a, x) => a + num(x.total), 0)) }],
+    };
+  }
+
+  if (id === "purchases") {
+    const rows = await q(
+      `SELECT p.id, p.day, b.name AS branch, sp.name AS supplier, p.source, p.items_total, p.transport, p.other_charges, p.total, p.paid, p.payment_mode, p.status,
+         (SELECT GROUP_CONCAT(CONCAT(f.name_mr, ' ', pi.qty_kg, 'kg') SEPARATOR ', ') FROM purchase_items pi JOIN fish_items f ON f.id=pi.fish_id WHERE pi.purchase_id=p.id) AS items
+       FROM purchases p JOIN branches b ON b.id=p.branch_id LEFT JOIN suppliers sp ON sp.id=p.supplier_id
+       WHERE p.day BETWEEN ? AND ?${branchId ? " AND p.branch_id=?" : ""} ORDER BY p.id DESC LIMIT ${MAX_ROWS}`, args());
+    const PM: Record<string, string> = { cash: "रोख", upi: "UPI", bank: "बँक", credit: "उधार" };
+    const out = rows.map((x) => ({ id: num(x.id), day: dayStr(x.day), branch: shortBranch(String(x.branch)), supplier: x.supplier ?? "—", source: x.source ?? "", items: String(x.items ?? ""), charges: num(x.transport) + num(x.other_charges), total: num(x.total), paid: num(x.paid), due: x.status === "received" ? num(x.total) - num(x.paid) : 0, mode: PM[x.payment_mode] ?? x.payment_mode, status: x.status === "received" ? "पूर्ण" : "रद्द", _live: x.status === "received" }));
+    const live = out.filter((x) => x._live);
+    const sum = (f: (x: (typeof out)[number]) => number) => live.reduce((a, x) => a + f(x), 0);
+    return {
+      id, title: "खरेदी",
+      columns: [{ key: "id", label: "खरेदी #", kind: "int" }, { key: "day", label: "तारीख", kind: "date" }, { key: "branch", label: "शाखा", kind: "text" }, { key: "supplier", label: "पुरवठादार", kind: "text" }, { key: "source", label: "स्रोत", kind: "text" }, { key: "items", label: "माल", kind: "text" }, { key: "charges", label: "वाहतूक + इतर", kind: "inr" }, { key: "total", label: "एकूण", kind: "inr" }, { key: "paid", label: "दिले", kind: "inr" }, { key: "due", label: "बाकी", kind: "inr" }, { key: "mode", label: "पेमेंट", kind: "text" }, { key: "status", label: "स्थिती", kind: "text" }],
+      rows: out.map(({ _live, ...r }) => { void _live; return r; }), totals: { id: "एकूण (रद्द वगळून)", charges: sum((x) => x.charges), total: sum((x) => x.total), paid: sum((x) => x.paid), due: sum((x) => x.due) },
+      summary: [{ label: "खरेदी", value: String(live.length) }, { label: "एकूण रक्कम", value: fmtInr(sum((x) => x.total)) }, { label: "दिलेले", value: fmtInr(sum((x) => x.paid)) }, { label: "बाकी", value: fmtInr(sum((x) => x.due)) }],
+    };
+  }
+
+  if (id === "cashclosing") {
+    const rows = await q(
+      `SELECT c.day, b.name AS branch, c.opening_cash, c.cash_sales, c.upi_sales, c.other_sales, c.cash_expenses, c.cash_purchases, c.expected_cash, c.counted_cash, c.difference, u.name AS by_name
+       FROM cash_closings c JOIN branches b ON b.id=c.branch_id LEFT JOIN users u ON u.id=c.closed_by
+       WHERE c.day BETWEEN ? AND ?${branchId ? " AND c.branch_id=?" : ""} ORDER BY c.day DESC, b.id LIMIT ${MAX_ROWS}`, args());
+    const out = rows.map((x) => ({ day: dayStr(x.day), branch: shortBranch(String(x.branch)), opening: num(x.opening_cash), cash: num(x.cash_sales), upi: num(x.upi_sales) + num(x.other_sales), expenses: num(x.cash_expenses), purchases: num(x.cash_purchases), expected: num(x.expected_cash), counted: num(x.counted_cash), diff: num(x.difference), by: x.by_name ?? "" }));
+    return {
+      id, title: "रोख क्लोजिंग",
+      columns: [{ key: "day", label: "तारीख", kind: "date" }, { key: "branch", label: "शाखा", kind: "text" }, { key: "opening", label: "सुरुवात", kind: "inr" }, { key: "cash", label: "रोख विक्री", kind: "inr" }, { key: "upi", label: "UPI / इतर", kind: "inr" }, { key: "expenses", label: "रोख खर्च", kind: "inr" }, { key: "purchases", label: "रोख खरेदी", kind: "inr" }, { key: "expected", label: "असायला हवी", kind: "inr" }, { key: "counted", label: "मोजलेली", kind: "inr" }, { key: "diff", label: "तफावत", kind: "inr" }, { key: "by", label: "कोणी", kind: "text" }],
+      rows: out, totals: { day: "एकूण", cash: out.reduce((a, x) => a + x.cash, 0), upi: out.reduce((a, x) => a + x.upi, 0), expenses: out.reduce((a, x) => a + x.expenses, 0), diff: out.reduce((a, x) => a + x.diff, 0) },
+      summary: [{ label: "दिवस बंद", value: String(out.length) }, { label: "एकूण तफावत", value: fmtInr(out.reduce((a, x) => a + x.diff, 0)) }, { label: "तफावतीचे दिवस", value: String(out.filter((x) => Math.abs(x.diff) >= 0.005).length) }],
+    };
+  }
+
+  if (id === "staffpay") {
+    const rows = await q(
+      `SELECT p.day, b.name AS branch, s.name AS staff, p.kind, p.amount, p.for_month, p.advance_recovered, p.payment_mode, p.note
+       FROM staff_payments p JOIN staff s ON s.id=p.staff_id JOIN branches b ON b.id=p.branch_id
+       WHERE p.is_deleted=0 AND p.day BETWEEN ? AND ?${branchId ? " AND p.branch_id=?" : ""} ORDER BY p.day DESC, p.id DESC LIMIT ${MAX_ROWS}`, args());
+    const K: Record<string, string> = { salary: "पगार", advance: "उचल", bonus: "बोनस" }, M: Record<string, string> = { cash: "रोख", upi: "UPI", bank: "बँक" };
+    const out = rows.map((x) => ({ day: dayStr(x.day), branch: shortBranch(String(x.branch)), staff: String(x.staff), kind: K[x.kind], amount: num(x.amount), month: x.for_month ?? "", recovered: num(x.advance_recovered), mode: M[x.payment_mode], note: x.note ?? "", _k: String(x.kind) }));
+    const sum = (k: string) => out.filter((x) => x._k === k).reduce((a, x) => a + x.amount, 0);
+    return {
+      id, title: "पगार / उचल",
+      columns: [{ key: "day", label: "तारीख", kind: "date" }, { key: "branch", label: "शाखा", kind: "text" }, { key: "staff", label: "कर्मचारी", kind: "text" }, { key: "kind", label: "प्रकार", kind: "text" }, { key: "amount", label: "दिलेली रक्कम", kind: "inr" }, { key: "recovered", label: "उचल कपात", kind: "inr" }, { key: "month", label: "महिना", kind: "text" }, { key: "mode", label: "पद्धत", kind: "text" }, { key: "note", label: "टीप", kind: "text" }],
+      rows: out.map(({ _k, ...r }) => { void _k; return r; }), totals: { day: "एकूण", amount: out.reduce((a, x) => a + x.amount, 0), recovered: out.reduce((a, x) => a + x.recovered, 0) },
+      summary: [{ label: "पगार", value: fmtInr(sum("salary")) }, { label: "उचल", value: fmtInr(sum("advance")) }, { label: "बोनस", value: fmtInr(sum("bonus")) }, { label: "नोंदी", value: String(out.length) }],
+    };
+  }
+
+  if (id === "expenses") {
+    const rows = await q(
+      `SELECT e.day, b.name AS branch, e.category, e.amount, e.payment_mode, e.note, u.name AS by_name
+       FROM expenses e LEFT JOIN branches b ON b.id=e.branch_id LEFT JOIN users u ON u.id=e.created_by
+       WHERE e.is_deleted=0 AND e.day BETWEEN ? AND ?${branchId ? " AND e.branch_id=?" : ""} ORDER BY e.day DESC, e.id DESC LIMIT ${MAX_ROWS}`, args());
+    const out = rows.map((x) => ({ day: dayStr(x.day), branch: x.branch ? shortBranch(String(x.branch)) : "कंपनी (सामायिक)", category: EXPENSE_CATEGORIES[x.category as keyof typeof EXPENSE_CATEGORIES], amount: num(x.amount), mode: PAY_MODES[x.payment_mode as keyof typeof PAY_MODES], note: x.note ?? "", by: x.by_name ?? "" }));
+    const total = out.reduce((a, x) => a + x.amount, 0);
+    const byCat = new Map<string, number>();
+    for (const x of out) byCat.set(x.category, (byCat.get(x.category) ?? 0) + x.amount);
+    const top = [...byCat.entries()].sort((a, b) => b[1] - a[1])[0];
+    return {
+      id, title: "खर्च",
+      columns: [{ key: "day", label: "तारीख", kind: "date" }, { key: "branch", label: "शाखा", kind: "text" }, { key: "category", label: "प्रकार", kind: "text" }, { key: "amount", label: "रक्कम", kind: "inr" }, { key: "mode", label: "पेमेंट", kind: "text" }, { key: "note", label: "टीप", kind: "text" }, { key: "by", label: "नोंद करणारा", kind: "text" }],
+      rows: out, totals: { day: "एकूण", amount: total },
+      summary: [{ label: "एकूण खर्च", value: fmtInr(total) }, { label: "नोंदी", value: String(out.length) }, { label: "सर्वाधिक खर्च", value: top ? `${top[0]} (${fmtInr(top[1])})` : "—" }],
+    };
+  }
+
+  if (id === "customers") {
+    const { rows, total } = await loadCustomers(branchId, "", MAX_ROWS, 0);
+    const out = rows.map((c) => ({ name: c.name || "—", phone: c.phone, orders: c.orders, bills: c.bills, spend: c.spend, last: c.lastAt.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" }) }));
+    return {
+      id, title: "ग्राहक",
+      columns: [{ key: "name", label: "ग्राहक", kind: "text" }, { key: "phone", label: "मोबाईल", kind: "text" }, { key: "orders", label: "ऑर्डर्स", kind: "int" }, { key: "bills", label: "काउंटर बिले", kind: "int" }, { key: "spend", label: "एकूण खरेदी", kind: "inr" }, { key: "last", label: "शेवटची खरेदी", kind: "text" }],
+      rows: out, totals: { name: "एकूण", orders: out.reduce((a, x) => a + x.orders, 0), bills: out.reduce((a, x) => a + x.bills, 0), spend: out.reduce((a, x) => a + x.spend, 0) },
+      summary: [{ label: "ग्राहक", value: String(total) }, { label: "एकूण खरेदी", value: fmtInr(out.reduce((a, x) => a + x.spend, 0)) }],
     };
   }
 

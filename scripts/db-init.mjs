@@ -212,6 +212,157 @@ CREATE TABLE IF NOT EXISTS branch_settings (
 ) ENGINE=InnoDB;
 `);
 
+await conn.query(`
+CREATE TABLE IF NOT EXISTS categories (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  slug VARCHAR(40) NOT NULL UNIQUE,
+  name_mr VARCHAR(80) NOT NULL,
+  name_en VARCHAR(80) NOT NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  is_active TINYINT(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB;
+INSERT IGNORE INTO categories (slug, name_mr, name_en, sort_order) VALUES
+  ('sea', 'सागरी मासे', 'Sea fish', 1), ('river', 'नदीतील मासे', 'River fish', 2), ('shellfish', 'कोळंबी / खेकडा', 'Prawns & crabs', 3);
+ALTER TABLE fish_items ADD COLUMN IF NOT EXISTS image_url VARCHAR(300) NULL;
+-- branch_id NULL = company-wide expense
+CREATE TABLE IF NOT EXISTS expenses (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  branch_id INT NULL,
+  day DATE NOT NULL,
+  category ENUM('transport','ice_packaging','staff','electricity','rent','maintenance','other') NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  payment_mode ENUM('cash','upi','bank','other') NOT NULL DEFAULT 'cash',
+  note VARCHAR(200) NULL,
+  is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+  created_by INT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_exp (branch_id, day),
+  FOREIGN KEY (branch_id) REFERENCES branches(id)
+) ENGINE=InnoDB;
+`);
+
+await conn.query(`
+ALTER TABLE branch_settings ADD COLUMN IF NOT EXISTS low_stock_kg DECIMAL(6,2) NOT NULL DEFAULT 3;
+
+CREATE TABLE IF NOT EXISTS suppliers (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(160) NOT NULL,
+  phone VARCHAR(20) NULL,
+  address VARCHAR(300) NULL,
+  supplier_type VARCHAR(60) NULL,            -- e.g. harbour, farm, wholesaler
+  payment_terms VARCHAR(120) NULL,
+  opening_balance DECIMAL(12,2) NOT NULL DEFAULT 0,   -- amount already owed to the supplier when entered
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS purchases (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  branch_id INT NOT NULL,
+  supplier_id INT NULL,
+  day DATE NOT NULL,
+  source VARCHAR(120) NULL,                  -- harbour / market the fish came from
+  items_total DECIMAL(12,2) NOT NULL,
+  transport DECIMAL(10,2) NOT NULL DEFAULT 0,
+  other_charges DECIMAL(10,2) NOT NULL DEFAULT 0,
+  total DECIMAL(12,2) NOT NULL,
+  payment_mode ENUM('cash','upi','bank','credit') NOT NULL DEFAULT 'cash',
+  paid DECIMAL(12,2) NOT NULL DEFAULT 0,
+  note VARCHAR(200) NULL,
+  status ENUM('received','cancelled') NOT NULL DEFAULT 'received',
+  created_by INT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_pur (branch_id, day),
+  FOREIGN KEY (branch_id) REFERENCES branches(id),
+  FOREIGN KEY (supplier_id) REFERENCES suppliers(id)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS purchase_items (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  purchase_id INT NOT NULL,
+  fish_id INT NOT NULL,
+  qty_kg DECIMAL(8,2) NOT NULL,
+  rate_per_kg DECIMAL(8,2) NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  FOREIGN KEY (purchase_id) REFERENCES purchases(id) ON DELETE CASCADE,
+  FOREIGN KEY (fish_id) REFERENCES fish_items(id)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS supplier_payments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  supplier_id INT NOT NULL,
+  branch_id INT NULL,
+  day DATE NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  payment_mode ENUM('cash','upi','bank','other') NOT NULL DEFAULT 'cash',
+  note VARCHAR(200) NULL,
+  created_by INT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (supplier_id) REFERENCES suppliers(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS cash_closings (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  branch_id INT NOT NULL,
+  day DATE NOT NULL,
+  opening_cash DECIMAL(12,2) NOT NULL DEFAULT 0,
+  cash_sales DECIMAL(12,2) NOT NULL DEFAULT 0,        -- snapshot of cash bills at closing time
+  upi_sales DECIMAL(12,2) NOT NULL DEFAULT 0,
+  other_sales DECIMAL(12,2) NOT NULL DEFAULT 0,
+  cash_expenses DECIMAL(12,2) NOT NULL DEFAULT 0,
+  cash_purchases DECIMAL(12,2) NOT NULL DEFAULT 0,
+  expected_cash DECIMAL(12,2) NOT NULL,
+  counted_cash DECIMAL(12,2) NOT NULL,
+  difference DECIMAL(12,2) NOT NULL,                  -- counted − expected (negative = short)
+  note VARCHAR(200) NULL,
+  closed_by INT NULL,
+  closed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_close (branch_id, day),
+  FOREIGN KEY (branch_id) REFERENCES branches(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS staff (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  branch_id INT NOT NULL,
+  name VARCHAR(120) NOT NULL,
+  phone VARCHAR(20) NULL,
+  job_title VARCHAR(60) NULL,
+  monthly_salary DECIMAL(10,2) NOT NULL DEFAULT 0,
+  joined_on DATE NULL,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (branch_id) REFERENCES branches(id)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS staff_attendance (
+  staff_id INT NOT NULL,
+  day DATE NOT NULL,
+  status ENUM('present','half','absent','leave') NOT NULL,
+  marked_by INT NULL,
+  PRIMARY KEY (staff_id, day),
+  FOREIGN KEY (staff_id) REFERENCES staff(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+`);
+
+await conn.query(`
+-- Salary / advance (उचल) / bonus paid to staff. Each payment also creates a "staff" expense (expense_id) so cash closing and expense reports stay right.
+CREATE TABLE IF NOT EXISTS staff_payments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  staff_id INT NOT NULL,
+  branch_id INT NOT NULL,
+  day DATE NOT NULL,                                    -- date the money was given
+  kind ENUM('salary','advance','bonus') NOT NULL,
+  amount DECIMAL(10,2) NOT NULL DEFAULT 0,              -- cash / money actually handed over
+  for_month CHAR(7) NULL,                               -- YYYY-MM, for salary
+  advance_recovered DECIMAL(10,2) NOT NULL DEFAULT 0,   -- part of an earlier advance deducted from this salary
+  payment_mode ENUM('cash','upi','bank') NOT NULL DEFAULT 'cash',
+  note VARCHAR(200) NULL,
+  expense_id INT NULL,
+  is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+  created_by INT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_sp (staff_id, day),
+  FOREIGN KEY (staff_id) REFERENCES staff(id),
+  FOREIGN KEY (branch_id) REFERENCES branches(id)
+) ENGINE=InnoDB;
+`);
+
 // Fish list: read from the website's own catalogue so names stay identical.
 const species = readFileSync("src/data/species.ts", "utf8");
 const fishRe = /slug:\s*"([^"]+)",\s*nameMr:\s*"([^"]+)",\s*nameEn:\s*"([^"]+)",\s*category:\s*"([^"]+)"/g;

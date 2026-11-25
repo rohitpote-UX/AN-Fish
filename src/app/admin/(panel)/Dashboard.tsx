@@ -163,13 +163,14 @@ export async function HeadDashboard({ sp, fixedBranchId, basePath = "/" }: { sp:
           <Card title="आजची स्थिती (शाखानुसार)" sub="स्टॉक भरला का, किती प्रकार उपलब्ध, ऑर्डर्स" className="lg:col-span-3">
             <div className="-mx-2 overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead><tr className="text-xs font-bold text-[#7A8794]"><th className="px-2 py-2">शाखा</th><th>स्टॉक</th><th>उपलब्ध</th><th>आजचे ऑर्डर्स</th></tr></thead>
+                <thead><tr className="text-xs font-bold text-[#7A8794]"><th className="px-2 py-2">शाखा</th><th>स्टॉक</th><th>उपलब्ध</th><th>कमी / संपले</th><th>आजचे ऑर्डर्स</th></tr></thead>
                 <tbody>
                   {d.branchesToday.map((b) => (
                     <tr key={b.id} className="border-t border-[#172B3A]/8">
                       <td className="px-2 py-2.5 font-bold"><Link href={`${branchesHref}/${b.id}`} className="hover:text-[#0EA5A0]">{b.name}</Link></td>
                       <td>{b.entered > 0 ? <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700">भरला</span> : <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-bold text-red-700">बाकी</span>}</td>
                       <td className="tabular-nums">{b.available} प्रकार</td>
+                      <td>{b.lowCount > 0 ? <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800">{b.lowCount} मासे</span> : <span className="text-[#7A8794]">—</span>}</td>
                       <td className="tabular-nums">{b.ordersToday}{b.newOrders > 0 && <span className="ml-2 rounded-full bg-amber-400 px-2 py-0.5 text-xs font-extrabold">{b.newOrders} नवीन</span>}</td>
                     </tr>
                   ))}

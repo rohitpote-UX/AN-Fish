@@ -44,6 +44,12 @@ export function SettingsForm({ branchId, initial, sample }: { branchId: number; 
             </label>
           </section>
 
+          <section>
+            <h2 className="text-lg font-extrabold">कमी स्टॉक सूचना</h2>
+            <p className="mb-3 text-sm text-[#7A8794]">एखाद्या माशाची शिल्लक या वजनापेक्षा कमी झाली की मॅनेजरच्या स्क्रीनवर सूचना दिसते.</p>
+            <label className="flex items-center gap-3"><input name="lowStock" type="number" step="0.5" min="0" defaultValue={initial.lowStockKg} className={inp + " max-w-[160px]"} /><span className="font-bold">kg</span></label>
+          </section>
+
           <section className="space-y-4">
             <h2 className="text-lg font-extrabold">बिलावरचा मजकूर</h2>
             <label className="block">

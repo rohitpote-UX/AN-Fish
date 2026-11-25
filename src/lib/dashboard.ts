@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { todayIST } from "@/lib/adminAuth";
 import { eachDay, prevRange, type Range } from "@/lib/dateRange";
 import { SALES, SALES_JOINS, SOLD } from "@/lib/salesSql";
+import { getLowStock } from "@/lib/lowStock";
 
 const BASE = `FROM stock_days sd JOIN fish_items f ON f.id=sd.fish_id JOIN branches b ON b.id=sd.branch_id
   LEFT JOIN (SELECT branch_id, fish_id, day, SUM(qty_kg) AS q FROM wastage WHERE is_deleted=0 GROUP BY branch_id, fish_id, day) w
@@ -56,7 +57,7 @@ export async function getDashboard(range: Range, branchId: number | null) {
   const [avail] = await db().query<RowDataPacket[]>(
     `SELECT COALESCE(SUM(CASE WHEN sd.sold_out=0 THEN GREATEST(COALESCE(sd.closing_kg, sd.opening_kg+sd.added_kg-COALESCE(w.q,0)-(SELECT COALESCE(SUM(bi.qty_kg),0) FROM bill_items bi JOIN bills bl ON bl.id=bi.bill_id WHERE bl.branch_id=sd.branch_id AND bi.fish_id=sd.fish_id AND bl.bill_day=sd.day AND bl.is_void=0)),0) ELSE 0 END),0) AS kg
      ${BASE} WHERE sd.day=?${bw}`, [today, ...ba]);
-  let branchesToday: { id: number; name: string; entered: number; available: number; ordersToday: number; newOrders: number }[] = [];
+  let branchesToday: { id: number; name: string; entered: number; available: number; ordersToday: number; newOrders: number; lowCount: number }[] = [];
   if (!branchId) {
     const [rows] = await db().query<RowDataPacket[]>(
       `SELECT b.id, b.name,
@@ -65,7 +66,8 @@ export async function getDashboard(range: Range, branchId: number | null) {
          (SELECT COUNT(*) FROM orders o WHERE o.branch_id=b.id AND ${OD}=?) AS orders_today,
          (SELECT COUNT(*) FROM orders o WHERE o.branch_id=b.id AND o.status='new') AS new_orders
        FROM branches b WHERE b.is_active=1 ORDER BY b.id`, [today, today, today]);
-    branchesToday = rows.map((x) => ({ id: x.id, name: short(String(x.name)), entered: n(x.entered), available: n(x.available), ordersToday: n(x.orders_today), newOrders: n(x.new_orders) }));
+    const lows = await Promise.all(rows.map((x) => getLowStock(x.id)));
+    branchesToday = rows.map((x, i) => ({ id: x.id, name: short(String(x.name)), entered: n(x.entered), available: n(x.available), ordersToday: n(x.orders_today), newOrders: n(x.new_orders), lowCount: lows[i].low.length + lows[i].out.length }));
   }
   return {
     range, cur, prev, trend, payments: payments as { cash: number; upi: number; other: number },

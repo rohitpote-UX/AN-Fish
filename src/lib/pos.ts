@@ -24,7 +24,7 @@ const shortBranch = (n: string) => n.replace(/^ए एन फिश वर्ल
 export async function loadPosFish(branchId: number): Promise<PosFish[]> {
   const day = todayIST();
   const [r] = await db().query<RowDataPacket[]>(
-    `SELECT f.id, f.slug, f.name_mr, f.name_en, f.category, s.price_per_kg, s.opening_kg, s.added_kg, s.closing_kg, s.sold_out,
+    `SELECT f.id, f.slug, f.name_mr, f.name_en, f.category, f.image_url, s.price_per_kg, s.opening_kg, s.added_kg, s.closing_kg, s.sold_out,
         (SELECT COALESCE(SUM(w.qty_kg),0) FROM wastage w WHERE w.branch_id=s.branch_id AND w.fish_id=s.fish_id AND w.day=s.day AND w.is_deleted=0) AS wastage,
         (SELECT COALESCE(SUM(bi.qty_kg),0) FROM bill_items bi JOIN bills bl ON bl.id=bi.bill_id
            WHERE bl.branch_id=s.branch_id AND bi.fish_id=s.fish_id AND bl.bill_day=s.day AND bl.is_void=0) AS billed
@@ -34,7 +34,7 @@ export async function loadPosFish(branchId: number): Promise<PosFish[]> {
   );
   return r.map((x) => ({
     id: x.id, slug: x.slug, nameMr: x.name_mr, nameEn: x.name_en, category: x.category,
-    image: SPECIES_LIST.find((sp) => sp.slug === x.slug)?.image ?? null,
+    image: x.image_url || SPECIES_LIST.find((sp) => sp.slug === x.slug)?.image || null,
     price: Number(x.price_per_kg),
     // After the day is closed (closing entered) nothing more can be sold.
     left: x.sold_out || x.closing_kg !== null ? 0 : Math.max(0, Number(x.opening_kg) + Number(x.added_kg) - Number(x.wastage) - Number(x.billed)),

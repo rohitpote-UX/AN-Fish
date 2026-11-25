@@ -6,18 +6,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ChevronRight, ClipboardList, KeyRound, LayoutDashboard, LogOut, Menu, PanelLeftClose, PanelLeftOpen,
-  PackageCheck, BarChart3, Receipt, Settings, ShoppingCart, Store, Trash2, History, X, type LucideIcon,
+  PackageCheck, BarChart3, Banknote, Boxes, Building2, Contact, Receipt, Settings, Truck, UserCog, Users, Wallet, ShoppingCart, Store, Trash2, History, X, type LucideIcon,
 } from "lucide-react";
 
 const ICONS: Record<string, LucideIcon> = {
-  dashboard: LayoutDashboard, branches: Store, stock: PackageCheck, orders: ClipboardList, accounts: KeyRound, wastage: Trash2, ledger: History, reports: BarChart3, pos: ShoppingCart, bills: Receipt, summary: PackageCheck, settings: Settings,
+  dashboard: LayoutDashboard, branches: Store, stock: PackageCheck, orders: ClipboardList, accounts: KeyRound, wastage: Trash2, ledger: History, reports: BarChart3, pos: ShoppingCart, bills: Receipt, summary: PackageCheck, settings: Settings, products: Boxes, users: Users, customers: Contact, expenses: Wallet, purchases: Truck, suppliers: Building2, cash: Banknote, staff: UserCog,
 };
 
 export type NavItem = { href: string; label: string; icon: keyof typeof ICONS; badge?: number; match: string };
 export type NavGroup = { title: string; items: NavItem[] };
 
 const CRUMBS: Record<string, string> = {
-  dashboard: "डॅशबोर्ड", "stock-summary": "शिल्लक स्टॉक", settings: "बिलिंग सेटिंग्ज",
+  dashboard: "डॅशबोर्ड", purchases: "खरेदी", suppliers: "पुरवठादार", "cash-closing": "रोख बंद करणे", staff: "कर्मचारी", products: "उत्पादने", users: "वापरकर्ते", customers: "ग्राहक", expenses: "खर्च", "stock-summary": "शिल्लक स्टॉक", settings: "बिलिंग सेटिंग्ज",
   orders: "ऑर्डर्स", pos: "बिलिंग", bills: "बिले", reports: "रिपोर्ट्स", wastage: "वाया गेलेला माल", ledger: "स्टॉक नोंदवही", branches: "शाखा", new: "नवीन शाखा", accounts: "खाती", login: "लॉगिन",
 };
 

@@ -14,7 +14,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
     isBranch ? [s.branchId ?? 0] : [],
   );
   const newOrders = Number(c[0]?.n ?? 0);
-  const [home, orders, accounts, wastage, ledger, reports, branchesHref, pos, bills, summary, settingsHref, dashboardHref] = await Promise.all([adminHref("/"), adminHref("/orders"), adminHref("/accounts"), adminHref("/wastage"), adminHref("/ledger"), adminHref("/reports"), adminHref("/branches"), adminHref("/pos"), adminHref("/bills"), adminHref("/stock-summary"), adminHref("/settings"), adminHref("/dashboard")]);
+  const [home, orders, accounts, wastage, ledger, reports, branchesHref, pos, bills, summary, settingsHref, dashboardHref, productsHref, usersHref, customersHref, expensesHref, purchasesHref, suppliersHref, cashHref, staffHref] = await Promise.all([adminHref("/"), adminHref("/orders"), adminHref("/accounts"), adminHref("/wastage"), adminHref("/ledger"), adminHref("/reports"), adminHref("/branches"), adminHref("/pos"), adminHref("/bills"), adminHref("/stock-summary"), adminHref("/settings"), adminHref("/dashboard"), adminHref("/products"), adminHref("/users"), adminHref("/customers"), adminHref("/expenses"), adminHref("/purchases"), adminHref("/suppliers"), adminHref("/cash-closing"), adminHref("/staff")]);
   const inv: NavGroup = { title: "स्टॉक", items: [
     { href: wastage, label: "वाया गेलेला माल", icon: "wastage", match: "/wastage" },
     { href: ledger, label: "स्टॉक नोंदवही", icon: "ledger", match: "/ledger" },
@@ -35,6 +35,12 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         { href: orders, label: "ऑर्डर्स", icon: "orders", badge: newOrders, match: "/orders" },
         { href: bills, label: "बिले", icon: "bills", match: "/bills" },
         { href: reports, label: "रिपोर्ट्स", icon: "reports", match: "/reports" },
+        { href: purchasesHref, label: "खरेदी", icon: "purchases", match: "/purchases" },
+        { href: suppliersHref, label: "पुरवठादार", icon: "suppliers", match: "/suppliers" },
+        { href: cashHref, label: "रोख बंद करणे", icon: "cash", match: "/cash-closing" },
+        { href: expensesHref, label: "खर्च", icon: "expenses", match: "/expenses" },
+        { href: staffHref, label: "कर्मचारी", icon: "staff", match: "/staff" },
+        { href: customersHref, label: "ग्राहक", icon: "customers", match: "/customers" },
         { href: settingsHref, label: "बिलिंग सेटिंग्ज", icon: "settings", match: "/settings" },
       ] }, inv]
     : [
@@ -46,6 +52,16 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           { href: bills, label: "बिले", icon: "bills", match: "/bills" },
           { href: reports, label: "रिपोर्ट्स", icon: "reports", match: "/reports" },
           { href: settingsHref, label: "बिलिंग सेटिंग्ज", icon: "settings", match: "/settings" },
+        ] },
+        { title: "व्यवस्थापन", items: [
+          { href: productsHref, label: "उत्पादने", icon: "products", match: "/products" },
+          { href: usersHref, label: "वापरकर्ते", icon: "users", match: "/users" },
+          { href: purchasesHref, label: "खरेदी", icon: "purchases", match: "/purchases" },
+          { href: suppliersHref, label: "पुरवठादार", icon: "suppliers", match: "/suppliers" },
+          { href: cashHref, label: "रोख बंद करणे", icon: "cash", match: "/cash-closing" },
+          { href: expensesHref, label: "खर्च", icon: "expenses", match: "/expenses" },
+          { href: staffHref, label: "कर्मचारी", icon: "staff", match: "/staff" },
+          { href: customersHref, label: "ग्राहक", icon: "customers", match: "/customers" },
         ] },
         inv,
         ...(s.role === "abnexa" ? [{ title: "प्रणाली", items: [{ href: accounts, label: "खाती", icon: "accounts" as const, match: "/accounts" }] }] : []),

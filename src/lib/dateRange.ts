@@ -50,5 +50,5 @@ export function eachDay(r: Range): string[] {
 }
 
 export const fmtKg = (n: number) => `${n.toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2 })} kg`;
-export const fmtInr = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
+export const fmtInr = (n: number) => `${n < 0 ? "−" : ""}₹${Math.abs(Math.round(n)).toLocaleString("en-IN")}`;
 export const shortDay = (iso: string) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-IN", { day: "2-digit", month: "short", timeZone: "UTC" });
