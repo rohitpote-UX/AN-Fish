@@ -19,6 +19,8 @@ export function db(): mysql.Pool {
       maxIdle: process.env.VERCEL ? 1 : 10,
       idleTimeout: 30_000,
       charset: "utf8mb4",
+      // Return SQL DATE columns as plain "YYYY-MM-DD" strings. As JS Dates they shift a day back in India (UTC conversion).
+      dateStrings: ["DATE"],
       // Managed MySQL (TiDB, Aiven, PlanetScale…) requires TLS: set DB_SSL=1.
       ssl: process.env.DB_SSL === "1" ? { minVersion: "TLSv1.2", rejectUnauthorized: true } : undefined,
     });

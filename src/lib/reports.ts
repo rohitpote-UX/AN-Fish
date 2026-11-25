@@ -3,6 +3,7 @@ import type { RowDataPacket } from "mysql2";
 import { db } from "@/lib/db";
 import { fmtInr, fmtKg, type Range } from "@/lib/dateRange";
 import { REASONS } from "@/app/admin/(panel)/wastage/reasons";
+import { EXPECTED_LEFT, SALES, SALES_JOINS, SOLD } from "@/lib/salesSql";
 
 export type Kind = "text" | "int" | "kg" | "inr" | "date";
 export type Col = { key: string; label: string; kind: Kind };
@@ -28,12 +29,11 @@ export const REPORT_LIST: { id: string; title: string; desc: string; headOnly?: 
 ];
 
 const MAX_ROWS = 20000;
-const SOLD = "CASE WHEN sd.closing_kg IS NULL THEN 0 ELSE sd.opening_kg+sd.added_kg-COALESCE(w.q,0)-sd.closing_kg END";
 const BASE = `FROM stock_days sd
   JOIN fish_items f ON f.id=sd.fish_id
   JOIN branches b ON b.id=sd.branch_id
   LEFT JOIN (SELECT branch_id, fish_id, day, SUM(qty_kg) AS q FROM wastage WHERE is_deleted=0 GROUP BY branch_id, fish_id, day) w
-    ON w.branch_id=sd.branch_id AND w.fish_id=sd.fish_id AND w.day=sd.day`;
+    ON w.branch_id=sd.branch_id AND w.fish_id=sd.fish_id AND w.day=sd.day${SALES_JOINS}`;
 const shortBranch = (n: string) => n.replace(/^ए एन फिश वर्ल्ड\s*—\s*/, "");
 const num = (v: unknown) => Number(v ?? 0);
 const dayStr = (v: unknown) => (v instanceof Date ? v.toISOString().slice(0, 10) : String(v).slice(0, 10));
@@ -46,7 +46,7 @@ export async function runReport(id: string, r: Range, branchId: number | null): 
   if (id === "daywise") {
     const rows = await q(
       `SELECT sd.day, SUM(sd.opening_kg) AS opening, SUM(sd.added_kg) AS added, SUM(COALESCE(w.q,0)) AS wastage,
-         SUM(${SOLD}) AS sold, SUM(${SOLD}*sd.price_per_kg) AS sales, SUM(sd.closing_kg) AS closing
+         SUM(${SOLD}) AS sold, SUM(${SALES}) AS sales, SUM(sd.closing_kg) AS closing
        ${BASE} WHERE sd.day BETWEEN ? AND ?${bw} GROUP BY sd.day ORDER BY sd.day DESC`, args());
     const orders = await q(
       `SELECT DATE(CONVERT_TZ(created_at, @@session.time_zone, '+05:30')) AS d, COUNT(*) AS n FROM orders
@@ -65,7 +65,7 @@ export async function runReport(id: string, r: Range, branchId: number | null): 
   if (id === "fishwise") {
     const rows = await q(
       `SELECT f.name_mr AS fish, f.name_en AS fish_en, SUM(sd.added_kg+sd.opening_kg) AS supply, SUM(sd.added_kg) AS added, SUM(COALESCE(w.q,0)) AS wastage,
-         SUM(${SOLD}) AS sold, SUM(${SOLD}*sd.price_per_kg) AS sales
+         SUM(${SOLD}) AS sold, SUM(${SALES}) AS sales
        ${BASE} WHERE sd.day BETWEEN ? AND ?${bw} GROUP BY f.id HAVING SUM(sd.opening_kg+sd.added_kg)>0 ORDER BY sales DESC, sold DESC`, args());
     const out = rows.map((x) => ({ fish: `${x.fish}`, added: num(x.added), wastage: num(x.wastage), sold: num(x.sold), sales: num(x.sales), avg: num(x.sold) > 0 ? num(x.sales) / num(x.sold) : null }));
     const t = out.reduce((a, x) => ({ added: a.added + x.added, wastage: a.wastage + x.wastage, sold: a.sold + x.sold, sales: a.sales + x.sales }), { added: 0, wastage: 0, sold: 0, sales: 0 });
@@ -79,7 +79,7 @@ export async function runReport(id: string, r: Range, branchId: number | null): 
 
   if (id === "branchwise") {
     const rows = await q(
-      `SELECT b.id, b.name, SUM(sd.added_kg) AS added, SUM(COALESCE(w.q,0)) AS wastage, SUM(${SOLD}) AS sold, SUM(${SOLD}*sd.price_per_kg) AS sales
+      `SELECT b.id, b.name, SUM(sd.added_kg) AS added, SUM(COALESCE(w.q,0)) AS wastage, SUM(${SOLD}) AS sold, SUM(${SALES}) AS sales
        ${BASE} WHERE sd.day BETWEEN ? AND ? GROUP BY b.id ORDER BY sales DESC`, [r.from, r.to]);
     const ords = await q(
       `SELECT branch_id, COUNT(*) AS n, SUM(status='completed') AS done FROM orders
@@ -98,20 +98,25 @@ export async function runReport(id: string, r: Range, branchId: number | null): 
   if (id === "stockday") {
     const rows = await q(
       `SELECT sd.day, b.name AS branch, f.name_mr AS fish, sd.price_per_kg AS price, sd.opening_kg AS opening, sd.added_kg AS added,
-         COALESCE(w.q,0) AS wastage, ${SOLD} AS sold, sd.closing_kg AS closing, sd.sold_out,
-         (SELECT COALESCE(SUM(bi.qty_kg),0) FROM bill_items bi JOIN bills bl ON bl.id=bi.bill_id WHERE bl.branch_id=sd.branch_id AND bi.fish_id=sd.fish_id AND bl.bill_day=sd.day AND bl.is_void=0) AS billed
-       ${BASE} WHERE sd.day BETWEEN ? AND ?${bw} AND (sd.opening_kg>0 OR sd.added_kg>0 OR sd.closing_kg IS NOT NULL)
+         COALESCE(w.q,0) AS wastage, ${SOLD} AS sold, ${SALES} AS sales_amt, (bd.day IS NOT NULL) AS uses_bills,
+         ${EXPECTED_LEFT} AS expected_left, sd.closing_kg AS closing, sd.sold_out
+       ${BASE} WHERE sd.day BETWEEN ? AND ?${bw} AND (sd.opening_kg>0 OR sd.added_kg>0 OR sd.closing_kg IS NOT NULL OR bq.kg IS NOT NULL)
        ORDER BY sd.day DESC, b.id, f.sort_order LIMIT ${MAX_ROWS + 1}`, args());
     const truncated = rows.length > MAX_ROWS;
-    const out = rows.slice(0, MAX_ROWS).map((x) => ({
-      day: dayStr(x.day), branch: shortBranch(String(x.branch)), fish: String(x.fish), price: num(x.price), opening: num(x.opening), added: num(x.added), wastage: num(x.wastage), billed: num(x.billed),
-      sold: x.closing === null ? null : num(x.sold), closing: x.closing === null ? null : num(x.closing), sales: x.closing === null ? null : num(x.sold) * num(x.price),
-      status: x.sold_out || (x.closing !== null && num(x.closing) === 0) ? "संपले" : "उपलब्ध",
-    }));
+    const out = rows.slice(0, MAX_ROWS).map((x) => {
+      const known = !!x.uses_bills || x.closing !== null; // sales are known from bills, or once the closing stock is in
+      return {
+        day: dayStr(x.day), branch: shortBranch(String(x.branch)), fish: String(x.fish), price: num(x.price), opening: num(x.opening), added: num(x.added), wastage: num(x.wastage),
+        sold: known ? num(x.sold) : null, sales: known ? num(x.sales_amt) : null, closing: x.closing === null ? null : num(x.closing),
+        // Counter-billing days only: books say X should be left; the physical count says Y. Positive = stock missing / sold without a bill.
+        variance: x.uses_bills && x.closing !== null ? num(x.expected_left) - num(x.closing) : null,
+        status: x.sold_out || (x.closing !== null && num(x.closing) === 0) ? "संपले" : "उपलब्ध",
+      };
+    });
     const t = out.reduce((a, x) => ({ opening: a.opening + x.opening, added: a.added + x.added, wastage: a.wastage + x.wastage, sold: a.sold + (x.sold ?? 0), sales: a.sales + (x.sales ?? 0) }), { opening: 0, added: 0, wastage: 0, sold: 0, sales: 0 });
     return {
       id, title: "दैनिक स्टॉक", truncated,
-      columns: [{ key: "day", label: "तारीख", kind: "date" }, { key: "branch", label: "शाखा", kind: "text" }, { key: "fish", label: "मासा", kind: "text" }, { key: "price", label: "भाव ₹/kg", kind: "inr" }, { key: "opening", label: "सुरुवात (kg)", kind: "kg" }, { key: "added", label: "नवीन आवक (kg)", kind: "kg" }, { key: "wastage", label: "वाया गेले (kg)", kind: "kg" }, { key: "sold", label: "विक्री (kg)", kind: "kg" }, { key: "billed", label: "काउंटर बिल (kg)", kind: "kg" }, { key: "closing", label: "क्लोजिंग (kg)", kind: "kg" }, { key: "sales", label: "विक्री रक्कम", kind: "inr" }, { key: "status", label: "स्थिती", kind: "text" }],
+      columns: [{ key: "day", label: "तारीख", kind: "date" }, { key: "branch", label: "शाखा", kind: "text" }, { key: "fish", label: "मासा", kind: "text" }, { key: "price", label: "भाव ₹/kg", kind: "inr" }, { key: "opening", label: "सुरुवात (kg)", kind: "kg" }, { key: "added", label: "नवीन आवक (kg)", kind: "kg" }, { key: "wastage", label: "वाया गेले (kg)", kind: "kg" }, { key: "sold", label: "विक्री (kg)", kind: "kg" }, { key: "closing", label: "क्लोजिंग (kg)", kind: "kg" }, { key: "variance", label: "तफावत (kg)", kind: "kg" }, { key: "sales", label: "विक्री रक्कम", kind: "inr" }, { key: "status", label: "स्थिती", kind: "text" }],
       rows: out, totals: { day: "एकूण", opening: t.opening, added: t.added, wastage: t.wastage, sold: t.sold, sales: t.sales },
       summary: [{ label: "सुरुवातीचा स्टॉक", value: fmtKg(t.opening) }, { label: "नवीन आवक", value: fmtKg(t.added) }, { label: "विक्री", value: fmtKg(t.sold) }, { label: "वाया गेले", value: fmtKg(t.wastage) }, { label: "विक्री रक्कम", value: fmtInr(t.sales) }],
     };

@@ -3,11 +3,11 @@ import type { RowDataPacket } from "mysql2";
 import { db } from "@/lib/db";
 import { todayIST } from "@/lib/adminAuth";
 import { eachDay, prevRange, type Range } from "@/lib/dateRange";
+import { SALES, SALES_JOINS, SOLD } from "@/lib/salesSql";
 
-const SOLD = "CASE WHEN sd.closing_kg IS NULL THEN 0 ELSE sd.opening_kg+sd.added_kg-COALESCE(w.q,0)-sd.closing_kg END";
 const BASE = `FROM stock_days sd JOIN fish_items f ON f.id=sd.fish_id JOIN branches b ON b.id=sd.branch_id
   LEFT JOIN (SELECT branch_id, fish_id, day, SUM(qty_kg) AS q FROM wastage WHERE is_deleted=0 GROUP BY branch_id, fish_id, day) w
-  ON w.branch_id=sd.branch_id AND w.fish_id=sd.fish_id AND w.day=sd.day`;
+  ON w.branch_id=sd.branch_id AND w.fish_id=sd.fish_id AND w.day=sd.day${SALES_JOINS}`;
 const OD = "DATE(CONVERT_TZ(o.created_at, @@session.time_zone, '+05:30'))";
 const n = (v: unknown) => Number(v ?? 0);
 const short = (s: string) => s.replace(/^ए एन फिश वर्ल्ड\s*—\s*/, "");
@@ -18,7 +18,7 @@ export type Kpis = { sales: number; soldKg: number; addedKg: number; wastageKg: 
 async function kpis(r: Range, branchId: number | null): Promise<Kpis> {
   const bw = branchId ? " AND sd.branch_id=?" : "";
   const [s] = await db().query<RowDataPacket[]>(
-    `SELECT COALESCE(SUM(${SOLD}*sd.price_per_kg),0) AS sales, COALESCE(SUM(${SOLD}),0) AS sold, COALESCE(SUM(sd.added_kg),0) AS added, COALESCE(SUM(w.q),0) AS wastage
+    `SELECT COALESCE(SUM(${SALES}),0) AS sales, COALESCE(SUM(${SOLD}),0) AS sold, COALESCE(SUM(sd.added_kg),0) AS added, COALESCE(SUM(w.q),0) AS wastage
      ${BASE} WHERE sd.day BETWEEN ? AND ?${bw}`, [r.from, r.to, ...(branchId ? [branchId] : [])]);
   const [o] = await db().query<RowDataPacket[]>(
     `SELECT COUNT(*) AS total, COALESCE(SUM(o.status IN ('new','confirmed','ready')),0) AS pending, COALESCE(SUM(o.status='completed'),0) AS done, COALESCE(SUM(o.status='cancelled'),0) AS cancelled
@@ -33,12 +33,12 @@ export async function getDashboard(range: Range, branchId: number | null) {
   const [cur, prev] = await Promise.all([kpis(range, branchId), kpis(prevRange(range), branchId)]);
 
   const [trendRows] = await db().query<RowDataPacket[]>(
-    `SELECT sd.day, SUM(${SOLD}*sd.price_per_kg) AS sales, SUM(${SOLD}) AS sold ${BASE} WHERE sd.day BETWEEN ? AND ?${bw} GROUP BY sd.day`, [range.from, range.to, ...ba]);
+    `SELECT sd.day, SUM(${SALES}) AS sales, SUM(${SOLD}) AS sold ${BASE} WHERE sd.day BETWEEN ? AND ?${bw} GROUP BY sd.day`, [range.from, range.to, ...ba]);
   const tm = new Map(trendRows.map((x) => [dayStr(x.day), n(x.sales)]));
   const trend = eachDay(range).map((d) => ({ day: d, value: tm.get(d) ?? 0 }));
 
   const [byBranchRows] = branchId ? [[] as RowDataPacket[]] : await db().query<RowDataPacket[]>(
-    `SELECT b.name, SUM(${SOLD}*sd.price_per_kg) AS sales ${BASE} WHERE sd.day BETWEEN ? AND ? GROUP BY b.id ORDER BY sales DESC`, [range.from, range.to]);
+    `SELECT b.name, SUM(${SALES}) AS sales ${BASE} WHERE sd.day BETWEEN ? AND ? GROUP BY b.id ORDER BY sales DESC`, [range.from, range.to]);
   const [topFishRows] = await db().query<RowDataPacket[]>(
     `SELECT f.name_mr AS fish, SUM(${SOLD}) AS sold ${BASE} WHERE sd.day BETWEEN ? AND ?${bw} GROUP BY f.id HAVING sold>0 ORDER BY sold DESC LIMIT 6`, [range.from, range.to, ...ba]);
   const [statusRows] = await db().query<RowDataPacket[]>(

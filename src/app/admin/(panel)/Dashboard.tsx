@@ -128,7 +128,7 @@ export async function HeadDashboard({ sp }: { sp: Record<string, string | undefi
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <Card title="विक्रीचा कल (रोज)" sub="क्लोजिंग भरलेल्या दिवसांची विक्री रक्कम" className="lg:col-span-2"><TrendChart data={d.trend} format={fmtInr} /></Card>
+        <Card title="विक्रीचा कल (रोज)" sub="बिलांवरून (किंवा क्लोजिंगवरून) रोजची विक्री रक्कम" className="lg:col-span-2"><TrendChart data={d.trend} format={fmtInr} /></Card>
         <Card title="ऑर्डर्सची स्थिती" sub="निवडलेल्या कालावधीतील">
           <Donut items={Object.entries(ST).map(([k, v]) => ({ label: v.t, value: d.statuses[k] ?? 0, color: v.color }))} />
         </Card>
@@ -181,7 +181,7 @@ export async function HeadDashboard({ sp }: { sp: Record<string, string | undefi
           )}
         </Card>
       </div>
-      <p className="text-xs text-[#7A8794]">टीप: विक्री = सुरुवात + आवक − वाया गेले − क्लोजिंग (जिथे क्लोजिंग भरले आहे). सर्व आकडे प्रत्यक्ष नोंदींवरून.</p>
+      <p className="text-xs text-[#7A8794]">टीप: काउंटर बिलिंग वापरणाऱ्या दिवसाची विक्री बिलांवरून (सूट वजा, रद्द बिले वगळून); बाकी दिवसांची सुरुवात + आवक − वाया गेले − क्लोजिंग वरून. सर्व आकडे प्रत्यक्ष नोंदींवरून.</p>
     </div>
   );
 }
