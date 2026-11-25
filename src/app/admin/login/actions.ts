@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import type { RowDataPacket } from "mysql2";
 import { db } from "@/lib/db";
 import { createSession, destroySession } from "@/lib/session";
+import { adminHref, normalizeLoginId } from "@/lib/adminAuth";
 
 export type LoginState = { error?: string };
 
@@ -14,7 +15,7 @@ const FAIL = "लॉगिन आयडी किंवा पासवर्ड
 const DUMMY = "$2b$12$wiQUnQh6dsgjqEBieD7iEOdqVH/ccpQ9eg6zRqEBS2H/PzdBELXyq";
 
 export async function loginAction(_prev: LoginState, form: FormData): Promise<LoginState> {
-  const loginId = String(form.get("loginId") || "").trim().toLowerCase().replace(/[\s-]/g, "");
+  const loginId = normalizeLoginId(String(form.get("loginId") || ""));
   const password = String(form.get("password") || "");
   if (!loginId || !password || password.length > 200) return { error: FAIL };
 
@@ -28,10 +29,10 @@ export async function loginAction(_prev: LoginState, form: FormData): Promise<Lo
   if (!u.is_active) return { error: "हे खाते बंद केले आहे. कृपया Abnexa शी संपर्क करा." };
 
   await createSession({ uid: u.id, role: u.role, branchId: u.branch_id, name: u.name });
-  redirect("/admin");
+  redirect(await adminHref("/"));
 }
 
 export async function logoutAction() {
   await destroySession();
-  redirect("/admin/login");
+  redirect(await adminHref("/login"));
 }

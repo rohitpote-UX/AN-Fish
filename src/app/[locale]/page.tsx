@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import { Hero } from "@/components/sections/home/Hero";
+import { getBranchWhatsappMap } from "@/lib/liveStock";
 import { MaharashtraMapSection } from "@/components/sections/home/MaharashtraMapSection";
 import { SignatureSection } from "@/components/sections/home/SignatureSection";
 import { AboutSection } from "@/components/sections/home/AboutSection";
@@ -12,6 +13,9 @@ import { ReviewsSection } from "@/components/sections/home/ReviewsSection";
 import { OrderSection } from "@/components/sections/home/OrderSection";
 import { FaqSection } from "@/components/sections/home/FaqSection";
 import { ContactSection } from "@/components/sections/home/ContactSection";
+
+// Re-generate every minute so branch WhatsApp numbers stay current.
+export const revalidate = 60;
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -36,7 +40,7 @@ export default async function HomePage({
       <Hero />
 
       {/* 02. MAHARASHTRA 3D MAP & FRANCHISE STORES (#franchise-map) - Karad HQ (with 3D Fish), Ishwarpur, Patan & Arabian Sea */}
-      <MaharashtraMapSection />
+      <MaharashtraMapSection whatsappBySlug={await getBranchWhatsappMap()} />
 
       {/* 03. SIGNATURE CATCH (#signature) - "आमची खासियत" (Pomfret, Surmai, Tiger Prawns, Rawas) */}
       <SignatureSection />

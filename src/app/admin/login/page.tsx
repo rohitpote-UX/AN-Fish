@@ -1,10 +1,11 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
+import { adminHref } from "@/lib/adminAuth";
 import { LoginForm } from "./LoginForm";
 
 export default async function AdminLoginPage() {
-  if (await getSession()) redirect("/admin");
+  if (await getSession()) redirect(await adminHref("/"));
 
   return (
     <main className="relative grid min-h-screen place-items-center overflow-hidden bg-[#071C2C] px-4 py-10 font-[Baloo_2,sans-serif]">

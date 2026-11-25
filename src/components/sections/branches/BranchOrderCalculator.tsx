@@ -4,9 +4,22 @@ import React, { useState } from "react";
 import { MessageCircle, ShoppingBag, Sparkles, Check, Phone } from "lucide-react";
 import { Branch } from "@/types";
 
+export interface LiveFishOption {
+  id: string;
+  nameMr: string;
+  nameEn: string;
+  rate: string;
+}
+
 interface BranchOrderCalculatorProps {
   branch: Branch;
   locale: string;
+  /** Today's available fish with the branch's own price (from the admin panel). Falls back to the static list. */
+  liveFish?: LiveFishOption[];
+  /** The branch's own WhatsApp number (digits only, with country code). */
+  whatsapp?: string;
+  /** When set, the order is also saved to the database so the branch admin sees it in their list. */
+  saveToBranchSlug?: string;
 }
 
 const FISH_OPTIONS = [
@@ -35,24 +48,29 @@ const SPICE_OPTIONS = [
   { id: "curry", nameMr: "+ AN मालवणी कालवण मसाला", nameEn: "+ AN Malvani Curry Masala", extra: "₹90" },
 ];
 
-export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorProps) {
+export function BranchOrderCalculator({ branch, locale, liveFish, whatsapp, saveToBranchSlug }: BranchOrderCalculatorProps) {
+  const fishOptions = liveFish ?? FISH_OPTIONS;
   const isMarathi = locale === "mr";
   const isHindi = locale === "hi";
 
-  const [selectedFish, setSelectedFish] = useState(FISH_OPTIONS[0]);
+  const [selectedFish, setSelectedFish] = useState<LiveFishOption>(fishOptions[0]);
   const [selectedWeight, setSelectedWeight] = useState(WEIGHT_OPTIONS[1]);
   const [selectedCut, setSelectedCut] = useState(CUT_OPTIONS[0]);
   const [selectedSpice, setSelectedSpice] = useState(SPICE_OPTIONS[0]);
-  const [orderType, setOrderType] = useState<"delivery" | "pickup">("delivery");
 
-  const buildWhatsappLink = () => {
+  const [custName, setCustName] = useState("");
+  const [custPhone, setCustPhone] = useState("");
+  const [sending, setSending] = useState(false);
+  const [formError, setFormError] = useState("");
+
+  const buildWhatsappLink = (orderId?: number) => {
     const text = isMarathi
       ? `नमस्कार AN Fish World (${branch.nameMr})!\n\nमला थेट आजच्या ताजी आवकमधून ऑर्डर करायची आहे:\n` +
         `🐟 मासा: ${selectedFish.nameMr} (${selectedFish.rate})\n` +
         `⚖️ वजन: ${selectedWeight}\n` +
         `🔪 मोफत कटिंग: ${selectedCut.nameMr}\n` +
         `🌶️ मसाला: ${selectedSpice.nameMr} (${selectedSpice.extra})\n` +
-        `🚚 प्रकार: ${orderType === "delivery" ? "३० मिनिटांत घरपोच डिलिव्हरी" : "दालनातून स्वतः पिकअप"}\n\n` +
+        `🚚 प्रकार: ${"दालनातून स्वतः पिकअप"}\n\n` +
         `कृपया आजची उपलब्धता व एकूण बिल पाठवा. धन्यवाद!`
       : isHindi
       ? `नमस्ते AN Fish World (${branch.nameMr})!\n\nमुझे सीधे आज की ताज़ा आवक से ऑर्डर करना है:\n` +
@@ -60,19 +78,64 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
         `⚖️ वज़न: ${selectedWeight}\n` +
         `🔪 मुफ्त कटिंग: ${selectedCut.nameMr}\n` +
         `🌶️ मसाला: ${selectedSpice.nameMr} (${selectedSpice.extra})\n` +
-        `🚚 प्रकार: ${orderType === "delivery" ? "३० मिनट में होम डिलीवरी" : "शाखा से पिकअप"}\n\n` +
+        `🚚 प्रकार: ${"शाखा से पिकअप"}\n\n` +
         `कृपया आज की उपलब्धता और कुल बिल भेजें। धन्यवाद!`
       : `Hello AN Fish World (${branch.nameEn})!\n\nI want to place an order from today's catch:\n` +
         `🐟 Fish: ${selectedFish.nameEn} (${selectedFish.rate})\n` +
         `⚖️ Weight: ${selectedWeight}\n` +
         `🔪 Free Cut: ${selectedCut.nameEn}\n` +
         `🌶️ Masala: ${selectedSpice.nameEn}\n` +
-        `🚚 Type: ${orderType === "delivery" ? "Home Delivery" : "Store Pickup"}\n\n` +
+        `🚚 Type: ${"Store Pickup"}\n\n` +
         `Please confirm stock availability and send total bill. Thank you!`;
 
-    const cleanPhone = branch.phone.replace(/[^0-9]/g, "");
-    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+    const tail = orderId ? `\n\n#${orderId} | ${custName.trim()} | ${custPhone}` : "";
+    const cleanPhone = (whatsapp ?? branch.phone).replace(/[^0-9]/g, "");
+    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text + tail)}`;
   };
+
+
+  const submitOrder = async () => {
+    const phone = custPhone.replace(/\D/g, "");
+    if (custName.trim().length < 2 || phone.length !== 10) {
+      setFormError(isMarathi ? "कृपया नाव आणि १० अंकी मोबाईल नंबर टाका" : isHindi ? "कृपया नाम और १० अंकों का मोबाइल नंबर डालें" : "Please enter your name and a 10-digit mobile number");
+      return;
+    }
+    setFormError("");
+    setSending(true);
+    // Open the tab right away (browsers block pop-ups opened after an await), fill the link in afterwards.
+    const tab = window.open("", "_blank");
+    let orderId: number | undefined;
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          branchSlug: saveToBranchSlug,
+          fishSlug: selectedFish.id,
+          weightKg: parseFloat(selectedWeight),
+          cut: selectedCut.nameMr,
+          masala: selectedSpice.id === "none" ? "none" : selectedSpice.nameMr,
+          name: custName.trim(),
+          phone,
+        }),
+      });
+      if (res.ok) orderId = (await res.json()).id;
+      else if (res.status === 409) {
+        tab?.close();
+        setFormError(isMarathi ? "ही मासोळी आता उपलब्ध नाही. पेज रिफ्रेश करा." : isHindi ? "यह मछली अभी उपलब्ध नहीं है। पेज रिफ्रेश करें।" : "This fish is no longer available. Please refresh.");
+        setSending(false);
+        return;
+      }
+    } catch {
+      /* saving failed: still let the customer order on WhatsApp */
+    }
+    const link = buildWhatsappLink(orderId);
+    if (tab) tab.location.href = link;
+    else window.location.href = link;
+    setSending(false);
+  };
+
+  const inputCls = "h-11 w-full rounded-xl border border-white/15 bg-[#04151F] px-3 text-sm font-semibold text-white outline-none placeholder:text-white/35 focus:border-[#38BDF8]";
 
   return (
     <div className="rounded-3xl bg-gradient-to-b from-[#0B2535] via-[#091F2C] to-[#061824] border border-white/10 p-6 sm:p-8 shadow-2xl">
@@ -98,7 +161,7 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
             {isMarathi ? "१. मासोळीचा प्रकार निवडा (Select Fish):" : isHindi ? "१. मछली का प्रकार चुनें (Select Fish):" : "1. Select Fish Catch:"}
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {FISH_OPTIONS.map((f) => {
+            {fishOptions.map((f) => {
               const active = selectedFish.id === f.id;
               return (
                 <button
@@ -209,52 +272,26 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
           </div>
         </div>
 
-        {/* 5. Delivery vs Store Pickup */}
+        {/* 5. Pickup info (orders are collected from the store; no delivery) */}
         <div className="pt-2">
-          <label className="block text-xs font-bold font-marathi-display text-white/90 mb-2">
-            {isMarathi ? "५. पुरवठा पद्धत (Delivery Mode):" : isHindi ? "५. डिलीवरी का तरीका (Delivery Mode):" : "5. Delivery Mode:"}
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => setOrderType("delivery")}
-              className={`min-h-0 p-3 rounded-xl border text-center transition-all cursor-pointer font-marathi-display ${
-                orderType === "delivery"
-                  ? "bg-emerald-500/20 border-emerald-400 text-white shadow-lg"
-                  : "bg-[#04151F] border-white/10 text-white/70"
-              }`}
-            >
-              <span className="block text-xs font-bold text-white">{isMarathi ? "⚡ ३० मिनिटांत घरपोच" : isHindi ? "⚡ ३० मिनट में होम डिलीवरी" : "⚡ 30-Min Home Delivery"}</span>
-              <span className="text-[0.65rem] text-emerald-400 font-semibold block mt-0.5">
-                {isMarathi ? "स्थानिक १५ किमी परिसर" : isHindi ? "स्थानीय १५ किमी क्षेत्र" : "Local 15 km Radius"}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setOrderType("pickup")}
-              className={`min-h-0 p-3 rounded-xl border text-center transition-all cursor-pointer font-marathi-display ${
-                orderType === "pickup"
-                  ? "bg-[#0A9AD9]/20 border-[#38BDF8] text-white shadow-lg"
-                  : "bg-[#04151F] border-white/10 text-white/70"
-              }`}
-            >
-              <span className="block text-xs font-bold text-white">{isMarathi ? "🏪 दालनातून स्वतः पिकअप" : isHindi ? "🏪 शाखा से खुद पिकअप" : "🏪 In-Store Pickup"}</span>
-              <span className="text-[0.65rem] text-[#38BDF8] font-semibold block mt-0.5">
-                {isMarathi ? "तयार करून ठेवले जाईल" : isHindi ? "तैयार करके रखा जाएगा" : "Pre-packed & Ready"}
-              </span>
-            </button>
+          <div className="rounded-xl border border-[#38BDF8]/40 bg-[#0A9AD9]/15 p-3 text-center font-marathi-display">
+            <span className="block text-xs font-bold text-white">{isMarathi ? "🏪 दालनातून स्वतः पिकअप" : isHindi ? "🏪 शाखा से खुद पिकअप" : "🏪 In-Store Pickup"}</span>
+            <span className="mt-0.5 block text-[0.65rem] font-semibold text-[#38BDF8]">
+              {isMarathi ? "ऑर्डर तयार करून ठेवले जाईल · पैसे दालनात द्या" : isHindi ? "ऑर्डर तैयार रखा जाएगा · भुगतान शाखा में करें" : "Order kept ready · pay at the store"}
+            </span>
           </div>
         </div>
 
         {/* SUBMIT BUTTON */}
         <div className="pt-3">
-          <a
-            href={buildWhatsappLink()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-gradient-to-r from-[#0A9AD9] via-[#0284C7] to-[#25D366] hover:from-[#38BDF8] hover:to-[#25D366] text-white font-black text-sm uppercase tracking-wider transition-all duration-300 shadow-[0_8px_30px_rgba(37,211,102,0.4)] hover:shadow-[0_12px_40px_rgba(37,211,102,0.6)] cursor-pointer font-marathi-display"
-          >
+          {saveToBranchSlug ? (
+            <>
+              <div className="mb-3 grid gap-3 sm:grid-cols-2">
+                <input value={custName} onChange={(e) => setCustName(e.target.value)} autoComplete="name" maxLength={120} className={inputCls} placeholder={isMarathi ? "तुमचे नाव" : isHindi ? "आपका नाम" : "Your name"} aria-label="Name" />
+                <input value={custPhone} onChange={(e) => setCustPhone(e.target.value)} inputMode="numeric" autoComplete="tel-national" maxLength={14} className={inputCls} placeholder={isMarathi ? "मोबाईल नंबर (१० अंक)" : isHindi ? "मोबाइल नंबर (१० अंक)" : "Mobile number (10 digits)"} aria-label="Mobile number" />
+              </div>
+              {formError && <p role="alert" className="mb-3 rounded-lg bg-red-500/15 px-3 py-2 text-xs font-bold text-red-300">{formError}</p>}
+              <button type="button" onClick={submitOrder} disabled={sending} className="w-full inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-gradient-to-r from-[#0A9AD9] via-[#0284C7] to-[#25D366] hover:from-[#38BDF8] hover:to-[#25D366] text-white font-black text-sm uppercase tracking-wider transition-all duration-300 shadow-[0_8px_30px_rgba(37,211,102,0.4)] hover:shadow-[0_12px_40px_rgba(37,211,102,0.6)] cursor-pointer font-marathi-display disabled:opacity-70">
             <MessageCircle className="w-5 h-5 fill-current shrink-0" />
             <span>
               {isMarathi
@@ -263,7 +300,20 @@ export function BranchOrderCalculator({ branch, locale }: BranchOrderCalculatorP
                 ? `व्हाट्सएप पर यह ऑर्डर भेजें (${selectedFish.nameMr.split(" ")[0]} - ${selectedWeight})`
                 : `Send Order via WhatsApp (${selectedFish.nameEn} - ${selectedWeight})`}
             </span>
-          </a>
+              </button>
+            </>
+          ) : (
+            <a href={buildWhatsappLink()} target="_blank" rel="noopener noreferrer" className="w-full inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl bg-gradient-to-r from-[#0A9AD9] via-[#0284C7] to-[#25D366] hover:from-[#38BDF8] hover:to-[#25D366] text-white font-black text-sm uppercase tracking-wider transition-all duration-300 shadow-[0_8px_30px_rgba(37,211,102,0.4)] hover:shadow-[0_12px_40px_rgba(37,211,102,0.6)] cursor-pointer font-marathi-display">
+            <MessageCircle className="w-5 h-5 fill-current shrink-0" />
+            <span>
+              {isMarathi
+                ? `व्हॉट्सॲपवर ही ऑर्डर पाठवा (${selectedFish.nameMr.split(" ")[0]} - ${selectedWeight})`
+                : isHindi
+                ? `व्हाट्सएप पर यह ऑर्डर भेजें (${selectedFish.nameMr.split(" ")[0]} - ${selectedWeight})`
+                : `Send Order via WhatsApp (${selectedFish.nameEn} - ${selectedWeight})`}
+            </span>
+            </a>
+          )}
 
           <p className="text-center text-[0.68rem] text-white/60 font-marathi-body mt-2">
             💡 {isMarathi ? `एका क्लिकवर थेट ${branch.villageNameMr || branch.nameMr} दालनाच्या व्यवस्थापकाशी चॅट सुरू होईल.` : isHindi ? `एक क्लिक पर सीधे ${branch.villageNameMr || branch.nameMr} शाखा के प्रबंधक से चैट शुरू होगी।` : `One click starts direct chat with the manager of ${branch.nameEn}.`}

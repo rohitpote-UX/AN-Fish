@@ -29,7 +29,11 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { getLiveBranch } from "@/lib/liveStock";
 import { BranchOrderCalculator } from "@/components/sections/branches/BranchOrderCalculator";
+
+// Refresh live stock/prices every minute (static pages, re-generated in the background).
+export const revalidate = 60;
 
 export function generateStaticParams() {
   const params: { locale: string; slug: string }[] = [];
@@ -69,6 +73,7 @@ export default async function BranchDetailPage({
 
   const branch = BRANCHES_LIST.find((b) => b.slug === slug);
   if (!branch) notFound();
+  const live = await getLiveBranch(slug);
 
   const isMarathi = locale === "mr";
   const isHindi = locale === "hi";
@@ -269,7 +274,7 @@ export default async function BranchDetailPage({
   const t = (mr: string, en: string, hi?: string) => (isMarathi ? mr : isHindi ? hi ?? mr : en);
   const isMr = isMarathi || isHindi;
   const name = isMr ? branch.nameMr : branch.nameEn;
-  const digits = branch.phone.replace(/[^0-9]/g, "");
+  const digits = (live?.whatsapp || branch.phone).replace(/[^0-9]/g, "");
   const telHref = `tel:${branch.phone.replace(/[^0-9+]/g, "")}`;
 
   const kind =
@@ -283,9 +288,9 @@ export default async function BranchDetailPage({
     { icon: Waves, title: t("०°C नैसर्गिक गारवा", "0°C Natural Chill", "०°C प्राकृतिक ठंडक"), sub: t("१००% केमिकलमुक्त", "100% chemical-free", "१००% केमिकल मुक्त") },
     { icon: Droplets, title: t("आरओ पाण्याने धुलाई", "RO Water Wash", "आरओ पानी से धुलाई"), sub: t("पिण्याच्या शुद्ध पाण्याने स्वच्छता", "Cleaned with pure drinking water", "शुद्ध पीने के पानी से सफाई") },
     { icon: Scissors, title: t("मोफत चोख कटिंग", "Free Custom Cutting", "मुफ्त चोख कटिंग"), sub: t("तवा फ्राय, कालवण, बोनलेस", "Tawa fry, curry, boneless", "तवा फ्राई, करी, बोनलेस") },
-    { icon: Truck, title: t("३० मिनिटांत घरपोच", "30-Minute Delivery", "३० मिनट में घरपहुंच"), sub: t("स्थानिक एक्सप्रेस डिलिव्हरी", "Local express delivery", "स्थानीय एक्सप्रेस डिलीवरी") },
+    { icon: Truck, title: t("दालनातून पिकअप", "Store Pickup", "शाखा से पिकअप"), sub: t("ऑर्डर तयार करून ठेवतो", "We keep your order ready", "ऑर्डर तैयार रखते हैं") },
     { icon: PackageCheck, title: t("गंधहीन पॅकिंग", "Odour-free Packing", "गंधरहित पैकिंग"), sub: t("फूड-ग्रेड पेपर व व्हॅक्यूम", "Food-grade paper & vacuum", "फूड-ग्रेड पेपर व वैक्यूम") },
-    { icon: CreditCard, title: t("डिजिटल पेमेंट", "Digital Payments", "डिजिटल पेमेंट"), sub: t("UPI, Cards व Cash", "UPI, cards & cash", "UPI, कार्ड व कैश") },
+    { icon: CreditCard, title: t("पेमेंट दालनात", "Pay at the Store", "भुगतान शाखा में"), sub: t("ऑर्डर घेताना पैसे द्या", "Pay when you collect", "ऑर्डर लेते समय भुगतान") },
   ];
 
   const steps = [
@@ -322,11 +327,11 @@ export default async function BranchDetailPage({
     {
       time: t("सकाळी ७:०० पुढे", "7:00 AM onward", "सुबह ७:०० से आगे"),
       icon: Truck,
-      title: t("थेट विक्री व घरपोच", "Retail Butchering & Delivery", "सीधी बिक्री व होम डिलीवरी"),
+      title: t("थेट विक्री व कटिंग", "Retail Sale & Cutting", "सीधी बिक्री व कटिंग"),
       desc: t(
-        "ग्राहकांना आवडीनुसार मोफत चोख कटिंग आणि ३० मिनिटांत घरपोच सुरक्षित डिलिव्हरी.",
-        "Precision custom butchering at zero extra cost and 30-minute delivery to doorsteps.",
-        "ग्राहकों को पसंद अनुसार मुफ्त चोख कटिंग और ३० मिनट में सुरक्षित होम डिलीवरी।"
+        "ग्राहकांना आवडीनुसार मोफत चोख कटिंग करून दालनातच ताजी मासोळी दिली जाते.",
+        "Free custom cutting to your choice, fresh fish handed over right at the store.",
+        "ग्राहकों की पसंद अनुसार मुफ्त कटिंग करके शाखा में ही ताज़ा मछली दी जाती है।"
       ),
     },
   ];
@@ -400,8 +405,8 @@ export default async function BranchDetailPage({
                   { icon: Clock, label: t("दालनाची वेळ", "Store timings", "शाखा समय"), value: isMr ? branch.hoursMr : branch.hoursEn },
                   {
                     icon: Truck,
-                    label: t("डिलिव्हरी", "Delivery", "डिलीवरी"),
-                    value: t("१५ किमी परिसरात ३० मिनिटांत जलद घरपोच सेवा", "Fast delivery within a 15 km radius", "१५ किमी क्षेत्र में ३० मिनट में त्वरित होम डिलीवरी"),
+                    label: t("ऑर्डर", "Orders", "ऑर्डर"),
+                    value: t("WhatsApp वर ऑर्डर करा, दालनात येऊन घ्या", "Order on WhatsApp, collect at the store", "WhatsApp पर ऑर्डर करें, शाखा से ले जाएं"),
                   },
                   { icon: Phone, label: t("फोन", "Phone", "फ़ोन"), value: branch.phone },
                 ].map(({ icon: Icon, label, value }) => (
@@ -507,6 +512,63 @@ export default async function BranchDetailPage({
             </span>
           </div>
 
+          {live ? (
+            live.fish.length === 0 ? (
+              <p className="rounded-3xl bg-white p-10 text-center font-marathi-display text-lg font-semibold text-[#071C2C]/60 ring-1 ring-[#071C2C]/10">
+                {t("आजचा स्टॉक आणि भाव लवकरच अपडेट होईल. ताज्या माहितीसाठी WhatsApp वर विचारा.", "Today's stock and rates will be updated shortly. Ask on WhatsApp for the latest.", "आज का स्टॉक और भाव जल्द अपडेट होगा। ताज़ा जानकारी के लिए WhatsApp पर पूछें।")}
+              </p>
+            ) : (
+              <>
+                {live.updatedAt && (
+                  <p className="-mt-4 mb-6 text-sm font-semibold text-[#071C2C]/55">
+                    {t(`आज ${live.updatedAt} वाजता अपडेट केले`, `Updated today at ${live.updatedAt}`, `आज ${live.updatedAt} बजे अपडेट किया`)}
+                  </p>
+                )}
+                <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {live.fish.map((fish) => (
+                    <li key={fish.slug} className={`flex flex-col overflow-hidden rounded-3xl bg-white ring-1 ring-[#071C2C]/10 ${fish.available ? "" : "opacity-70"}`}>
+                      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#F4F7F5]">
+                        {fish.image && (
+                          <Image src={imgFor(fish.image)} alt={isMr ? fish.nameMr : fish.nameEn} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className={`object-contain p-3 ${fish.available ? "" : "grayscale"}`} />
+                        )}
+                        <span className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[0.72rem] font-bold shadow ${fish.available ? "bg-white text-emerald-700" : "bg-[#071C2C] text-white"}`}>
+                          <span className={`size-1.5 rounded-full ${fish.available ? "animate-pulse bg-emerald-500" : "bg-red-400"}`} />
+                          {fish.available ? t("आज उपलब्ध", "Available today", "आज उपलब्ध") : t("संपले", "Sold out", "समाप्त")}
+                        </span>
+                      </div>
+                      <div className="flex flex-1 flex-col gap-3 p-5">
+                        <h3 className="font-marathi-display text-lg font-bold leading-snug">{isMr ? fish.nameMr : fish.nameEn}</h3>
+                        <div className="mt-auto flex items-end justify-between gap-3 border-t border-[#071C2C]/10 pt-4">
+                          <div>
+                            <span className="block text-[0.68rem] font-semibold text-[#071C2C]/45">{t("आजचा भाव", "Today's rate", "आज का भाव")}</span>
+                            <span className="text-xl font-extrabold tabular-nums text-[#071C2C]">₹{fish.pricePerKg.toLocaleString("en-IN")}<span className="text-sm font-bold text-[#071C2C]/55"> / kg</span></span>
+                          </div>
+                          {fish.available && (
+                            <a
+                              href={`https://wa.me/${digits}?text=${encodeURIComponent(
+                                isMarathi
+                                  ? `नमस्कार AN Fish World (${branch.nameMr}), मला आज "${fish.nameMr}" (₹${fish.pricePerKg}/kg) घ्यायची आहे.`
+                                  : isHindi
+                                  ? `नमस्ते AN Fish World (${branch.nameMr}), मुझे आज "${fish.nameMr}" (₹${fish.pricePerKg}/kg) चाहिए।`
+                                  : `Hello AN Fish World (${branch.nameEn}), I want "${fish.nameEn}" (₹${fish.pricePerKg}/kg) today.`
+                              )}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label={`Order ${fish.nameEn} on WhatsApp`}
+                              className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#25D366] px-4 py-2.5 font-marathi-display text-sm font-bold text-[#052E16] transition-all hover:-translate-y-0.5 hover:brightness-110 active:scale-95"
+                            >
+                              <MessageCircle className="size-4 fill-current" />
+                              {t("मागवा", "Order", "मंगवाएं")}
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )
+          ) : (
           <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {stockItems.map((fish, i) => {
               const cuts = (isMr ? fish.cutsMr : fish.cutsEn).split("•").map((c) => c.trim()).filter(Boolean);
@@ -578,11 +640,26 @@ export default async function BranchDetailPage({
               );
             })}
           </ul>
+          )}
         </section>
 
         {/* ============================ ORDER CALCULATOR ============================ */}
         <section className="mt-16 lg:mt-20">
-          <BranchOrderCalculator branch={branch} locale={locale} />
+          {live ? (
+            live.fish.some((f) => f.available) && (
+              <BranchOrderCalculator
+                branch={branch}
+                locale={locale}
+                whatsapp={live.whatsapp}
+                saveToBranchSlug={slug}
+                liveFish={live.fish
+                  .filter((f) => f.available)
+                  .map((f) => ({ id: f.slug, nameMr: f.nameMr, nameEn: f.nameEn, rate: `₹${f.pricePerKg.toLocaleString("en-IN")}/kg` }))}
+              />
+            )
+          ) : (
+            <BranchOrderCalculator branch={branch} locale={locale} />
+          )}
         </section>
 
         {/* ============================ FRESHNESS PROCESS ============================ */}
@@ -636,7 +713,7 @@ export default async function BranchDetailPage({
                 {t("ए एन फिश स्पेशल मसाले", "AN Fish Special Masalas", "ए एन फिश स्पेशल मसाले")}
               </h2>
             </div>
-            <p className="font-marathi-body text-sm text-[#071C2C]/60">{t("माशांसोबत घरपोच उपलब्ध", "Delivered along with your fish", "मछली के साथ घरपहुंच उपलब्ध")}</p>
+            <p className="font-marathi-body text-sm text-[#071C2C]/60">{t("दालनात उपलब्ध", "Available at the store", "शाखा में उपलब्ध")}</p>
           </div>
 
           <ul className="grid grid-cols-1 gap-5 md:grid-cols-3">

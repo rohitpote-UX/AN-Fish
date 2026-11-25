@@ -143,7 +143,7 @@ function IconBtn({
 /*  Component                                                                  */
 /* -------------------------------------------------------------------------- */
 
-export function MaharashtraGisMap() {
+export function MaharashtraGisMap({ whatsappBySlug = {} }: { whatsappBySlug?: Record<string, string> }) {
   const locale = useLocale();
   const reduce = useReducedMotion();
   const isMr = locale === "mr" || locale === "hi";
@@ -533,7 +533,7 @@ export function MaharashtraGisMap() {
       : { c: COLORS.cyan, label: t("अधिकृत दालन", "Authorized Store", "अधिकृत शाखा"), Icon: Store };
 
   const waLink = (b: Branch) =>
-    `https://wa.me/${b.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
+    `https://wa.me/${(whatsappBySlug[b.slug] || b.phone).replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
       t(
         `नमस्कार, मला ${b.nameMr} येथील आजच्या ताज्या आवकची माहिती हवी आहे.`,
         `Hello, I would like to know today's fresh catch at ${b.nameEn}.`,

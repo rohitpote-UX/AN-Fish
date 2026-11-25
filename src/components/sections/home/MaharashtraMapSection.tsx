@@ -7,7 +7,7 @@ import { Store, TrendingUp, MessageCircle, ShieldCheck, CheckCircle2, Truck } fr
 import { PLACEHOLDERS } from "@/data/placeholders";
 import { MaharashtraGisMap } from "./MaharashtraGisMap";
 
-export function MaharashtraMapSection() {
+export function MaharashtraMapSection({ whatsappBySlug }: { whatsappBySlug?: Record<string, string> }) {
   const locale = useLocale();
   const isMarathi = locale === "mr";
   const isHindi = locale === "hi";
@@ -81,7 +81,7 @@ export function MaharashtraMapSection() {
         </div>
 
         {/* PREMIUM INTERACTIVE GIS MAP (districts, explorer sidebar, markers, controls, details panel) */}
-        <MaharashtraGisMap />
+        <MaharashtraGisMap whatsappBySlug={whatsappBySlug} />
 
         {/* 4 FEATURE CARDS: 2x2 grid on mobile, 1 col on <=340px, icon on top, equal heights, 14-16px padding */}
         <div className="mt-8 grid grid-cols-1 min-[341px]:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
