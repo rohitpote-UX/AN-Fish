@@ -7,7 +7,7 @@ const MAX_AGE = 60 * 60 * 12; // 12 hours
 
 export type Session = {
   uid: number;
-  role: "abnexa" | "super_admin" | "branch_admin";
+  role: "abnexa" | "super_admin" | "branch_admin" | "counter";
   branchId: number | null;
   name: string;
 };

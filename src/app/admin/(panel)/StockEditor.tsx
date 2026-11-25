@@ -12,6 +12,7 @@ export type StockRow = {
   opening: number;
   added: number;
   closing: number | null;
+  wastage: number;
   soldOut: boolean;
 };
 
@@ -23,8 +24,9 @@ function Row({ r }: { r: StockRow }) {
   const [closing, setClosing] = useState(r.closing === null ? "" : String(r.closing));
   const [soldOut, setSoldOut] = useState(r.soldOut);
 
-  const total = num(opening) + num(added);
-  const sold = closing === "" ? null : Math.max(0, total - num(closing));
+  const total = num(opening) + num(added) - r.wastage;
+  const over = closing !== "" && num(closing) > total + 1e-9;
+  const sold = closing === "" || over ? null : Math.max(0, total - num(closing));
   const out = soldOut || (closing !== "" && num(closing) === 0);
   const inp =
     "h-11 w-full rounded-lg border border-[#071C2C]/15 bg-white px-2.5 text-base tabular-nums outline-none focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/20";
@@ -52,8 +54,12 @@ function Row({ r }: { r: StockRow }) {
         <label className="text-[11px] font-semibold text-[#071C2C]/55 md:hidden">क्लोजिंग स्टॉक (kg)</label>
         <input name={`closing_${r.fishId}`} type="number" step="0.01" min="0" value={closing} onChange={(e) => setClosing(e.target.value)} placeholder="संध्याकाळी" className={inp} />
       </td>
+      <td className="px-2 py-2 text-center text-sm font-bold tabular-nums max-md:inline-block max-md:w-1/2">
+        <span className="text-[11px] font-semibold text-[#071C2C]/55 md:hidden">वाया गेले: </span>
+        {r.wastage > 0 ? <span className="text-red-600">{r.wastage.toFixed(2)} kg</span> : <span className="text-[#071C2C]/35">—</span>}
+      </td>
       <td className="px-3 py-2 text-center text-sm font-bold tabular-nums max-md:inline-block max-md:w-1/2">
-        {sold === null ? <span className="text-[#071C2C]/35">—</span> : `${sold.toFixed(2)} kg`}
+        {over ? <span className="text-red-600">जास्त!</span> : sold === null ? <span className="text-[#071C2C]/35">—</span> : `${sold.toFixed(2)} kg`}
       </td>
       <td className="px-3 py-2 max-md:block">
         <label className="flex cursor-pointer items-center gap-2 text-sm font-bold">
@@ -72,7 +78,7 @@ export function StockEditor({ branchId, rows, day }: { branchId: number; rows: S
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#071C2C]/8 px-4 py-3">
         <div>
           <h2 className="text-lg font-extrabold">आजचा स्टॉक आणि भाव</h2>
-          <p className="text-xs text-[#071C2C]/55">तारीख: {day} · विक्री = सुरुवात + आवक − क्लोजिंग</p>
+          <p className="text-xs text-[#071C2C]/55">तारीख: {day} · विक्री = सुरुवात + आवक − वाया गेले − क्लोजिंग</p>
         </div>
       </div>
       <table className="w-full text-left">
@@ -83,6 +89,7 @@ export function StockEditor({ branchId, rows, day }: { branchId: number; rows: S
             <th className="px-2 py-2.5">सुरुवात (kg)</th>
             <th className="px-2 py-2.5">नवीन आवक (kg)</th>
             <th className="px-2 py-2.5">क्लोजिंग (kg)</th>
+            <th className="px-2 py-2.5 text-center">वाया गेले</th>
             <th className="px-3 py-2.5 text-center">विक्री</th>
             <th className="px-3 py-2.5">स्थिती</th>
           </tr>

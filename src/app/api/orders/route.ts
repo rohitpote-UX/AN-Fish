@@ -32,7 +32,9 @@ export async function POST(req: NextRequest) {
   const d = parsed.data;
 
   const [rows] = await db().query<RowDataPacket[]>(
-    `SELECT b.id AS branch_id, f.id AS fish_id, f.name_mr, s.price_per_kg, s.opening_kg, s.added_kg, s.closing_kg, s.sold_out
+    `SELECT b.id AS branch_id, f.id AS fish_id, f.name_mr, s.price_per_kg, s.opening_kg, s.added_kg, s.closing_kg, s.sold_out,
+            (SELECT COALESCE(SUM(w.qty_kg),0) FROM wastage w WHERE w.branch_id=s.branch_id AND w.fish_id=s.fish_id AND w.day=s.day AND w.is_deleted=0) AS wastage,
+            (SELECT COALESCE(SUM(bi.qty_kg),0) FROM bill_items bi JOIN bills bl ON bl.id=bi.bill_id WHERE bl.branch_id=s.branch_id AND bi.fish_id=s.fish_id AND bl.bill_day=s.day AND bl.is_void=0) AS billed
      FROM branches b
      JOIN fish_items f ON f.slug=?
      JOIN stock_days s ON s.branch_id=b.id AND s.fish_id=f.id AND s.day=?
@@ -41,7 +43,7 @@ export async function POST(req: NextRequest) {
   );
   const r = rows[0];
   if (!r || Number(r.price_per_kg) <= 0) return NextResponse.json({ error: "Not available" }, { status: 409 });
-  const left = r.closing_kg === null ? Number(r.opening_kg) + Number(r.added_kg) : Number(r.closing_kg);
+  const left = r.closing_kg === null ? Number(r.opening_kg) + Number(r.added_kg) - Number(r.wastage) - Number(r.billed) : Number(r.closing_kg);
   if (r.sold_out || left <= 0) return NextResponse.json({ error: "Sold out" }, { status: 409 });
 
   // Price always comes from the database, never from the browser.
@@ -57,6 +59,7 @@ export async function POST(req: NextRequest) {
       "INSERT INTO order_items (order_id, fish_id, fish_name, qty_kg, price_per_kg, cut) VALUES (?,?,?,?,?,?)",
       [o.insertId, r.fish_id, r.name_mr, d.weightKg, r.price_per_kg, d.cut ?? null],
     );
+    await conn.query("INSERT INTO order_events (order_id, status) VALUES (?, 'new')", [o.insertId]);
     await conn.commit();
     return NextResponse.json({ id: o.insertId });
   } catch {

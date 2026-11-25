@@ -64,35 +64,41 @@ export function BranchOrderCalculator({ branch, locale, liveFish, whatsapp, save
   const [formError, setFormError] = useState("");
 
   const buildWhatsappLink = (orderId?: number) => {
-    const text = isMarathi
-      ? `नमस्कार AN Fish World (${branch.nameMr})!\n\nमला थेट आजच्या ताजी आवकमधून ऑर्डर करायची आहे:\n` +
-        `🐟 मासा: ${selectedFish.nameMr} (${selectedFish.rate})\n` +
-        `⚖️ वजन: ${selectedWeight}\n` +
-        `🔪 मोफत कटिंग: ${selectedCut.nameMr}\n` +
-        `🌶️ मसाला: ${selectedSpice.nameMr} (${selectedSpice.extra})\n` +
-        `🚚 प्रकार: ${"दालनातून स्वतः पिकअप"}\n\n` +
-        `कृपया आजची उपलब्धता व एकूण बिल पाठवा. धन्यवाद!`
-      : isHindi
-      ? `नमस्ते AN Fish World (${branch.nameMr})!\n\nमुझे सीधे आज की ताज़ा आवक से ऑर्डर करना है:\n` +
-        `🐟 मछली: ${selectedFish.nameMr} (${selectedFish.rate})\n` +
-        `⚖️ वज़न: ${selectedWeight}\n` +
-        `🔪 मुफ्त कटिंग: ${selectedCut.nameMr}\n` +
-        `🌶️ मसाला: ${selectedSpice.nameMr} (${selectedSpice.extra})\n` +
-        `🚚 प्रकार: ${"शाखा से पिकअप"}\n\n` +
-        `कृपया आज की उपलब्धता और कुल बिल भेजें। धन्यवाद!`
-      : `Hello AN Fish World (${branch.nameEn})!\n\nI want to place an order from today's catch:\n` +
-        `🐟 Fish: ${selectedFish.nameEn} (${selectedFish.rate})\n` +
-        `⚖️ Weight: ${selectedWeight}\n` +
-        `🔪 Free Cut: ${selectedCut.nameEn}\n` +
-        `🌶️ Masala: ${selectedSpice.nameEn}\n` +
-        `🚚 Type: ${"Store Pickup"}\n\n` +
-        `Please confirm stock availability and send total bill. Thank you!`;
-
-    const tail = orderId ? `\n\n#${orderId} | ${custName.trim()} | ${custPhone}` : "";
+    const lang = isMarathi ? "mr" : isHindi ? "hi" : "en";
+    const L = {
+      mr: { head: "नवीन ऑर्डर", branch: "शाखा", detail: "ऑर्डर तपशील", cut: "कटिंग", masala: "मसाला", total: "अंदाजे रक्कम", pickup: "दालनात येऊन घेणे · पैसे दालनात द्यायचे", name: "नाव", mobile: "मोबाईल", ask: "कृपया उपलब्धता कन्फर्म करा. धन्यवाद! 🙏", rate: "भाव" },
+      hi: { head: "नया ऑर्डर", branch: "शाखा", detail: "ऑर्डर विवरण", cut: "कटिंग", masala: "मसाला", total: "अनुमानित राशि", pickup: "शाखा से खुद लेना · भुगतान शाखा में", name: "नाम", mobile: "मोबाइल", ask: "कृपया उपलब्धता कन्फर्म करें। धन्यवाद! 🙏", rate: "भाव" },
+      en: { head: "New Order", branch: "Branch", detail: "Order details", cut: "Cut", masala: "Masala", total: "Estimated total", pickup: "Store pickup · pay at the store", name: "Name", mobile: "Mobile", ask: "Please confirm availability. Thank you! 🙏", rate: "Rate" },
+    }[lang];
+    const fishName = lang === "en" ? selectedFish.nameEn : selectedFish.nameMr;
+    const cutName = lang === "en" ? selectedCut.nameEn : selectedCut.nameMr;
+    const spiceName = lang === "en" ? selectedSpice.nameEn : selectedSpice.nameMr;
+    const kg = parseFloat(selectedWeight) || 0;
+    const rate = parseInt(selectedFish.rate.replace(/[^0-9]/g, ""), 10) || 0;
+    const total = rate && kg ? Math.round(rate * kg) : 0;
+    const inr = (n: number) => "₹" + n.toLocaleString("en-IN");
+    const bar = "━━━━━━━━━━━━━━";
+    const lines = [
+      "🐟 *AN FISH WORLD*",
+      bar,
+      `🧾 *${L.head}${orderId ? `  #${orderId}` : ""}*`,
+      `📍 ${L.branch}: ${lang === "en" ? branch.nameEn : branch.nameMr}`,
+      "",
+      `*${L.detail}*`,
+      `1️⃣ *${fishName}*`,
+      `    ⚖️ ${selectedWeight}${rate ? `  ×  ${inr(rate)}/kg` : ""}`,
+      `    🔪 ${L.cut}: ${cutName}`,
+      ...(selectedSpice.id !== "none" ? [`    🌶️ ${L.masala}: ${spiceName}`] : []),
+      bar,
+      ...(total ? [`💰 *${L.total}: ${inr(total)}*`] : []),
+      `🏪 ${L.pickup}`,
+      ...(orderId && custName.trim() ? [bar, `👤 ${L.name}: ${custName.trim()}`, `📞 ${L.mobile}: ${custPhone.replace(/\D/g, "")}`] : []),
+      "",
+      L.ask,
+    ];
     const cleanPhone = (whatsapp ?? branch.phone).replace(/[^0-9]/g, "");
-    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text + tail)}`;
+    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(lines.join("\n"))}`;
   };
-
 
   const submitOrder = async () => {
     const phone = custPhone.replace(/\D/g, "");

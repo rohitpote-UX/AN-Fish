@@ -10,9 +10,20 @@ export async function adminHref(path: string): Promise<string> {
   return (base + path) || "/";
 }
 
-export async function requireSession(): Promise<Session> {
+/** Any logged-in user, including counter (billing) logins. Only the POS / bills pages use this directly. */
+export async function requireAnySession(): Promise<Session> {
   const s = await getSession();
   if (!s) redirect(await adminHref("/login"));
+  return s;
+}
+
+/**
+ * Back-office session. Counter logins are bounced to the billing screen, so every
+ * existing page and action is automatically closed to them.
+ */
+export async function requireSession(): Promise<Session> {
+  const s = await requireAnySession();
+  if (s.role === "counter") redirect(await adminHref("/pos"));
   return s;
 }
 
@@ -32,7 +43,7 @@ export async function requireAbnexa(): Promise<Session> {
 
 /** A branch admin may only touch their own branch; super admin may touch any. */
 export function canAccessBranch(s: Session, branchId: number) {
-  return s.role !== "branch_admin" || s.branchId === branchId;
+  return s.role === "abnexa" || s.role === "super_admin" || s.branchId === branchId;
 }
 
 /** Today's date in India, as YYYY-MM-DD. */

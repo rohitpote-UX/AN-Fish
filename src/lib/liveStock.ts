@@ -33,14 +33,16 @@ export async function getLiveBranch(slug: string): Promise<LiveBranch | null> {
     );
     if (!b[0]) return null;
     const [r] = await db().query<RowDataPacket[]>(
-      `SELECT f.slug, f.name_mr, f.name_en, s.price_per_kg, s.opening_kg, s.added_kg, s.closing_kg, s.sold_out, s.updated_at
+      `SELECT f.slug, f.name_mr, f.name_en, s.price_per_kg, s.opening_kg, s.added_kg, s.closing_kg, s.sold_out, s.updated_at,
+              (SELECT COALESCE(SUM(w.qty_kg),0) FROM wastage w WHERE w.branch_id=s.branch_id AND w.fish_id=s.fish_id AND w.day=s.day AND w.is_deleted=0) AS wastage,
+              (SELECT COALESCE(SUM(bi.qty_kg),0) FROM bill_items bi JOIN bills bl ON bl.id=bi.bill_id WHERE bl.branch_id=s.branch_id AND bi.fish_id=s.fish_id AND bl.bill_day=s.day AND bl.is_void=0) AS billed
        FROM stock_days s JOIN fish_items f ON f.id=s.fish_id
        WHERE s.branch_id=? AND s.day=? AND s.price_per_kg>0 AND f.is_active=1
        ORDER BY f.sort_order, f.id`,
       [b[0].id, todayIST()],
     );
     const fish: LiveFish[] = r.map((x) => {
-      const left = x.closing_kg === null ? Number(x.opening_kg) + Number(x.added_kg) : Number(x.closing_kg);
+      const left = x.closing_kg === null ? Number(x.opening_kg) + Number(x.added_kg) - Number(x.wastage) - Number(x.billed) : Number(x.closing_kg);
       return {
         slug: x.slug,
         nameMr: x.name_mr,

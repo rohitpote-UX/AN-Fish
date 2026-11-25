@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { adminHref, requireSuper, todayIST } from "@/lib/adminAuth";
 import { monthIST, monthsSince } from "@/lib/billing";
 import { BillingPanel, type Payment } from "./BillingPanel";
+import { CounterPanel } from "./CounterPanel";
 import { loadStock } from "@/lib/stock";
 import { StockEditor } from "../../StockEditor";
 import { BranchControls } from "./ResetPassword";
@@ -20,6 +21,7 @@ export default async function BranchDetail({ params }: { params: Promise<{ id: s
   );
   const b = rows[0];
   if (!b) notFound();
+  const [cr] = await db().query<RowDataPacket[]>("SELECT id, login_id, is_active FROM users WHERE branch_id=? AND role='counter' ORDER BY id", [id]);
   const { day, rows: stock } = await loadStock(id);
 
   let billing: React.ReactNode = null;
@@ -55,6 +57,7 @@ export default async function BranchDetail({ params }: { params: Promise<{ id: s
         <div className="mt-4 border-t border-[#071C2C]/8 pt-4"><BranchControls branchId={id} active={!!b.is_active} canToggle={session.role === "abnexa"} /></div>
       </div>
       {billing}
+      <CounterPanel branchId={id} counters={cr.map((c) => ({ id: c.id, login: c.login_id, active: !!c.is_active }))} />
       <StockEditor branchId={id} rows={stock} day={day} />
     </div>
   );

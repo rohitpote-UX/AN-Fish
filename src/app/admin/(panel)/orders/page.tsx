@@ -4,20 +4,12 @@ import type { RowDataPacket } from "mysql2";
 import { db } from "@/lib/db";
 import { adminHref, requireSession, todayIST } from "@/lib/adminAuth";
 import { AutoRefresh } from "../AutoRefresh";
-import { setOrderStatusAction, type OrderStatus } from "./actions";
+import type { OrderStatus } from "./actions";
+import { ORDER_LABEL, ORDER_NEXT, orderWaLink } from "@/lib/orderStatus";
+import { StatusButton } from "./StatusButton";
 
-const LABEL: Record<OrderStatus, { t: string; cls: string }> = {
-  new: { t: "नवीन", cls: "bg-amber-100 text-amber-800" },
-  confirmed: { t: "कन्फर्म", cls: "bg-sky-100 text-sky-800" },
-  ready: { t: "तयार", cls: "bg-teal-100 text-teal-800" },
-  completed: { t: "पूर्ण", cls: "bg-emerald-100 text-emerald-800" },
-  cancelled: { t: "रद्द", cls: "bg-red-100 text-red-700" },
-};
-const NEXT: Partial<Record<OrderStatus, { to: OrderStatus; t: string }>> = {
-  new: { to: "confirmed", t: "कन्फर्म करा" },
-  confirmed: { to: "ready", t: "तयार झाले" },
-  ready: { to: "completed", t: "दिले / पूर्ण" },
-};
+const LABEL = ORDER_LABEL;
+const NEXT = ORDER_NEXT;
 
 export default async function OrdersPage({ searchParams }: { searchParams: Promise<{ day?: string; status?: string; branch?: string }> }) {
   const s = await requireSession();
@@ -112,12 +104,13 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
         {orders.map((o) => {
           const st = o.status as OrderStatus;
           const next = NEXT[st];
-          const wa = `https://wa.me/91${o.customer_phone}?text=${encodeURIComponent(`नमस्कार ${o.customer_name}, तुमची ऑर्डर #${o.id} ${LABEL[st].t === "तयार" ? "तयार आहे. कृपया दालनात येऊन घेऊन जा." : "मिळाली आहे. धन्यवाद!"}`)}`;
+          const waFor = (status: OrderStatus) => orderWaLink({ id: o.id, phone: o.customer_phone, name: o.customer_name, branch: String(o.branch_name), items: String(o.items ?? "").split("\n"), total: Number(o.total) }, status);
+          const wa = waFor(st);
           return (
             <li key={o.id} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-[#071C2C]/10">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-lg font-extrabold">#{o.id} · {o.customer_name}</p>
+                  <Link href={`${base}/${o.id}`} className="!min-h-0 text-lg font-extrabold hover:text-[#0D9488] hover:underline">#{o.id} · {o.customer_name}</Link>
                   <p className="mt-0.5 flex items-center gap-1.5 text-xs text-[#071C2C]/55">
                     <Clock className="size-3.5" />
                     {new Date(o.created_at).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: false })}
@@ -133,14 +126,23 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
                 <a href={`tel:+91${o.customer_phone}`} className="flex h-10 items-center gap-1.5 rounded-lg border border-[#071C2C]/15 px-3 text-sm font-bold"><Phone className="size-4" />{o.customer_phone}</a>
                 <a href={wa} target="_blank" rel="noopener noreferrer" className="flex h-10 items-center gap-1.5 rounded-lg bg-[#25D366] px-3 text-sm font-bold text-[#052E16]"><MessageCircle className="size-4" />WhatsApp</a>
                 {next && (
-                  <form action={setOrderStatusAction.bind(null, o.id, next.to)}>
-                    <button className="h-10 rounded-lg bg-[#0D9488] px-4 text-sm font-bold text-white hover:bg-[#071C2C]">{next.t}</button>
-                  </form>
+                  <StatusButton
+                    orderId={o.id}
+                    to={next.to}
+                    label={next.to === "confirmed" ? "✅ कन्फर्म करा + मेसेज" : next.to === "ready" ? "🏪 तयार + मेसेज" : next.t}
+                    waHref={next.to === "completed" ? undefined : waFor(next.to)}
+                    className="h-10 rounded-lg bg-[#0D9488] px-4 text-sm font-bold text-white hover:bg-[#071C2C]"
+                  />
                 )}
                 {st !== "cancelled" && st !== "completed" && (
-                  <form action={setOrderStatusAction.bind(null, o.id, "cancelled")}>
-                    <button className="h-10 rounded-lg border border-red-200 px-3 text-sm font-bold text-red-600 hover:bg-red-50">रद्द</button>
-                  </form>
+                  <StatusButton
+                    orderId={o.id}
+                    to="cancelled"
+                    label="रद्द"
+                    waHref={waFor("cancelled")}
+                    confirmText={`ऑर्डर #${o.id} रद्द करायची? ग्राहकाला रद्द झाल्याचा मेसेज पाठवता येईल.`}
+                    className="h-10 rounded-lg border border-red-200 px-3 text-sm font-bold text-red-600 hover:bg-red-50"
+                  />
                 )}
               </div>
             </li>

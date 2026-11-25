@@ -14,8 +14,13 @@ export function db(): mysql.Pool {
       password: process.env.DB_PASSWORD || "",
       database: process.env.DB_NAME || "anfish",
       waitForConnections: true,
-      connectionLimit: 10,
+      // Serverless hosts (Vercel) open many short-lived instances: keep each pool tiny.
+      connectionLimit: Number(process.env.DB_POOL || (process.env.VERCEL ? 2 : 10)),
+      maxIdle: process.env.VERCEL ? 1 : 10,
+      idleTimeout: 30_000,
       charset: "utf8mb4",
+      // Managed MySQL (TiDB, Aiven, PlanetScale…) requires TLS: set DB_SSL=1.
+      ssl: process.env.DB_SSL === "1" ? { minVersion: "TLSv1.2", rejectUnauthorized: true } : undefined,
     });
   }
   return globalThis.__anfishPool;
