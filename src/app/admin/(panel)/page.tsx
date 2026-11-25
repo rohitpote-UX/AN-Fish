@@ -94,11 +94,14 @@ export default async function AdminHome() {
     `SELECT b.id, b.name, b.address, b.is_active,
         COUNT(CASE WHEN sd.sold_out=0 AND (sd.opening_kg+sd.added_kg)>0 THEN 1 END) AS available_fish,
         COALESCE(SUM(sd.opening_kg+sd.added_kg),0) AS total_kg,
-        MAX(sd.updated_at) AS updated
+        MAX(sd.updated_at) AS updated,
+        (SELECT COUNT(*) FROM orders o WHERE o.branch_id=b.id AND DATE(CONVERT_TZ(o.created_at, @@session.time_zone, '+05:30'))=?) AS orders_today,
+        (SELECT COUNT(*) FROM orders o WHERE o.branch_id=b.id AND o.status='new') AS orders_new
      FROM branches b LEFT JOIN stock_days sd ON sd.branch_id=b.id AND sd.day=?
      GROUP BY b.id ORDER BY b.id`,
-    [todayIST()],
+    [todayIST(), todayIST()],
   );
+  const ordersBase = await adminHref("/orders");
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -122,6 +125,14 @@ export default async function AdminHome() {
                 </span>
                 <ChevronRight className="size-5 text-[#071C2C]/35" />
               </Link>
+            
+              <div className="mt-2 flex items-center justify-between rounded-xl bg-white px-4 py-2.5 text-sm ring-1 ring-[#071C2C]/10">
+                <span className="font-semibold text-[#071C2C]/70">
+                  आजचे ऑर्डर्स: <b className="text-[#071C2C]">{b.orders_today}</b>
+                  {Number(b.orders_new) > 0 && <span className="ml-2 rounded-full bg-amber-400 px-2 py-0.5 text-xs font-extrabold text-[#071C2C]">{b.orders_new} नवीन</span>}
+                </span>
+                <Link href={`${ordersBase}?branch=${b.id}`} className="!min-h-0 font-bold text-[#0D9488] hover:underline">ऑर्डर्स पहा →</Link>
+              </div>
             </li>
           )),
         )}

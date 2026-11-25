@@ -19,7 +19,7 @@ const NEXT: Partial<Record<OrderStatus, { to: OrderStatus; t: string }>> = {
   ready: { to: "completed", t: "दिले / पूर्ण" },
 };
 
-export default async function OrdersPage({ searchParams }: { searchParams: Promise<{ day?: string; status?: string }> }) {
+export default async function OrdersPage({ searchParams }: { searchParams: Promise<{ day?: string; status?: string; branch?: string }> }) {
   const s = await requireSession();
   const sp = await searchParams;
   const day = /^\d{4}-\d{2}-\d{2}$/.test(sp.day ?? "") ? sp.day! : todayIST();
@@ -27,9 +27,14 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
 
   const where = ["DATE(CONVERT_TZ(o.created_at, @@session.time_zone, '+05:30')) = ?"];
   const args: (string | number)[] = [day];
-  if (s.role === "branch_admin") {
+  const isHead = s.role !== "branch_admin";
+  const branchFilter = isHead && /^\d+$/.test(sp.branch ?? "") ? Number(sp.branch) : null;
+  if (!isHead) {
     where.push("o.branch_id = ?");
     args.push(s.branchId ?? 0);
+  } else if (branchFilter) {
+    where.push("o.branch_id = ?");
+    args.push(branchFilter);
   }
   if (status) {
     where.push("o.status = ?");
@@ -42,7 +47,24 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
      WHERE ${where.join(" AND ")} GROUP BY o.id ORDER BY o.id DESC`,
     args,
   );
+  // Head office / Abnexa: per-branch order counts for the chosen day (ignores the branch & status filters).
+  let branchCounts: RowDataPacket[] = [];
+  if (isHead) {
+    [branchCounts] = await db().query<RowDataPacket[]>(
+      `SELECT b.id, b.name, COUNT(o.id) AS total, COALESCE(SUM(o.status='new'),0) AS new_count
+       FROM branches b LEFT JOIN orders o ON o.branch_id=b.id AND DATE(CONVERT_TZ(o.created_at, @@session.time_zone, '+05:30')) = ?
+       GROUP BY b.id ORDER BY b.id`,
+      [day],
+    );
+  }
   const base = await adminHref("/orders");
+  const q = (extra: Record<string, string | number | null>) => {
+    const p = new URLSearchParams({ day });
+    if (status) p.set("status", status);
+    if (branchFilter) p.set("branch", String(branchFilter));
+    for (const [k, v] of Object.entries(extra)) { if (v === null) p.delete(k); else p.set(k, String(v)); }
+    return `${base}?${p}`;
+  };
   const chip = (active: boolean) =>
     `rounded-full px-4 py-2 text-sm font-bold ${active ? "bg-[#071C2C] text-white" : "bg-white text-[#071C2C]/70 ring-1 ring-[#071C2C]/10 hover:ring-[#0D9488]"}`;
 
@@ -57,16 +79,32 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
         <form className="flex items-center gap-2" action={base}>
           <input type="date" name="day" defaultValue={day} max={todayIST()} className="h-11 rounded-xl border border-[#071C2C]/15 bg-white px-3 font-semibold" />
           {status && <input type="hidden" name="status" value={status} />}
+          {branchFilter && <input type="hidden" name="branch" value={branchFilter} />}
           <button className="h-11 rounded-xl bg-[#071C2C] px-4 text-sm font-bold text-white">पहा</button>
         </form>
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Link href={`${base}?day=${day}`} className={chip(!status)}>सर्व</Link>
+        <Link href={q({ status: null })} className={chip(!status)}>सर्व</Link>
         {(Object.keys(LABEL) as OrderStatus[]).map((k) => (
-          <Link key={k} href={`${base}?day=${day}&status=${k}`} className={chip(status === k)}>{LABEL[k].t}</Link>
+          <Link key={k} href={q({ status: k })} className={chip(status === k)}>{LABEL[k].t}</Link>
         ))}
       </div>
+
+      {isHead && (
+        <div>
+          <p className="mb-2 text-xs font-bold text-[#071C2C]/55">शाखा निवडा</p>
+          <div className="flex flex-wrap gap-2">
+            <Link href={q({ branch: null })} className={chip(!branchFilter)}>सर्व शाखा</Link>
+            {branchCounts.map((b) => (
+              <Link key={b.id} href={q({ branch: b.id })} className={chip(branchFilter === b.id)}>
+                {String(b.name).replace(/^ए एन फिश वर्ल्ड\s*—\s*/, "")} · {b.total}
+                {Number(b.new_count) > 0 && <span className="ml-1.5 rounded-full bg-amber-400 px-1.5 py-0.5 text-[11px] font-extrabold text-[#071C2C]">{b.new_count} नवीन</span>}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {orders.length === 0 && <p className="rounded-2xl bg-white p-10 text-center text-[#071C2C]/60">या दिवशी ऑर्डर नाही.</p>}
 
